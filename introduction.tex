@@ -1,0 +1,58 @@
+\chapter{Introduction au système}
+	Le système de Paillier est basé sur les concepts de résiduosité modulo $n^2$ quand $n$ a exactement 
+	deux facteurs premiers $p$ et $q$,
+	il utilise les particularités de l'anneau $\Mgrinv{Z}{n^2}$ pour combiner un message 
+	dans l'anneau \Mgr{Z}{n} et une valeur aléatoire dans \Mgrinv{Z}{n} de tel sorte que deux messages égales 
+	sont chiffrés différemment, Paillier a aussi démontré que le problème de dé\-chif\-frer les donnés peut être 
+	réduit en temps polynomial au problème \emph{RSA} \footnote{Trouver la clé privé de l'algorithme \emph{RSA} a partir 
+	de la clé publique. c.f.: factoriser la multiplication $n = pq$.} qui est supposé difficile\footnote{Le terme {\it difficile} dans ce contexte désigne 
+	une algorithme non calculable en temps polynomial.} par la communauté scientifique. 
+	Premièrement on va introduire les fonctions de chiffrement et déchiffrement, nécessaires pour les conclusions sur les 
+	groupes cycliques liés, après on les reprendra en prouvant chaque propriété et en montrant les mathématiques sous-jacentes. 
+
+
+
+	\section{La fonction de chiffrement}
+		Il s'agit d'un chiffrement randomisé, alors la fonction de chiffrement d'un mot $m$ reçoit une valeur aléatoire $r$:% et est un 
+%		isomorphisme\footnote{le isomorphisme sera discuté dans le 
+%		chapitre \ref{chap:detaille}, page \pageref{chap:detaille}} entre la couple 
+%		$(m,r)$ et le chiffré $c$. 
+		\begin{definition} On utilisera la notation $\mathcal{E}_g$ pour designer la fonction de chiffrement:
+			\begin{equation}
+					\mathcal{E}_g : \begin{array}[t]{ccl} \Mgr{Z}{n} \times \Mgrinv{Z}{n} &\rightarrow & \Mgrinv{Z}{n^2}  \\
+						(m,r)&\mapsto& g^mr^n\mod{n^2}	 \end{array}
+			\end{equation}
+		\end{definition}
+
+		Le système repose sur le fait que la clé publique est formée par le couple $(n,g)$ et que le déchiffrement du message
+		sans la connaissance de la factorisation de $n$ est difficile.
+	\section{La fonction de déchiffrement}
+		\label{section:dech}
+		Le déchiffrement se déroule en utilisant la fonction $L_{n}$ 
+		juste après avoir élevé le mot chiffré à la valeur de la fonction de Carmichael 
+		en $n$, $\lambda(n)$: % \footnote{on la définira dans le chapitre \ref{chap:detaille}}:
+		\begin{equation}
+			L_{m} : \begin{array}[t]{ccl} \{x \in \Mgrinv{Z}{m^2}, x \equiv 1\mod{m}\} &\rightarrow &   \Mgr{Z}{m}  \\
+				x&\mapsto& \frac{x-1}{m}
+			 \end{array}
+		\end{equation}
+
+		\begin{definition} On utilisera la notation $D_n$ pour designer la fonction de dé\-chif\-fre\-ment:
+			\begin{equation}
+				D_n : \begin{array}[t]{ccl} \Mgrinv{Z}{n^2} &\rightarrow &   \Mgr{Z}{n}  \\
+					c&\mapsto& \frac{L_n(c^{\lambda(n)}\mod{n^2})}{L_n(g^{\lambda(n)}\mod{n^2})}\mod{n}
+				\end{array}
+			\end{equation}
+		\end{definition}
+
+
+%		\begin{remark}
+%			Dans le rapport, la notation $L_m$ dénote $L_{n,m}$ et $L$ dénote $L_{n,n}$, où $n$ est le produit des premiers $p$ et $q$ déjà décrits.
+%		\end{remark}
+
+		Maintenant qu'on a déjà introduit les fonctions de chiffrement et dé\-chiffre\-ment, on va étudier avec plus de précision chaque aspect 
+		ma\-thé\-ma\-ti\-que du système et autres simplifications et extensions proposées par des différents chercheurs.
+
+		Dans la section \ref{sec:mecanisme}, on reprendra la fonction de déchiffrement en montrant pourquoi elle permet de retrouver 
+		le message clair. %le raisonnement derrière.
+

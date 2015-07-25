@@ -1,0 +1,20 @@
+\chapter{Reconnaissance de l'objet}
+
+L'étape de reconnaissance consiste à retrouver l'objet à partir d'une base de données  d'objet déjà existant. En gros,  l'objectif peut être interpreté comme un *matching* de features, où les features de l'image de test doive être identifié comme un certain objet. Ce problème est défini comme un problème de \textbf{classification}.
+
+- Classification : \\
+1. Simultané \\
+2. Un contre tous \\
+Ce concepte consiste à trouver un classificateur binaire capable, *portanto*, de retrouver se une amostre de teste appartient où non à la classe désiré. Un classificateur est ensuite entraîne pour chaque classe. Une comparaison séquentielle est fait entre le cas de test et le modèle retrouvé pour chaque classificateur. Finalment, un méthode de décision, comme un système de votes, est mis 
+
+-Outils pour la classification : \\
+
+1. Réseaux de neurones : connues pour sa bonne performance dans les problèmes de classification
+Advantages : 
+Inconvenients: Entrainement lent et la convergence n'est pas nécessairement garanti pour un nombre de *trainning cases* donné.
+
+2. Support vector Machine
+
+3. Random Forrest \\
+
+On a choisi un \textit{multi-layer perceptron} comme classificateur. L'entré du réseaux réçois les histogrammes de features concatenés un après les autres. Le résultat c'est un histogramme d'entré de taille *700* - 615 pfh, 100 - sift, 26 -rgb. Le classificateur est entrainé de façon supervisé ver l'agorithme \textit{backpropagation}. La sortie correspond à une couche \textit{softmax} dont sa taille correspond au nombre d'objets entrainés.

@@ -1,0 +1,433 @@
+\chapter{Extensions de Damgård–Jurik}
+%	\TODO{revisar o franc\^es}
+	\label{chap:jurik}
+
+	Ivan B. Damgård et Mads J. Jurik ont proposé en 2001 une extension\cite{Damgard:2001:GSA:648118.746742} au système de 
+	Paillier. Cette extension met l'accent sur les systèmes de vote électroniques
+	en reposant sur la Propriété multiplicative du système (Propriété \ref{prop:mult}). Une particularité de cette 
+	extension est l'utilisation des anneaux $\Mgrinv{Z}{n^{s+1}}$ 
+	où $s\geq 1$, dans le système de Paillier $s=1$. Sous réserve de la limitation $s<p,q$ ,
+	ils ont prouvé que l'ordre de l'élé\-ment $n+1$ est $n^s$, cette propriété ouvre la possibilité d'introduire des informations
+	dans $\Mgr{Z}{n^{s}}$ en gardant l'isomorphisme de la fonction $\mathcal{E}$ et la propriété multiplicative 
+	déjà présents dans le système de Paillier. Ainsi 
+	augmentant le taux d'information dans un message chiffré. Dans le système de Paillier la valeur aléatoire occupe l'image de la fonction
+	de chiffrement sans ajouter d'information, alors la taille des mots chiffrés est deux fois plus grande que l'information 
+	transférée. Le système proposé ici accède à un taux d'information de $1 -1/s$, clairement, proche de $1$ pour $s$ grand.
+	%si $s \to \infty $, le taux vaut $1$.
+
+	L'utilisation de la base $g=1+n$ permet aussi le calcul du logarithme modulaire avec complexité $O(s^2)$, 
+	l'algorithme utilisé par Damgård et Jurik est décrit plus loin.
+
+	\section{Chiffrement dans \Mgrinv{Z}{n^{s+1}}}
+
+	On introduit la fonction de Chiffrement pour le système étendu:
+
+	\begin{definition} La fonction de chiffrement étendue.
+		\begin{equation}
+			\mathcal{E'}_{s} : \begin{array}[t]{ccl} \Mgr{Z}{n^s} \times \Mgrinv{Z}{n} &\rightarrow & \Mgrinv{Z}{n^{s+1}}  \\
+			(m,r)&\mapsto& (1+n)^mr^{n^s}\mod{n^{s+1}}	 \end{array}
+		\end{equation}
+	\end{definition}
+
+	Étant donnée la fonction de chiffrement il est clair que le déchiffrement se repose sur le pro\-blè\-me de trouver le 
+	logarithme modulaire de base $n+1$ dans \Mgrinv{Z}{n^{s+1}}, par contre, comme dit avant, il existe un algorithme polynomial
+	pour résoudre ce problème lorsque l'on connaît $\lambda(n\lambda(n))$ :
+
+	De manière itérative sur $j$ il récupère le message modulo $n^j$: Soit $m_j$ le message modulo $n^j$ et $t$ un entier strictement positif,
+	l'égalité $\binom{m_{j}}{t+1}n^t = \binom{m_{j-1}}{t+1}n^t + n^j\cdot k$ est vraie pour un entier $k$ et permet d'engendrer un 
+	algorithme linéaire pour calculer $m_j$ connaissant  $m_{j-1}$. L'égalité est facilement prouvée en utilisant le fait que 
+	$\binom{m_j}{t+1}$ et  $\binom{m_{j-1}}{t+1}$ sont congrus modulo $n^{j}$ sauf pour un facteur de $n^{j-1}$, alors, en multipliant les deux 
+	côtés par $n^t$, $t\geq1$:
+		\begin{equation}
+			\label{eq:mj} \binom{m_j}{t+1}n^t \equiv \binom{m_{j-1}}{t+1}n^t+n^{j-1}\cdot k\cdot n^t \equiv \binom{m_{j-1}}{t+1}n^t \mod{n^j} 
+		\end{equation}
+	On note $\mathcal{L}$ la fonction:$$\mathcal{L}(m_{j-1},j) = \sum_{k = 2}^{j}\binom{m_{j-1}}{k}n^{k-1} \mod n^j$$ 
+	et on reprend la fonction $L_m$ introduite dans la section   \ref{section:dech} en prouvant que la différence 
+	$L_{n}((1+n)^m\mod{n^{j+1}}) - \mathcal{L}(m_{j-1},j)$ vaut $m_j$
+
+	\begin{lemma} $L_{n}((1+n)^m\mod{n^{j+1}}) - \mathcal{L}(m_{j-1},j) \equiv m_j \mod{n^j}$:
+		\label{lemma:jurik}
+		\begin{proof}
+			\begin{eqnarray*}
+				 \text{Soit }L &=& L_{n}((1+n)^m\mod{n^{j+1}}) \\
+				     &=& \frac{1+\binom{m_{j+1}}{1}n +  \dots +\binom{m_{j+1}}{j}n^{j} -1  \mod{n^{j+1}}  }{n} \\
+							 &\equiv& \binom{m_{j}}{1}n^0 + \dots +\binom{m_{j}}{j}n^{j-1} \mod{n^{j}}\\
+							 &\equiv& \sum_{k=1}^{j}\binom{m_{j}}{k}n^{k-1} \mod{n^{j}}
+			\end{eqnarray*}
+			Si on soustrait $\mathcal{L}(m_{j-1},j)$:
+			$$L-\mathcal{L}(m_{j-1},j)  = \sum_{k=1}^{j}\binom{m_{j}}{k}n^{k-1} - \sum_{k = 2}^{j}\binom{m_{j-1}}{k}n^{k-1} \mod n^j $$
+			Depuis l'équation \ref{eq:mj}, on peut combiner les sommations et annuler les valeurs quand $k>1$:
+			$$L-\mathcal{L}(m_{j-1},j) \equiv m_j + \sum_{k=2}^{j}\left(\binom{m_{j}}{k}n^{k-1}-\binom{m_{j-1}}{k}n^{k-1} \right) \equiv m_j \mod{n^j} $$
+		\end{proof}
+	\end{lemma}
+
+
+	Pour appliquer le lemme on définit la fonction $Rec_{n,j}$:
+
+	\begin{equation}\label{equation:rec}
+			{Rec}_{n,j} : \begin{array}[t]{ccl} \Mgr{Z}{n^{j+1}} &\rightarrow &   \Mgr{Z}{n^{j}}  \\
+                               	c&\mapsto&\begin{cases} L_n(c\mod{n^{j+1}}) - \mathcal{L}({Rec}_{n,j-1}(c),j)&\text{si }j>1 \\%
+				L_n(c\mod{n^{2}}) &\text{si }j=1\end{cases} 
+			\end{array}
+	\end{equation}
+
+	Maintenant, on sait résoudre le problème de trouver l'exposant quand la base est $n+1$, par contre la valeur aléatoire qui multiplie la 
+	puissance existe encore dans ce schéma  et on doit en tenir compte. 
+	
+
+
+	
+	
+%	On a introduit une fonction auxiliaire $Rec$ (\ref{equation:rec}) qui applique l'idée du Lemme \ref{lemma:jurik} et alors est capable de calculer l'exposant 
+%	de $(1+n)^m$. Cependant la valeur résultat de la fonction de chiffrement contient $r^{n^s}$. Il faut le retirer: On efface $r^{n^s}$ de 
+%	la même façon qu'on a fait pour Paillier. Comme $\lambda(n^{s+1}) = n^s\lambda(n)$, il faut juste élever le 
+%	message chiffré à une valeur multiple de $\lambda(n)$, 
+	Damgård et Jurik ont trouvé une façon créative de utiliser le Lemme \ref{lemma:jurik} même quand on a élevé le message chiffré à un multiple de 
+	$\lambda(n)$. Comme la méthode vue permet de trouver $m \bmod n^s$, il faut juste que $d\equiv 1 \bmod n^s$ et $d\equiv 0 \bmod{\lambda(n)}$ et on peut s'en servir:
+	\begin{equation} 
+		\label{eq:lambdad} 
+		c^d = \left((1+n)^mr^{n^s}\right)^{d} \equiv  (1+n)^{(md \bmod{n^s})}r^{(n^sd \bmod{\lambda(n)})} \equiv  (1+n)^{m}\bmod{n^{s+1}}\text{,}
+	\end{equation}
+	alors l'expression de déchiffrement devient:
+
+	\begin{definition} La fonction de Déchiffrement étendue.
+		\begin{equation}\label{eq:defd}
+		d\text{ vérifiant: }
+			\begin{cases}%
+				d \equiv 1 \mod{n^s} \\%
+				d \equiv 0 \mod{\lambda(n)}%
+			\end{cases}
+		\end{equation}
+
+
+		\begin{equation}
+			{D'}_{n,s} : \begin{array}[t]{ccl} \Mgrinv{Z}{n^{s+1}} &\rightarrow &   \Mgr{Z}{n^s}  \\
+			c&\mapsto& Rec_{n,s}(c^{d})
+			\end{array}
+		\end{equation}
+
+	\end{definition}
+
+
+	
+	Quelques pré calculs et l'implantation itérative de la récursivité de $Rec$ permettent d'éviter des opérations supplémentaires. 
+	L'algorithme \ref{algo:logm} dans la page \pageref{algo:logm} montre comment les implanter.
+
+
+	\section{Une variation à seuil}
+
+	Dans un système à seuil il existe $N_s > k$ entités, chacune avec une partie de 
+	la ``solution'' d'un problème global, le seuil $k$ définit le plus petit nombre de entités nécessaires 
+	pour effectuer la tâche, avec un nombre strictement moins grand que $k$ les entités n'ont pas d'information suffisante 
+	pour la solution et la tâche devient difficile. 
+
+	Damgård et Jurik ont utilisé le travail de Fouque, Poupard et Stern dans \cite{Fouque00sharingdecryption} pour compléter l'extension 
+	en engendrant un système avec un serveur fiable et des serveurs tiers. Les protocoles introduits dans \cite{Fouque00sharingdecryption} sont
+	capables, avec les fonctions de Paillier, de déchiffrer de manière sûre un message 
+	avec un seuil dans le nombre de serveurs utilisés, c'est-à-dire il existe un nombre $k$ de serveurs nécessaires
+	pour déchiffrer la valeur, et le résultat contient une preuve de la validité du calcul effectué par chaque serveur, 
+	$k-1$ serveurs ne peuvent pas déchiffrer.
+
+	Le travail de Fouque, Poupard et Stern est basé sur le système à seuil de Victor Shoup \cite{Shoup99practicalthreshold}. Dans 
+	l'original le système de chiffrement était RSA. L'avan\-cée de Fouque, Poupard et Stern a été l'adaptation au système de Paillier et 
+	finalement Damgård et Jurik ont adapté l'idée au système étendu de Paillier.
+
+	Afin d'atteindre l'impossibilité de déchiffrement des données avec moins de $k$ serveurs, une phase initiale de création de clés 
+	partielles est nécessaire. Avec moins de $k$ clés il doit être impossible de trouver $\lambda(n)$ ou $d$. Ici $l\geq k$ serveurs 
+	collaborent pour déchiffrer $c$. Chacun se voit attribuer une clé partielle. En collaborant les $l$ serveurs reconstruisent $d$ et peuvent 
+	déchiffrer le message.
+	
+	Shoup a défini des restrictions pour les serveurs:
+
+	\begin{itemize}  \label{item:restr}
+		\item Pour la sécurité de la clé secrète: Le nombre de serveurs corruptibles doit être $<k$.
+		\item Pour le calcul du mot déchiffré: Le nombre de serveurs corruptibles ne peut dépasser $N_s-k$.
+	\end{itemize}
+
+	Le protocole repose sur le fait qu'un polynôme de degré $m$ ne peut être défini par un nombre de points plus petit que $m+1$. 
+	Si l'on considère les polynômes de degré $2$ dans $\mathbb{R}$, il y a une infinité polynômes qui passent par $(1,7)$ et $(2,16)$, alors
+	la valeur de ces polynômes dans n'importe quel point sauf $1$ et $2$ peut pendre n'importe quel valeur dans $\mathbb{R}$. Par contre
+	si on introduit un autre point $(3,29)$, le polynôme $2x^2+3x+2$ est complètement déterminé (voir l'image \ref{graph:polyboth}).
+
+	\begin{figure}[htl]
+		\centering%
+		\subfloat[Deux Points]{\label{graph:polyall}\input{gnuplot/sortie.tex}}%
+		\subfloat[Trois Points]{\label{graph:polyfixed}\input{gnuplot/correct.tex}}% 
+		\caption{Diverses résultats avec deux et trois points dans $\mathbb{R}$.}
+		\label{graph:polyboth}
+	\end{figure}
+
+	De façon équivalente cette idée fonctionne pour les anneaux $\Mgr{Z}{n^{s+1}}$ et on peut créer des clés distribuées.
+	L'autorité génère un polynôme $f$ de degré $k-1$ tel que $f(0) = 2N_s!d$, distribue à chacun des serveurs $f(i)$. 
+	Alors, si $k$ serveurs collaborent, ils retrouvent $f$ donc $f(0)$. La clé est $\frac{f(0)}{2N_s!}$. 
+	%Ici on parle de exposants, alors $f$ est calculé dans \Mgrinv{}
+
+	\begin{algo}{Création des Clés}
+		\begin{itemize}\renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$\cdot$}
+			\item{\bf Entrée:} 
+				\begin{itemize}
+					\item $N_s$: le nombre de serveurs.
+					\item $k$: le nombre de serveurs nécessaires pour le déchiffrement.
+					\item $d$: la clé privé.
+				\end{itemize}
+			\item{\bf Calcul:}
+				\begin{enumerate} %			
+				\renewcommand{\theenumi}{\arabic{enumi}}
+				\renewcommand{\theenumii}{\arabic{enumii}}
+				\renewcommand{\theenumiii}{\arabic{enumiii}}
+				\renewcommand{\labelenumi}{\theenumi.}
+				\renewcommand{\labelenumii}{\theenumi.\theenumii.}
+				\renewcommand{\labelenumiii}{\theenumi.\theenumii.\theenumiii.}
+				\makeatletter
+				\renewcommand{\p@enumii}{\theenumi.}
+				\renewcommand{\p@enumiii}{\theenumi.\theenumii.}
+				\makeatother
+				\item Choisir $p$ et $q$ premiers tels que $p = 2p'+1$ et $q = 2q'+1$ avec $p'$ et $q'$ premiers.
+				\item Poser $n = pq$ et $m = p'q'$
+				\item Choisir $k-1$ valeurs: $r_i\in_R \Mgr{Z}{n^sm}$, $1 \leq i \leq k-1$
+				\item Pour $j$ dans $[1,N_s]$:
+					\begin{enumerate}
+						\item Envoyer la clé $f(j) = 2N_s!(d+\sum_{i = 1}^{k-1}r_ij^i)\mod{n^sm}$ au serveur $j$.
+					\end{enumerate}
+				\end{enumerate}
+		\end{itemize}
+	\end{algo}
+
+	Grâce à l'interpolation de Lagrange on peut trouver facilement les coefficients du polynôme et finalement sa valeur 
+	en $0$: $2dN_s!$.
+
+%	\begin{theorem} Interpolation Lagrangienne: Soient les paires $(x_i,y_i)$ avec $x_i$ distincts, le polynôme $$L(X) = \sum_{j=0}^{n}y_j\left(\prod_{i=0,i\neq j}^{n} \frac{X-x_i}{x_j-x_i}\right)$$ quand calculé dans $x_i$  résulte le valeur $y_i$, pour $0\leq i\leq n$.
+%
+%	\begin{proof}
+%	On pose $l_j$ le polynôme:
+%		$$l_j = \prod_{i=0,i\neq j}^{n} \frac{X-x_i}{x_j-x_i}$$
+%		clairement quand on calcule $l_j$ dans $x_k, k\neq i$, il vaut $0$. Quand $k=j$, toutes les termes du produit veulent $1$ et 
+%		par conséquence $l_j = 1$. En effet:
+%
+%		$$L(x_k) = \sum_{j=0}^{n}y_jl_j = y_kl_k+\sum_{j=0,j\neq k}^{n}y_jl_j = y_k\cdot 1+\sum_{j=0,j\neq k}^ny_j\cdot0 = y_k$$
+%		et le polynôme interpole les points fournis.
+%	\end{proof}
+%	\end{theorem}
+
+
+	\begin{theorem} Interpolation Lagrangienne dans l'anneau $\Mgr{Z}{n^{s+1}}$: Soient les entiers   $x_i \in \Mgr{Z}{N_s}$ distincts et un polynôme $f$ de degré $k\leq N_s<\frac{n-1}{2}$ à coefficients entiers, l'expression:
+	$$ c^{L_Z(X)} \equiv c^{N_s!\cdot f(X)}\mod{n^{s+1}}, X\in\Mgr{Z}{_\frac{(n-1)}{2}} $$
+	est valide quand: $$L_Z(X) = \sum_{j=0}^{k}f(x_j)N_s!\left(\prod_{i=0,i\neq j}^{k} \frac{X-x_i}{x_j-x_i}\right).$$ 
+%	quand calculé dans $x_i$  résulte le valeur $N_s!y_i$, pour $0\leq i\leq n$.
+	\begin{proof}
+	On pose $\lambda_{x,j}$ l'expression pour $x$ entier $\leq N_s$:
+		$$\lambda_{x,j} = N_s!\prod_{i=0,i\neq j}^{k} \frac{x-x_i}{x_j-x_i}$$
+		elle est entière pour $x$ entière: $\binom{N_s}{z} = \frac{N_s!}{z!(N_s-z)!},z\in\mathbb{Z}$ est entière et alors $\frac{N_s!}{\prod|x_j-x_i|}$ est clairement
+		entière.
+		
+		Il est évident que $\lambda_{x_t,j} = 0$, quand $t\neq j$ ($x_t-x_t$ multiplie le terme). Quand $t=j$ toutes les termes du produit valent $1$ et 
+		par conséquent $\lambda_{x_j,j} = N_s!$. On a donc:
+		$$  L_Z(x_h) = \sum_{j=0}^{k}f(x_j)\lambda_{x_h,j} = f(x_h) N_s! + \sum_{j=0,j\neq h}^{k}f(x_j)\cdot 0 = f(x_h)N_s! $$
+%		$$L_Z(X) = \sum_{j=0}^{k}f(x_j)N_s!\left(\prod_{i=0,i\neq j}^{k} \frac{X-x_i}{x_j-x_i}\right) = f(x_j)\cdot N_s! + $$
+%		$$L(x_k) = \sum_{j=0}^{k}y_jl_j = y_kl_k+\sum_{j=0,j\neq k}^{n}y_jl_j = y_k\cdot 1+\sum_{j=0,j\neq k}^ny_j\cdot0 = y_k$$
+		et $c^{L_Z(X)} = c^{N_s!f(X)}$.
+		%le polynôme interpole les points fournis.
+	\end{proof}
+	\end{theorem}
+
+
+	Soit $N_s$ le nombre de serveurs, $k$ le seuil (nombre de serveurs tiers non tous corruptibles nécessaires à calculer $d$), 
+	$r_i\in_R\Mgr{Z}{n^sm}$, 
+	$\lambda(n)$ la fonction de Carmichael et $d$ la valeur définie dans l'expression (\ref{eq:defd}), on pose $f$ la fonction:
+			\begin{equation}
+				f : \begin{array}[t]{ccl} \mathbb{Z} &\rightarrow &   \Mgr{Z}{\phi(n^{s+1})}  \\
+					x  &\mapsto& 2N_s!(d + \sum_{i = 1}^{k-1} x^ir_i) \mod{\phi(n^{s+1})} 
+				\end{array}
+			\end{equation}
+	Quand calculé en $0$, elle nous donne $2N_s!d$ et alors, on peut utiliser l'interpolation de Lagrange pour 
+	distribuer les clés $f(i)$ et composer la puissance du mot chiffré $c^{f(0)2N_s!} =  c^{4N_s!^2d}$ à la fin. 
+	Avec l'équation \ref{eq:lambdad}:
+		
+			\begin{equation}c^{4N_s!^2d} \equiv (1+n)^{m4N_s!^2} \mod{n^{s+1}} \end{equation}
+
+	Le facteur $4N_s!^2$ peut être enlevé avec le pré calcul de $(1+n)^{-4N_s!^2}\bmod{n^{s+1}}$. 
+
+	\begin{algorithm}
+		\caption{Procédures de calcul de logarithme modulaire}
+		\label{algo:logm}
+		\begin{algorithmic}[1]
+			\Function{init\_values}{$maxS,n$}
+				\State $Cn_0 = 1$
+				\For{$j \gets 1 \textrm{ to }maxS$}
+					\State $Cn_j = Cn_{j-1}\cdot n$
+					\State $FE_{0,j} = 1$ 
+					\For{$k \gets 1 \textrm{ to } j$}
+						\State $FE_{k,j} = FE_{k-1,j}\cdot n \cdot k^{-1}\%Cn_{j}$ 
+					\EndFor
+				\EndFor
+			\EndFunction
+			\Function{find\_next\_m}{$m,c, j$}
+				\State $l\gets ((c\%Cn_{j+1})-1)/n$ 
+				\State $b \gets m$
+				\For {$ k \gets 2 \textrm{ to } j$}
+					\State $b \gets b\cdot(m-k+1) \% Cn_j$
+					\State $l \gets (l- b\cdot FE_{k,j} )\% Cn_j$
+				\EndFor
+				\Return{$l$}
+			\EndFunction
+			\Function{logarithm\_mod}{$c,s$}
+				\State $m \gets 0$
+				\For {$j \gets 1 \textrm{ to }s$}
+					\State $m = \text{FIND\_NEXT\_M($m,c,j$)}$
+				\EndFor
+				\Return{m}
+			\EndFunction
+		\end{algorithmic}
+	\end{algorithm}
+		\begin{figure}
+			\center
+			\caption{algorithme reparti pour la preuve d'égalité du logarithme.}
+			\input{repartielogproof}
+			\label{fig:rep}
+		\end{figure}
+
+	Chaque serveur doit être capable de prouver son calcul, cette preuve est basée sur la preuve \textit{Zero Knowledge} de Fiat-Shamir dans
+	\cite{journals/joc/FeigeFS88}. Un facteur de sécurité $k'$ est choisi, le serveur central envoie les clés $f(i)$ et une 
+	valeur $v$ gé\-né\-ra\-tri\-ce  du groupe cyclique des résidus quadratiques dans \Mgrinv{Z}{n^{s+1}} aux $N_s$ 
+	serveurs périphériques, il publie aussi les valeurs\footnote{Pour des raisons de simplicité, on note $f_j = f(j)$} 
+	$v^{f_1}, \dots, v^{f_{N_s}}$. Soit $k$ le seuil, les serveurs tirent au hasard une 
+	valeur $r_i$ de taille en bits égale à $(s+1)k+2k'$ et calculent $c_i = c^{f_i}$, $v_i = v^{f_i}$, $a = c^{r_i}$ et $b = v^{r_i}\mod{n^{s+1}}$. 
+	Ils hachent l'ensemble $\{c,c_i,v,v_i,a,b\}$, soit $H_i$ la valeur hachée obtenue, ils publient les valeurs $c, c_i, v, v_i, a, b$ et 
+	$z_i = r_i+H_if_i$. Finalement n'importe qui peut 
+	vérifier $c^{z_i} \stackrel{?}{=}ac_i^{H_i}$ et $v^{z_i} \stackrel{?}{=}bv_i^{H_i}$. Si les deux égalités sont vraies il signifie 
+	que $\log_{v}(v_i) = \log_{c}(c_i)$.
+	La Figure \ref{fig:rep} illustre le protocole énoncé.
+
+%	Inspiré dans le travail de  Fouque, Poupard et Stern on peut distribuer le calcul de $D'$. Comme déjà vue dans le chapitre 
+%	sur l'implantation de Paillier, la partie plus couteuse est la exponentiation et il est intéressant de la repartir: Pour que 
+%	le calcul de chaque serveur puisse être vérifié sans la connaissance de la fonction $f$ on introduit le protocole repartie pour la preuve 
+%	d'égalité de logarithmes. 
+
+	
+%	\TODO{Agora nos temos chaves distribuidas, é hora de distribuir o calculo. C}
+%	Jurik a étendu le système avec des méthodes reparties\cite{} pour l'appliquer 	
+%	\subsection{Protocoles Répartis}
+%	Des protocoles répartis on été proposées pour sécuriser et valider chaque sous étape d'une votation. 
+%		\subsection{Preuve d'égalité de logarithmes}
+
+
+
+%	\begin{algo}{Protocole d'exponentiation e preuve reapartie}
+%		\begin{itemize}\renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$\cdot$}
+%			\item{\bf Entités:}
+%				\begin{itemize}
+%					\item Serveur fiable: impossible d'être corrompu.
+%					\item $N_s$ serveurs respectant les contraintes définies dans la page \pageref{item:restr} 
+%				\end{itemize}
+%			\item{\bf Entrée:} 
+%				\begin{itemize}
+%					\item $N_s$: le nombre de serveurs.
+%					\item $k$: le nombre de serveurs nécessaires pour le déchiffrement.
+%					\item $d$: la clé privé.
+%				\end{itemize}
+%			\item{\bf Serveur fiable:}
+%				\begin{enumerate} %			
+%				\renewcommand{\theenumi}{\arabic{enumi}}
+%				\renewcommand{\theenumii}{\arabic{enumii}}
+%				\renewcommand{\theenumiii}{\arabic{enumiii}}
+%				\renewcommand{\labelenumi}{\theenumi.}
+%				\renewcommand{\labelenumii}{\theenumi.\theenumii.}
+%				\renewcommand{\labelenumiii}{\theenumi.\theenumii.\theenumiii.}
+%				\makeatletter
+%				\renewcommand{\p@enumii}{\theenumi.}
+%				\renewcommand{\p@enumiii}{\theenumi.\theenumii.}
+%				\makeatother
+%				\item $L := \{\}$
+%				\item Initialiser et envoyer les clés reparties.
+%				\item De que un serveur répond avec une exponentiation:
+%				\begin{enumerate}
+%					\item Vérifier la preuve envoyé, si elle est valide, ajouter $(c_i,i)$ à la liste $L$.
+%					\item Si $L$ est plus grand ou égal à $k$, sort de la boucle.
+%				\end{enumerate}
+%				\item Calculer: $c' = \prod{(c_i,i)\in L}c_i^{2\cdot N_s!\cdot \prod_{(c_j,j) \in L, j\neq i}\frac{-i}{i-j}}$
+%				\item pour chaque $(c_i,i)$ dans $L$, calcule:
+%				\begin{enumerate}
+%					\item vérifier la preuve envoyé, si elle est valide, ajouter $(c_i,i)$ à la liste $L$.
+%					\item si $L$ est plus grand ou égal à $k$, sort de la boucle.
+%				\end{enumerate}
+%
+%				\item Trouver $p$ et $q$ premiers tels que $p = 2p'+1$ et $q = 2q'+1$ avec $p'$ et $q'$ premiers.
+%				\item Trouver $k-1$ valeurs: $r_i\in_R\Mgr{Z}{(pq)^sp'q'}$, $1 \leq i \leq k-1$
+%				\item Pour $j$ dans $\{1;N_s\}$:
+%					\begin{enumerate}
+%						\item Envoyer la clé $d+\sum_{i = 1}^{k-1}r_ij^i\mod{(pq)^sp'q'}$ au serveur $j$.
+%					\end{enumerate}
+%				\end{enumerate}
+%
+%			\item{\bf Serveurs Tiers:}
+%				\begin{enumerate} %			
+%				\renewcommand{\theenumi}{\arabic{enumi}}
+%				\renewcommand{\theenumii}{\arabic{enumii}}
+%				\renewcommand{\theenumiii}{\arabic{enumiii}}
+%				\renewcommand{\labelenumi}{\theenumi.}
+%				\renewcommand{\labelenumii}{\theenumi.\theenumii.}
+%				\renewcommand{\labelenumiii}{\theenumi.\theenumii.\theenumiii.}
+%				\makeatletter
+%				\renewcommand{\p@enumii}{\theenumi.}
+%				\renewcommand{\p@enumiii}{\theenumi.\theenumii.}
+%				\makeatother
+%				\item Trouver $p$ et $q$ premiers tels que $p = 2p'+1$ et $q = 2q'+1$ avec $p'$ et $q'$ premiers.
+%				\item Trouver $k-1$ valeurs aléatoires: $r_i$, $1 \leq i \leq k-1$
+%				\item Pour $j$ dans $\{1;N_s\}$:
+%					\begin{enumerate}
+%						\item Envoyer la clé $d+\sum_{i = 1}^{k-1}r_ij^i\mod{(pq)^sp'q'}$ au serveur $j$.
+%					\end{enumerate}
+%				\end{enumerate}
+%
+%%			\item{\bf Calcul:}
+%%				\begin{enumerate} %			
+%%				\renewcommand{\theenumi}{\arabic{enumi}}
+%%				\renewcommand{\theenumii}{\arabic{enumii}}
+%%				\renewcommand{\theenumiii}{\arabic{enumiii}}
+%%				\renewcommand{\labelenumi}{\theenumi.}
+%%				\renewcommand{\labelenumii}{\theenumi.\theenumii.}
+%%				\renewcommand{\labelenumiii}{\theenumi.\theenumii.\theenumiii.}
+%%				\makeatletter
+%%				\renewcommand{\p@enumii}{\theenumi.}
+%%				\renewcommand{\p@enumiii}{\theenumi.\theenumii.}
+%%				\makeatother
+%%				\item Trouver $p$ et $q$ premiers tels que $p = 2p'+1$ et $q = 2q'+1$ avec $p'$ et $q'$ premiers.
+%%				\item Trouver $k-1$ valeurs aléatoires: $r_i$, $1 \leq i \leq k-1$
+%%				\item Pour $j$ dans $\{1;N_s\}$:
+%%					\begin{enumerate}
+%%						\item Envoyer la clé $d+\sum_{i = 1}^{k-1}r_ij^i\mod{(pq)^sp'q'}$ au serveur $j$.
+%%					\end{enumerate}
+%%				\end{enumerate}
+%		\end{itemize}
+%	\end{algo}
+
+
+
+%		Le schéma introduit dans \cite{Fouque00sharingdecryption} a été pris pour calculer le résultat d'une élection avec un seuil
+%		en limitant 
+%		Elle distribue le calcul d'une puissance (déchiffrement) sans publier  
+		%\TODO{validacao do log de u e v, ver o paper do jurik, pg 23: Brics-jurik.pdf.Protocol for equality of discrete logs}\\
+
+		%\TODO{introduzir a ideia de exponenciacao usando interpolacao de lagrange}\\
+	%
+%	\begin{gnuplot}[scale=1.1]
+%	set pm3d
+%	set surface
+%	splot sin(sqrt((x*x+y*y)))/sqrt(x*x+y*y)
+%	\end{gnuplot}	
+%		\begin{figure}
+%			\center
+%			\input{correct.tex}
+%			\caption{La solution trouvée quand a trois serveurs dans $\mathbb{R}$.}
+%		\end{figure}
+
+%	\TODO{dah o polinomio calculado em 1..n para todos os kras... mas o valor em 0 eh justamente a potencia.}
+
+%		\TODO{falar de Fiat-Shamir}\\
+	%	\TODO{protocolo de prova de escolha ``1-out-of-2''}\\
+	%	\TODO{protocolo de multiplicacao mod $n^s$}\\
+
+
+
+
+

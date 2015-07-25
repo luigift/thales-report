@@ -1,0 +1,408 @@
+\chapter{Implantation}
+
+	\label{chap:implantation}
+	L'implantation a été faite en \verb!C! avec la bibliothèque \verb!GMP!, la bibliothèque ari\-th\-mé\-tique de précision arbitraire 
+	du projet \verb!GNU! (voir les codes sources \ref{code:cfonc}, \ref{code:dfonc} et \ref{code:dfonccrt}).
+	Nativement le langage \verb!C! permet les calculs avec des entiers en complément à deux avec $64$ bits, en revanche la taille recommandée pour $n$ est
+	$1024$ bits (les calculs sont modulo $2048$, alors il est nécessaire une re\-pré\-sen\-ta\-tion de $4096$ bits pour la multiplication),
+	grâce à la bibliothèque \verb!GMP! il est possible de manipuler ces nombres de grand taille.
+	Quelques optimisations on étés mises en oeuvre, par exem\-ple: 
+	le pré calcul de $\lambda(n)$ et $n^2$, réduction des cycles par Théorème du Reste Chinois et 
+	la mémorisation de $g^{\lambda(n)}\bmod{n^2}$. Pour l'implantation des autres optimisations, le langage \verb!Python! a été utilisé: avec
+	une verbosité réduite et le traitement des grands entiers intégré, il a été plus rapide d'implanter toutes les fonctionnalités 
+	souhaitées. 
+	%Le code complet de la bibliothèque et un exemple d'utilisation sont disponibles dans les annexes \ref{Impl:C} et \ref{Impl:Py}.
+
+	Un profil du programme montre que les opérations les plus coûteuses sont les exponentiations modulaires (c.f. \verb!mpz_powm!), avec 99\%
+	du nombre de cycles du processus de chiffrement/déchiffrement. Le profil a été fait par les outils {\em Valgrind} et {\em Callgrind}, qui comptent le 
+	nombre de cycles par méthode, et finalement l'analyse des données 
+	par le logiciel {\em KCacheGrind}. La même analyse montre que le déchiffrement est deux fois plus rapide que le chiffrement 
+	et que l'optimisation du Théorème du Reste Chinois (voir le code source \ref{code:dfonccrt}) divise le nombre de 
+	cycles par trois dans le déchiffrement (Voir les tableauw en fin de chapitre). 
+
+	\begin{lstlisting}[language=C,emph={},caption=Fonction de chiffrement, label=code:cfonc]
+		void cypher_paillier(mpz_t c,const mpz_t message,const public_key key){
+			mpz_t y;
+			mpz_init(y);
+			mpz_powm(c,key->g,message,key->n2);
+			checkRandomInit();
+			set_to_invertible_element(y,key->n,*_rnd_paillier); 
+			mpz_powm(y,y,key->n,key->n2);
+			mpz_mul(c,c,y);
+			mpz_mod(c,c,key->n2);
+			mpz_clear(y);
+		}
+	\end{lstlisting}
+
+	\begin{lstlisting}[language=C,emph={},caption=Fonction de d\'echiffrement, label=code:dfonc]
+		void decypher_paillier(mpz_t message,const mpz_t c_message,const pvt_key key){
+			mpz_powm(message,c_message,key->lambda,key->n2);
+			mpz_sub_ui(message,message,1UL);
+			mpz_divexact(message,message,key->n);
+			mpz_mul(message,message,key->memo_g_lambda);
+			mpz_mod(message,message,key->n);
+		}
+	\end{lstlisting}
+
+	\begin{lstlisting}[language=C,emph={},caption=Fonction de d\'echiffrement avec Théorème du Reste Chinois, label=code:dfonccrt]
+		void decypher_paillier_crt(mpz_t message, mpz_t tmp, const mpz_t c_message,const pvt_key key){
+			mpz_sub_ui(message,key->p     ,1LU);
+			mpz_sub_ui(tmp    ,key->q     ,1LU);
+
+			mpz_powm(message,c_message,message,key->p2);
+			mpz_powm(tmp    ,c_message,tmp    ,key->q2);
+
+			mpz_sub_ui(message,message,1UL);
+			mpz_sub_ui(tmp   ,tmp   ,1UL);
+
+			mpz_divexact(message,message,key->p);
+			mpz_divexact(tmp    ,tmp    ,key->q);
+
+			mpz_mul(message,message,key->q);
+			mpz_mul(message,message,key->qi);
+
+			mpz_mul(tmp    ,tmp    ,key->p);
+			mpz_mul(tmp    ,tmp    ,key->pi);
+
+			mpz_mul(message,message,key->gpi);
+			mpz_mul(tmp    ,tmp    ,key->gqi);
+
+			mpz_add(message,tmp,message);
+
+			mpz_mod(message,message,key->n);
+			mpz_set(tmp,message);
+		}
+	\end{lstlisting}
+
+	En utilisant le langage \verb!Python! il a été plus rapide d'implanter d'au\-tres fonctionnalités, comme par exemple la signature. 
+
+	\begin{lstlisting}[language=python,caption=Fonction de signature, label=code:sign]	
+	def sign(self,message,pvtKey, hashf = None):
+		if hashf == None:
+			hashf = self.hash
+		i_hashed = hashf(message)
+		s1 = self.decrypt(i_hashed,pvtKey)
+		i_hashed*=pow(pvtKey.ginv,s1,pvtKey.n)
+		s2 = pow(i_hashed,pvtKey.ninv,pvtKey.n)
+		return (s1,s2)
+	\end{lstlisting}
+	
+	\begin{lstlisting}[language=python,caption=Fonction de signature, label=code:val]	
+	def validate(self,message,hashed,pubKey, hashf = None):
+		if hashf == None:
+			hashf = self.hash
+		i_hashed = hashf(message)
+		s1,s2 = hashed
+		encry = self.encrypt(s1,pubKey,r = s2)
+		print "sign result: ", encry
+		print "compare with: ", i_hashed
+
+		if i_hashed == encry:
+			return True
+		return False
+	\end{lstlisting}
+
+	\section{Liste de fonctions Implantées}
+
+	\subsection{Langage {\tt C}}
+	Les structures de données qui gardent les informations sur les clés pu\-bli\-ques et privées:
+	\begin{lstlisting}[language=C,emph={},caption=Structures des Clés en {\tt C}, label=code:struct]	
+typedef struct _paillier_pvt_key{
+	mpz_t p ,q;
+	mpz_t n ,n2;
+	mpz_t p2 ,q2;
+	mpz_t pi , qi;
+	mpz_t gpi ,gqi;
+	mpz_t lambda ,g;
+	mpz_t memo_g_lambda;
+} _paillier_pvt_key;
+
+typedef struct _paillier_public_key{
+	mpz_t n2;
+	mpz_t n;
+	mpz_t g;
+}_paillier_public_key;
+
+typedef _paillier_pvt_key *pvt_key;
+typedef _paillier_public_key *public_key;
+	\end{lstlisting}
+
+Les fonctions mises en œuvre avec le langage \verb!C!:
+
+	\begin{itemize} \renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$~~argument$}
+		\item \textbf{pvt\_key key\_gen\_paillier}: Retourne une clé initialisée avec des va\-leurs pré calculées.
+			\begin{itemize}
+				\item \verb!long int primary_key_size!: nombre de bits sou\-hai\-tés pour la valeur $n$ publique. Il est recommandé que $n$ soit
+				grand, genre $2048$.
+			\end{itemize}
+		\item \textbf{public\_key get\_public\_paillier}: Retourne la clé publique.
+			\begin{itemize}
+				\item \verb!const pvt_key private_key!: la clé privée gé\-né\-rée avec \textbf{key\_gen\_paillier}.
+			\end{itemize}
+		\item \textbf{void cleankeys}: libère la mémoire allouée pour les clés.
+			\begin{itemize}
+				\item \verb!pvt_key* pvt!: une clé privée initialisée ou \verb!NULL!. 
+				\item \verb!public_key* pub!: une clé publique initialisée ou \\\verb!NULL!.
+			\end{itemize}
+		\item \textbf{void cypher\_paillier}: Implante la fonction de chiffrement.
+			\begin{itemize}
+				\item \verb!mpz_t c!: un entier de \verb!GMP! initialisé, la valeur sera remplacée par le nombre chiffré.
+				\item \verb!const mpz_t message!: le message $\in \Mgr{Z}{n}$ à être chif\-fré.
+				\item \verb!const public_key key!: une clé publique valide et gé\-né\-rée par la fonction \textbf{get\_public\_paillier}.
+			\end{itemize}
+		\item \textbf{void decypher\_paillier}: Implante la fonction de déchiffrement.
+			\begin{itemize}
+				\item \verb!mpz_t message!: un entier de \verb!GMP! initialisé, la valeur sera remplacée par le message clair.
+				\item \verb!const mpz_t c_message!: le message chiffré.
+				\item \verb!const pvt_key key!: une clé privée générée par\\ \textbf{key\_gen\_paillier}.
+			\end{itemize}
+		\item \textbf{void print\_pvt\_key}: Imprime la clé privée dans \verb!stdout!.
+			\begin{itemize}
+				\item \verb!pvt_key key!: une clé privée initialisée par \\ \textbf{key\_gen\_paillier}.
+			\end{itemize}
+		\item \textbf{void print\_pub\_Key}: Imprime la clé publique dans \verb!stdout!.
+			\begin{itemize}
+				\item \verb!public_key key!: une clé publique initialisée par\\ \textbf{get\_public\_paillier}.
+			\end{itemize}
+		\item \textbf{void decypher\_paillier\_crt}: Implante la fonction de déchiffrement optimi\-sée  avec le Théorème du Reste Chinois.
+			\begin{itemize}
+				\item \verb!mpz_t message!: un entier de \verb!GMP! initialisé, la valeur sera remplacée par le message clair.
+				\item \verb!mpz_t tmp!: un entier de \verb!GMP! initialisé, la valeur sera aussi remplacée par le message clair.
+				\item \verb!const mpz_t c_message!:  le message chiffré.
+				\item \verb!const pvt_key key!: une clé privée générée par \\ \textbf{key\_gen\_paillier}.
+			\end{itemize}
+	\end{itemize}
+
+
+	\subsection{Langage {\tt Python}}
+
+
+	Les classes qui gardent les informations sur les clés publiques et privées en \verb!Python!:
+	\begin{lstlisting}[language=python,caption=Structures des Clés en Python, label=code:struct]
+dir(PaillierPvtKey()): ['__doc__', '__init__', '__module__', '__str__', 'g', 'ginv', 'lam', 'n', 'n2', 'ninv', 'p', 'p2', 'q', 'q2']
+dir(PaillierPubKey(PaillierPvtKey())): ['__doc__', '__init__', '__module__', '__str__', 'g', 'n', 'n2']
+	\end{lstlisting}
+
+Les fonctions mises en œuvre avec le langage \verb!python!:
+	
+	\begin{itemize} \renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$~~argument$}
+		\item \textbf{encrypt}: Implante la fonction de chiffrement. Retourne la valeur chif\-frée.
+			\begin{itemize}
+				\item \verb!m!: le message à être chiffré $\in \Mgr{Z}{n}$.
+				\item \verb!pubKey!: la clé publique.
+				\item \verb!r = None!: le nombre $r$ `aléatoire' $\in \Mgrinv{Z}{n}$.
+				Si \verb!None!, la va\-leur est prise aléatoirement avec
+				la fonction par défaut de la bibliothèque \verb!PyCrypto!.
+			\end{itemize}
+		\item \textbf{decrypt}: Implante la fonction de déchiffrement. Retourne le message clair.
+			\begin{itemize}
+				\item \verb!c!: le message chiffré.
+				\item \verb!pvtKey!: la clé privée.
+				\item \verb!optimizeCRT = True!: Si \verb!True!, active l'optimisation du Théorème du Reste Chinois.
+			\end{itemize}
+		\item \textbf{hashfile}: Retourne la valeur hachée d'un fichier.
+			\begin{itemize}
+				\item \verb!filename!: le chemin du fichier à être parcouru.
+				\item \verb!hashfunction = None!: la fonction de hachage.
+			\end{itemize}
+		\item \textbf{encryptfile}: Effectue la lecture d'un bloc d'octets du fichier et retourne le bloc d'octets chiffré.
+			\begin{itemize}
+				\item \verb!opennedfile!: un fichier ouvert avec permission de lecture.
+				\item \verb!pubKey!: la clé publique. 
+				\item \verb!random = None!: le nombre $r$ `aléatoire'. Si \verb!None! la va\-leur est prise aléatoirement avec
+				la fonction par défaut de la bibliothèque \verb!PyCrypto!.
+			\end{itemize}
+		\item \textbf{decrypt2file}: Écrit un bloc d'octets à partir d'un message chiffré.
+			\begin{itemize}
+				\item \verb!opennedfile!: un fichier ouvert avec permission d'écri\-ture.
+				\item \verb!c!: le message chiffré.
+				\item \verb!pvtKey!: la clé privé.
+				\item \verb!optCRT = True!: Si \verb!True!, active l'optimisation avec le Théo\-rè\-me du Reste Chinois.
+			\end{itemize}
+		\item \textbf{hash}: Retourne la valeur hachée de \verb!value!.
+			\begin{itemize}
+				\item \verb!value!: la valeur à être hachée.
+			\end{itemize}
+		\item \textbf{sign}: Crée la signature pour l'entier \verb!message!. Retourne une paire $(s_1,s_2)$, la signature.
+			\begin{itemize}
+				\item \verb!message!: l'entier à être signé $\in \Mgrinv{Z}{n^2}$.
+				\item \verb!pvtKey!: la clé privée.
+				\item \verb!hashf = None!: Une fonction de hachage. \verb!SHA-256! par dé\-faut.
+			\end{itemize}
+		\item \textbf{validate}: Vérifie une signature pour un entier \verb!message!. Retourne \verb!True! si la signature est
+		valide.
+			\begin{itemize}
+				\item \verb!message!: le message $\in \Mgrinv{Z}{n^2}$ qui a été signé.
+				\item \verb!hashed!: la signature, une paire $(s_1,s_2)$.
+				\item \verb!pubKey!: la clé publique.
+				\item \verb!hashf = None!: la fonction de hachage. \verb!SHA-256! par dé\-faut.
+			\end{itemize}
+	\end{itemize}
+
+	\section{Génération des clés}
+
+	Dans l'implantation en \verb!C!, le nombre $2^{nbits}$ a été ajouté à une valeur 
+	aléatoire entre $0$ et $2^{nbits}-1$ et le résultat a été appliqué dans 
+	la fonction \verb!getNextPrime!
+	pour calculer le premier de taille $nbits$ bits, cette fonction utilise le test de primalité
+	de {\em Miller-Rabin} le coût de génération des clés est haut, par contre la génération
+	des clés n'est faite qu'une fois durant une conversation.
+	En \verb!Python! la méthode \verb!getStrongPrime! est  fournie par la bi\-blio\-thè\-que 
+	\verb!PyCrypto!, elle reçoit le nombre de bits du premier souhaité et 
+	retourne un premier. Comme prouvé dans 
+	la section \ref{section:rsa}, cette construction garantit que $p\not\equiv1\mod{q}$.
+
+	\section{Un cas d'échec}
+%	\begin{quote}
+%	``Chooses a big prime number, finds out that he can't use internet.''
+%
+%	\hfill{\em 9gag}
+%	\end{quote}
+
+	Un exemple avec le cas $p \equiv 1 \mod{q}$ peut être construit avec le code en \verb!python!:
+	\begin{lstlisting}[language=python,caption=Fonction de signature, label=code:sign]	
+from Crypto.Util.number import *
+from paillier import *
+
+minv = 1000
+pp = 1
+qq = 1
+for j in xrange(100):
+	p = 1
+	q = getStrongPrime(1024);
+	for i in xrange(2,minv+2):
+		p = 2*q*i+1
+		if isPrime(2*q*i+1):
+			if minv > i:
+				print i
+				minv = i
+				pp = p
+				qq = q
+			break
+	print minv*2,i*2,j
+print minv*2
+print qq,pp
+pvt = PaillierPvtKey(p=pp, q=qq, g = pp*qq+1);
+print pvt
+pub = PaillierPubKey(pvt);
+psys = Paillier();
+sign = psys.sign('hashtest.txt',pvt,hashf = psys.hashfile);
+valid = psys.validate('hashtest.txt',sign,pub,hashf = psys.hashfile)
+if  valid:
+	print "Valid"
+else: 
+ 	print "NotValid"
+	print sign
+	\end{lstlisting}
+
+	Il arrive a trouver des premiers $p$ et $q$ de taille $\approx 1024$ avec $p = 4*q+1$:
+
+	$q = \seqsplit{168239459665154983899069779723382890162641520290992677149537145983760704100567177657875204773426248551583557375931181324315944871196680688296610056077930530907607875398008646622495581400017870698909480421124624271099939292525339117084331658694505294168135301813649537306092063677770708874874465067256517088789} $
+
+	$p = \seqsplit{672957838660619935596279118893531560650566081163970708598148583935042816402268710631500819093704994206334229503724725297263779484786722753186440224311722123630431501592034586489982325600071482795637921684498497084399757170101356468337326634778021176672541207254598149224368254711082835499497860269026068355157}$
+
+
+	Un message hachée avec \verb!SHA-256!: $h_m = \seqsplit{92797047729731123342803580575873901129497842137229421504992173164793618741803}$
+
+	Retourne la signature:
+
+	$sign = \seqsplit{(6410570705013218770837326205537468678207236610610114472753556546278518139319685167785080713301175935000458700270111456036729341706840753023209536942198408421731134908710592980802325400657025782708024621509702529670071316947462948587587981322182093705750142969460945341838698624794572087539266639813621066345831874446398211774339611363507718187598616253692874871587718502081625872696192570356608818992498738416603895014628357882445892002355265876930679886491401400677084951868385053201411801062695184444471262650327073809435154350878742024152616740081881191111245383393275186086497215825919497056713541890647654483200L, ~~~~34564053682558895424772669099820980128779839970203990463882025638923611201942927237833632193976073471431796820755510809296069167106316059999229327435208122146159799755289906935911905148376967730156668582338255448828978391613774931525630294684993175805752001527529145760345614396118985118190377097170752908647374690329888719376439716662597962428172200041791925683092028172156201081775220151105087849412573435321873358874429486453328403098407756189706853474115700867274860490576228757486650503199436295049767610747891825549914694319086434096386832146073412107435900502181322549913886409245801389789714031789318296834467L)}$
+
+
+	Par contre, la vérification de cette signature génère la valeur $h_m'$ suivante: 
+	
+	$h_m' = \seqsplit{12590953388417886432387152401011474891446122839779912119270165552880691043912197307710016986899812535462064391040759944005768940036570439749023201554512381490200360037779293733545675827729974029279280779329082250822152082078221061617887362030354325351015125172321264651812777107842471717153987182989088895359124478237049954302083082196379463444110226391532313786800361970451528811108218923259619222288382625470229842444731079672110942300122298655594382065086524548813392817382580360467767860073925621307533622317032336899627724190329317656332937393715880290433513094134967491408695155824054688709902126304104483879579703487336581315482746920259095170727282890639270415099145204366172448106456922266849979359094723343848846639074572251127083023689680408985093171952568326504490706530591273662931706502100478949836153890971819769962156671841931230106862431551146483196983934940900535809712258010921808862134584803079072847803853494817310861589668635258818643651159480864845977983766142996229525740200256646872096508167934078821444820215418085113756805602691003893328166251788798113107679556021653443015549074784770669397047213947208122806058318248481094053583422649779957243183957647193368365460449938565291414341874770778596306699750074}$
+	
+	Et le message ne peut pas être validé ($h_m\stackrel{?}{=}h_m'$ faux). Ce qui prouve la nécessité d'avoir une bijection.
+	
+
+
+	\section{Benchmark}
+
+Processeur: \verb!Intel(R) Core(TM)2 Duo CPU E6550  @ 2.33GHz!
+
+Système d'exploitation: \hfill \verb!Linux version 3.3.5-2.fc16.x86_64!
+
+	\hfill		\verb!(mockbuild@x86-04.phx2.fedoraproject.org)!
+
+	\hfill		\verb!(gcc version 4.6.3 20120306 (Red Hat 4.6.3-2) (GCC))!
+
+	\hfill		\verb!#1 SMP Tue May 8 11:24:50 UTC 2012i!
+
+Version de \verb!Python!: \verb!Python 2.7.3!
+
+Version de \verb!GMP!: \verb!libgmp.so.3.5.2!
+
+
+\begin{table}[hlc]
+\center
+\caption{Nombre de cycles du programme en {\tt C}, en $10^9$.}
+\begin{tabular}{|c   |c  |c    |c      |c  |}
+\hline
+$\multirow{2}{*}{$|n|$}$&\multicolumn{4}{|c|}{C}\\
+		\cline{2-5}
+                     &gen&chiff&déchiff&TRC\footnotemark[1]\\
+\hline
+\hline
+1024	&0,09	&0,03	&0,02	&0,01			\\
+2048	&0,68	&0,19	&0,09	&0,02			\\
+4096	&6,98	&1,22	&0,66	&0,17			\\
+\hline
+\end{tabular}
+\end{table}\footnotetext[1]{Le calcul est fait modulo $p$ et modulo $q$. Les résultats sont combinés avec le Théorème du Reste Chinois.}
+
+
+\begin{table}[hlc]
+\center
+\caption{Temps en {\tt C}, en secondes par opération.}
+
+\begin{tabular}{|c   |c  |c    |c      |c  |}
+\hline
+$\multirow{2}{*}{$|n|$}$&\multicolumn{4}{|c|}{C}\\
+		\cline{2-5}
+                     &gen&chiff&déchiff&TRC\\
+\hline
+\hline
+1024	&0,04	&0,01	&0,01	&0,00			\\
+2048	&0,29	&0,08	&0,04	&0,01			\\
+4096	&2,99	&0,52	&0,28	&0,07			\\
+\hline
+\end{tabular}
+\end{table}
+
+\begin{table}[hlc]
+\center
+\caption{Nombre de cycles du programme en {\tt Python}, en $10^9$.}
+\begin{tabular}{|c   |c  |c    |c      |c  |c  |c|}
+\hline
+$\multirow{2}{*}{$|n|$}$&\multicolumn{6}{|c|}{Python}\\
+		\cline{2-7}
+                     &gen&chiff&déchiff&TRC&sign&val\\
+\hline
+\hline
+1024	&0,18	&0,11	&0,06	&0,02	&0,06	&0,14	\\
+2048	&0,91	&0,67	&0,50	&0,23	&0,49	&0,88	\\
+4096	&7,12	&4,52	&3,65	&1,29	&2,65	&6,63	\\
+\hline
+\end{tabular}
+\end{table}
+
+
+\begin{table}[hlc]
+\center
+\caption{Temps en {\tt Python}, en secondes par opération.}
+\begin{tabular}{|c   |c  |c    |c      |c  |c  |c|}
+\hline
+$\multirow{2}{*}{$|n|$}$&\multicolumn{6}{|c|}{Python}\\
+		\cline{2-7}
+                     &gen&chiff&déchiff&TRC&sign&val\\
+\hline
+\hline
+1024	&0,08	&0,05	&0,03	&0,01	&0,03	&0,06	\\
+2048	&0,39	&0,29	&0,22	&0,10	&0,21	&0,38	\\
+4096	&3,05	&1,94	&1,57	&0,55	&1,14	&2,84	\\
+\hline
+\end{tabular}
+\end{table}
+
+

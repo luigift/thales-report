@@ -1,0 +1,123 @@
+\chapter{Signature Numérique}
+
+	À partir de tout système de chiffrement à clé publique bijectif, on peut construire un système de signature 
+	numérique. %
+%	Comme les systèmes habituels à clé publique, 
+	La signature dans le sys\-tè\-me Paillier se passe en calculant la valeur hachée $h$ 
+	du message $m$ et en ``dé\-chif\-frant'' cette valeur. Pour que ça soit possible 
+	la fonction de chiffrement doit être utilisée complètement, c'est-à-dire la fonction de dé\-chif\-fre\-ment
+	a une image d'ordre $n\phi(n)$ et la signature doit contenir le ``message déchiffré'' $\benolah{h}_g$ et la valeur 
+	aléatoire $r$ utilisée pour le chiffrement pour apporter toute l'information nécessaire à calculer $h$.
+
+	Le premier problème posé est la récupération de $r$. La solution est assez naturelle et utilise le fait que 
+	l'entité qui signe possède $\lambda(n)$ et peut retrouver la racine $n$-ième facilement étant donné le résidu.
+
+	\begin{rappel}
+		$$\mathcal{E}_g(m,r) = g^mr^n\mod{n^2}$$
+		$$L_n(x)  = \frac{x-1}{n}$$
+	 	$$D_n(c) = \frac{L_n(c^\lambda\mod{n^2})}{L_n(g^\lambda\mod{n^2})}\mod{n}$$
+	\end{rappel}
+
+
+
+	\begin{algo}{Signature}
+		\begin{itemize}\renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$\cdot$}
+			\item{\bf Entrée:} 
+				\begin{itemize}
+					\item $m$: le message à être signé.
+					\item $\lambda$: la clé privée. 
+					\item $(n,g)$: la clé publique.
+				\end{itemize}
+			\item{\bf Calcul:}
+				\begin{enumerate} %			
+				\renewcommand{\theenumi}{\arabic{enumi}}
+				\renewcommand{\theenumii}{\arabic{enumii}}
+				\renewcommand{\theenumiii}{\arabic{enumiii}}
+				\renewcommand{\labelenumi}{\theenumi.}
+				\renewcommand{\labelenumii}{\theenumi.\theenumii.}
+				\renewcommand{\labelenumiii}{\theenumi.\theenumii.\theenumiii.}
+				\makeatletter
+				\renewcommand{\p@enumii}{\theenumi.}
+				\renewcommand{\p@enumiii}{\theenumi.\theenumii.}
+				\makeatother
+
+					\item Calculer $h_m$ la valeur hachée du message $m$.
+					\item Calculer $\benolah{h_m}_g = D_n(h_m)$.
+					\item Trouver $r$:
+					\begin{enumerate}
+						\item Calculer $R =  h_m\cdot g^{-\benolah{h_m}_g}\mod{n}$.\label{item:calcR}
+						\item Calculer $r = R^{(n^{-1}\mod{\lambda(n)})}\mod{n}$.
+					\end{enumerate}
+					\item Créer la signature $(\benolah{h}_g,r)$.
+				\end{enumerate}
+			\item{\bf Transmettre:}
+				\begin{enumerate}[]
+				\item la paire $(\benolah{h}_g,r)$.
+				\end{enumerate}
+
+		\end{itemize}
+	\end{algo}
+
+
+	\begin{algo}{Vérification}
+		\begin{itemize}\renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$\cdot$}
+			\item{\bf Entrée:} 
+				\begin{itemize}
+					\item $m$: le message dont la signature doit être vérifié.
+					\item $(c,r)$: la signature.
+					\item $(n,g)$: la clé publique.
+				\end{itemize}
+			\item{\bf Calcul:}
+				\begin{enumerate} %			
+				\renewcommand{\theenumi}{\arabic{enumi}}
+				\renewcommand{\theenumii}{\arabic{enumii}}
+				\renewcommand{\theenumiii}{\arabic{enumiii}}
+				\renewcommand{\labelenumi}{\theenumi.}
+				\renewcommand{\labelenumii}{\theenumi.\theenumii.}
+				\renewcommand{\labelenumiii}{\theenumi.\theenumii.\theenumiii.}
+				\makeatletter
+				\renewcommand{\p@enumii}{\theenumi.}
+				\renewcommand{\p@enumiii}{\theenumi.\theenumii.}
+				\makeatother
+
+				\item Calculer $H = \mathcal{E}_g(c,r) = g^cr^n\mod{n^2}$
+				\item Calculer $h_m$ la valeur hachée du message $m$.
+				\item Vérifier l'égalité: $H = h_m$.
+				\end{enumerate}
+
+		\end{itemize}
+	\end{algo}
+
+	Comme dit avant, la validité de ce schéma est la possibilité de trouver $r$ tel que
+	$h_m = g^{\benolah{h_m}_g}r^n\mod{n^2}$. Dans la signature, le pas \ref{item:calcR} attribue à $R$ la valeur
+	$h_m\cdot g^{-\benolah{h_m}_g}\equiv r^n\mod{n^2} $. Pour trouver $r$ depuis $R \equiv r^n\mod{n^2} $ il 
+	faut juste calculer l'inverse de $n$ par rapport à l'ordre de $R$. En effet $\text{ordre$(R)$}|\lambda(n)$ et   
+	$\pgcd(\lambda(n),n) = 1$ impliquent:
+		$$R^{(n^{-1}\mod{\lambda(n)})} \equiv (r^n)^{(n^{-1}\mod{\lambda(n)})} \equiv r^{k\lambda(n)+1} \equiv r\mod{n^2}, k\in\mathbb{Z} $$
+
+%
+%	Le pas \ref{item:calcR} 
+%	Comme on sait que il existe $r$ tel que: 
+%	$$ h \equiv g^{\benolah{h}_g}r^n\mod{n^2} $$
+%	En multipliant $h$ par $g^{-\benolah{h}_g}$, on trouve $r^n$ modulo $n^2$, 
+%	comme l'ordre de $r$ divise $\lambda(n)$: $$(r^n)^{(n^{-1}\mod{\lambda(n)})} \equiv r^{k\lambda(n)+1} \equiv r\mod{n^2}, k\in\mathbb{Z} $$
+
+	\begin{remark} La possibilité de trouver $\benolah{h}_g$ et $r$ existe grâce à la connaissance de la
+	valeur de $\lambda(n)$. Il n'existe pas de méthode efficace connue pour calculer $\benolah{h}_g$ et $r$ 
+	avec la seule connaissance de la clé publique  (c.f. Chapitre \ref{secu}
+			à la page \pageref{secu}).
+	\end{remark}
+%	\begin{definition} On utilisera la notation $\mathcal{E}_g$ pour designer la fonction de chiffrement:
+%		\begin{equation}
+%			\mathcal{E}_g : \begin{array}[t]{ccl} \mathbb{Z} &\rightarrow & \Mgr{Z}{n} \times \Mgrinv{Z}{n}  \\
+%			                           n			 &\mapsto     & (s_1,s_2)	 \end{array}
+%		\end{equation}
+%		\begin{align}
+%			\left \{
+%				\begin{array}{c @{\equiv} l l}
+%				    s_1 & \frac{L(h(m)^{\lambda}\mod{n^2})}{L(g^{\lambda}\mod{n^2})}&\mod{n} \\
+%				    p^i & (h(m)g^{-s_1})^{1/n\mod{\lambda}} &\mod{q} \\
+%			\end{array}
+%			\right. 
+%		\end{align}	
+%	\end{definition}

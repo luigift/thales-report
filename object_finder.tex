@@ -1,0 +1,116 @@
+\chapter { Object Detection }
+
+
+\section { Floor Detection } 
+
+The major concern goal of the algorithm is to well estimate the floor plan coordinates. From that, other plans like walls could be inferred, supposing they have a fixed geometrical relation. The RANSAC algorithm provide a reasonable solution to the problem and it is already implemented in the PCL library.
+
+Some parameters need to be set, such as deviation from the plan mathematical model.
+
+The parameters used for the robot are described at the annex section.
+
+\subsection { RANSAC } 
+
+The RANSAC algorithm is a learning method to estimate a given model parameters. Contrary to other estimation algorithms, which considers the whole data represenetative to model estimation, RANSAC suppose the existance of \textbf{inliers or consensus} and \textbf{outliers}  and uses a voting scheme to select between reliable data, that must follow two assumptions: 
+
+\begin{itemize}
+  \item Noisy data will not vote consistenly for a single model - (few outliners) 
+  \item Enough good features voting for the same model - (few missing data)
+\end{itemize}
+
+\subsubsection{The RANSAC algorithm}
+
+The iterative algorithm is composed of two different stages : 
+\begin {itemize}
+  \item Sample minimal data from dataset requerid to first estimate model parameters.
+  \item Given a threshold error, it selects data points that are consistent to the model created in the first step.
+\end {itemize}
+
+\begin{itemize}
+  \item Random hypoythetical inliers subset
+  \item Find model parameters
+  \item All data tested according to a loss function that determine the \textit{consensus}
+  \item Finishes when a sufficient number of point belongs to the \textit{consensus}
+\end{itemize}
+
+
+\caption{My algorithm}\label{euclid}
+    \begin{algorithmic}[1]
+        \Procedure{RANSAC}{}
+        \State $\textit{stringlen} \gets \text{length of }\textit{string}$
+        \State $i \gets \textit{patlen}$
+        \BState \emph{top}:
+        \If {$i > \textit{stringlen}$} \Return false
+        \EndIf
+        \State $j \gets \textit{patlen}$
+        \BState \emph{loop}:
+        \If {$\textit{string}(i) = \textit{path}(j)$}
+        \State $j \gets j-1$.
+        \State $i \gets i-1$.
+        \State \textbf{goto} \emph{loop}.
+        \State \textbf{close};
+        \EndIf
+        \State $i \gets i+\max(\textit{delta}_1(\textit{string}(i)),\textit{delta}_2(j))$.
+        \State \textbf{goto} \emph{top}.
+        \EndProcedure
+    \end{algorithmic}
+\end{algorithm}
+
+\chapter{Database}
+
+Our main problem is to propose a new object model from which, given a viewpoint, the robot can estimate which movement
+will lead it to a better perspective for the object recognition. A viewpoint database is necessary to create this model.
+For a mobile robot, whose movements are fixed to ground level, a complete tour around the object seems to be the most informative
+action it can realize. This tour informs all possibles object surfaces. 
+
+\section{Generating Database} 
+
+The database generation consists in obtaining a set of views concerning a given object. First a simple model with no obstructions
+will be generated. State of the art detection algorithms seem to be variant to object distance \textbf{[review]}. Thus, our data set
+must cover different view distances. This distance can be adapt according to object size \textbf{[to implement]}. 
+The center goal is to achieve an automated data set generator. 
+To alternate between views the mobile robot uses its wheels and camera movements. 
+
+\subsection{Movement Primitives}
+
+\subsection{Detection and Tracking}
+
+In other to follow the object, a RGBD [Microsoft Kinect] is used. This device provide depth information about the image, therefore,
+increasing the amount of information we receive. Treating point cloud instead of pixels made it possible to apply a direct 
+treatment to remove the unnecessary parts of the image such as walls and the floor. This segmentation occurs in the following way :
+
+\begin{itemize}
+  \item Detects image main plan. This implies that the floor corresponds to the major part of the environment. 
+  \item 
+\end{itemize}
+
+
+\section {Constrains} 
+Our approach has several constrains that could be overcome with more specified work, however not influencing the object model we want
+to propose. The major constrains are cited bellow: 
+
+_Open areas
+
+_no ground inclination (the robot moves always in the same plan, no roll and pitch are constant)
+
+_objects placed on the floor
+
+_Objets opaques
+
+_Objets non tranparents
+
+_Écarté d'une certaine distance : a threshold which indicates how close two points are required to be to belong to the same object.
+
+
+\subsubsection{Point Cloud}
+
+
+
+\section{Cross Platform}
+
+Some important issues have to be addressed...
+
+\begin{itemize}
+  \item Vision field and pixel density ration - if a new camera needs to be adopted
+
+\end{itemize}

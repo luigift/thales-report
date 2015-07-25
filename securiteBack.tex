@@ -1,0 +1,161 @@
+\chapter{Sécurité}
+\label{secu}
+Paillier a prouvé que le problème de déchiffrer un message sans la con\-naissance 
+de la factorisation du nombre $n$ est réductible au problème \emph{RSA}, qui est 
+accepté comme difficile par la communauté scientifique. 
+
+Sont définis trois classes de problèmes, 
+la classe du problème de décider si un entier est un résidu 
+modulo $n$ carré est appelée \emph{CR[$n$]}, \emph{Class[$n$,$g$]} dénote 
+la classe du problème de trouver $\benolah{w}_g$ avec $w$, $g$ et $n$, et finalement \emph{D-Class[$n$]} pour le problème décisionnel 
+relié à \emph{Class[$n$,$g$]}. Il est énoncé aussi la \emph{DCRA}, l'assomption de difficulté de la classe \emph{CR[$n$]} et la
+\emph{CCRA}, l'assomption de difficulté de la classe \emph{Class[$n$]}. La table \ref{tab:classes} 
+est un résumé des classes qui seront discutés dans ce chapitre.
+
+\begin{table}[!htb]
+	\centering
+	\caption{Table des classes de problèmes}
+	\label{tab:classes}
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		Classe      	& Type\footnotemark[1]	 &Relations              & Cible                  & Données		     	\\
+		\hline
+		\hline
+		CR[$n$]       	& D			 &                        & si $x\in\mathrm{R}_n$  & $x$	           	\\
+		Class[$n$,$g$]  & C			 & $w = g^mr^n [n^2]$     & $\benolah{w}_g$        & $w$	          	\\
+		Class[$n$]      & C			 & $w = g^mr^n [n^2]$     & $\benolah{w}_g$        & $w$ et $g$	          	\\
+		D-Class[$n$]  	& D			 & $w = g^mr^n [n^2]$     & si $x = \benolah{w}_g$ & $x$, $w$ et $g$	   	\\
+		\hline
+		RSA[$n$,$n$]    & C			 & $c = m^e    [n]$       & $m$                    & $e$ et $c$ 		\\
+		Fact[$n$]     	& C			 & $n = pq$ 		  & $p$ ou $q$             & 	 			\\
+		\hline
+	\end{tabular}
+\end{table}\footnotetext[1]{D pour Problème Décisionnel et C pour Problème de Calcul.}
+
+%CR[n] 	**	-> Deciding Composite Residuosity 	       (decide whether a number is or not a n-th residue)
+%	
+%DCRA		-> Decisinal Composite Residuosity Assumption  (intractability assumption)
+%
+%D-Class[n] **	-> decisional problem associated to Class[n]
+%
+%Class[n,g] **	-> n-th Residuosity Class Problem of base g    (compute [[w]]g with w,g and n)
+%
+%RSA[n,n]	-> find the e-th root of a number modulo n
+%				C = m^e
+%				d = e^(-1) mod phi(n)
+%				C^d = m'
+%				m' = m.
+%				the problem is to find m with C, e and n.
+%Fact[n]		-> factor a number n = pq with p and q being big primes.
+
+\section{Auto Réductibilité Aléatoire}	
+	Avant de prouver la réductibilité de \emph{Class[$n$,$g$]} à \emph{RSA[$n$]}, on prouve que 
+	chaque instance du problème peut être transformé dans une autre instance aléatoire en temps polynomial.
+
+	\begin{lemma} \emph{Class[$n$,$g$]} est aléatoirement auto réductible sur $w\in\Mgrinv{Z}{n^2}$.
+		\begin{proof}
+			On pose $w' = wg^\alpha\beta^n\mod{n^2}$, en faisant le choix de $\alpha$ et $\beta$ 
+			uniforme sur le espace $\Mgr{Z}{n} \times \Mgrinv{Z}{n}$, comme $\mathcal{E}_g$ est une 
+			bijection (c.f. Théorème \ref{theorem:bijective}), $w'$ est distribué uniformément dans
+			$\Mgrinv{Z}{n^2}$, finalement $\benolah{w}_g$ est égal à  $\benolah{w'}_g-\alpha$  et alors chaque 
+			instance peut être modifié dans n'importe quel autre instance de façon aléatoire et la 
+			solution de la première peut être trouve à partir de la deuxième.
+		\end{proof}
+	\end{lemma}
+
+	\begin{lemma} \emph{Class[$n$,$g$]} est aléatoirement auto réductible sur $g\in\mathcal{B}$:
+				$$\forall g_1, g_2 \in \mathcal{B}, Class[n,g_1] \equiv Class[n,g_2].$$
+		\begin{proof}
+			Du Théorème \ref{lemma:equalbenolah} on a:
+				$$\benolah{w}_{g_1} = \benolah{w}_{g_2}\benolah{g_2}_{g_1}\mod{n}$$
+				En remplaçant $w$ par $g_1$, on a:
+				$$\benolah{g_1}_{g_1} = \benolah{g_1}_{g_2}\benolah{g_2}_{g_1}\mod{n}$$
+				Comme $\mathcal{E}_{g_1}(1,1) = g_1$, alors $\benolah{g_1}_{g_1} = 1$ et 
+				$\benolah{g_1}_{g_2} = \benolah{g_2}_{g_1}^{-1}\mod{n}$. Ainsi:
+				$$\benolah{w}_{g_1} = \benolah{w}_{g_2}\benolah{g_1}_{g_2}^{-1}\mod{n}$$
+				et on peut calculer $\benolah{w}_{g_2}$, le déchiffrement de $w$ sur $g_2$ 
+				avec le calcul de $\benolah{w}_{g_2}$ et $\benolah{g_1}_{g_2}$ les déchiffrements 
+				de $w$ et $g_1$ sur $g_2$, alors il est possible de réduire le problème 
+				sur $g_1$ en ayant lui résolu sur $g_2$.
+		\end{proof}
+	\end{lemma}
+
+	Avec ces deux théorèmes on peut conclure que la difficulté pour chaque instance du système est comparable, 
+	et si une solution polynomiale est trou\-vée pour une instance, on peut trouver des solutions aussi 
+	polynomiales pour d'autres instances aléatoires.
+
+	\begin{quotation}
+		A random-self reduction maps an arbitrary, worst-case instance $x$ in the domain of $f$ to a set
+		of random instances $y_1, \dots, y_k$ ... Thus the averace-case complexity of $f$, where the 
+		average is taken with respect to the induced
+		distribution on instances $y_i$, is the same, up to polynomial factors, as the worst-case 
+		randomized complexity of $f$.
+
+		\hfill \em Joan Feigenbaum et Lance Fortnow\cite{Feigenbaum91onthe}
+	\end{quotation}
+
+%	Random self-reducibility (RSR) is the rule that a good algorithm for the average case implies a good algorithm for the worst case. RSR is the ability to solve all instances of a problem by solving a large fraction of the instances.
+
+\section{Réductibilité à \emph{RSA[$x$]}}
+	\begin{theorem} \emph{Class[$n$,$g$]} est réductible à \emph{Fact[$n$]}.
+		\label{theorem:rsa}
+		\begin{proof}
+			Étant donné que la fonction \ref{equation:def} permet
+			le déchiffrement avec la valeur de $\lambda(n)$
+			(en faisant la puissance modulaire, l'algorithme est polynomial), et cette
+			valeur est facilement calculée avec la factorisation de $n$,
+			un problème de la classe \emph{Class[$n$,$g$]} peut être 
+			réduit à un autre de la classe \emph{Fact[n]}.
+		\end{proof}
+	\end{theorem} 
+	\begin{theorem} \emph{Class[$n$,$g$]} est réductible à \emph{Fact[$n$]}.
+		\label{theorem:fact}
+		\begin{proof}
+			On suppose l'existence d'un oracle pour la classe \emph{RSA[$n$]}, et qu'on 
+			a un message $m$ chiffré avec $\mathcal{E}_g$. 
+
+			Grâce à la bijection on sait que il existent $x$ et $y$ tel que
+			$\mathcal{E}_{n+1}(x,y) = m$, alors on utilise la particularité de 
+			la base $n+1$:
+			$$w \equiv (1+n)^xy^n \equiv y^n\mod n$$
+			et on calcule $y$ (avec le oracle \emph{RSA}) tel que $y^n \equiv w \mod{n}$. On divise $w$ par
+			$y^n$ modulo $n^2$ et on trouve: $$R_1=\frac{w}{y^n} \equiv (1+n)^x \equiv 1+nx\mod{n^2}$$
+
+			On fait le même raisonnement tel que $g$ était le mot chiffré ($y_2^n \equiv g\mod{n}$):
+			$$R_2 \equiv \frac{g}{y_2^n} \equiv 1+n\benolah{g}_{n+1}\mod{n^2}$$
+			En appliquant la fonction $L$ sur les deux résultats:
+				$$\frac{L(R_1)}{L(R_2)} = \frac{\benolah{w}_{n+1}}{\benolah{g}_{n+1}} \equiv \benolah{x}_{g} \mod{n^2} $$ 
+			on a le déchiffrement de $w$ sur la base $g$.	
+		\end{proof}
+	\end{theorem}
+
+	\begin{theorem} \emph{CR[$n$]} $\equiv$ \emph{D-Class[$n$]}.
+		\label{theorem:cr}
+		\begin{proof}
+		On prouve chaque réductibilité.
+
+			\begin{itemize} 
+				\item \emph{CR[$n$]} est réductible à \emph{D-Class[$n$]}:
+
+					La classe \emph{CR[$n$]} désigne le problème de décider si il existe
+					un $y$ tel que $x \equiv y^n\mod{n^2}$, pour réduire à \emph{D-Class[$n$]}, on 
+					fait le choix aléatoire d'un $g\in\mathcal{B}$ et on résoudre le problème 
+					``décider si  $x=\benolah{0}_g$'' qui est bien un problème de la classe \emph{D-Class[$n$]}
+					et peut être interprété comme: ``décider si il existe un $y$ tel que $x\equiv g^0y^n\mod{n^2}$''.
+
+				\item \emph{D-Class[$n$]} est réductible à \emph{CR[$n$]}:
+	
+					De façon analogue, on pose le problème ``décider si il existe un $y$ tel que $wg^{-x}\equiv y^n\mod{n^2}$''
+					qui est clairement un problème de la classe \emph{CR[$n$]} et est solution du problème 
+					``décider si  $x=\benolah{w}_g$''.
+			\end{itemize}
+			Ainsi les deux classes sont réductibles entre elles, étant équivalentes. 
+		\end{proof}
+	\end{theorem}
+
+	Depuis les théorèmes  \ref{theorem:rsa}, \ref{theorem:fact} et  \ref{theorem:cr} et le fait que 
+	\emph{D-Class[n]} est évidemment réductible\footnote{On calcule $\benolah{w}_g$ et compare avec $x$.} a \emph{Class[n]},
+	une hiérarchie peut être écrite en utilisant le symbole $\Leftarrow$ pour la 
+	phrase ``est réductible à'':
+
+	$$\emph{CR[n]} \equiv \emph{D-Class[n]} \Leftarrow \emph{Class[n]} \Leftarrow \emph{RSA[n,n]} \Leftarrow \emph{Fact[n]} $$

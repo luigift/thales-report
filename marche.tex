@@ -1,0 +1,49 @@
+
+	\section{Les clés RSA}
+%	\TODO{Revisar o francês!}
+	\label{section:rsa}
+	Depuis 2009, le standard \textit{FIPS 186-3} sert de référence pour les implantations des 
+	protocoles \textit{RSA} et \textit{DSA}. Dans la page $52$ du document 
+	 sont définies les contraintes pour la génération d'une paire \textit{RSA} $(p,q)$:
+	\begin{quotation}
+	$$\vdots$$
+	\begin{enumerate}
+	\setcounter{enumi}{1}
+		\item The primes $p$ and $q$ \textbf{shall} be selected with the following cons\-train\-ts: 
+			\begin{enumerate}
+				\item $(p–1)$ and $(q–1)$ \textbf{shall} be relatively prime to the public exponent $e$. 
+				\item The private prime factor $p$ \textbf{shall} be selected randomly and \textbf{shall} satisfy 
+					$\sqrt{2}(2^{\frac{nlen}{2}-1}) \leq p\leq (2^{\frac{nlen}{2}}– 1)$, where $nlen$
+					is the appropriate length for the desired \\$security\_strength$. 
+				\item The private prime factor $q$ \textbf{shall} be selected randomly and \textbf{shall} satisfy 
+					$\sqrt{2}(2^{\frac{nlen}{2}-1})\leq q\leq (2^{\frac{nlen}{2}}– 1)$, where $nlen$
+					is the appropriate length for the desired \\$security\_strength$.
+				\item $|p – q| > 2^{\frac{nlen}{2}} – 100$.
+			\end{enumerate}
+	\end{enumerate}
+	$$ \vdots $$
+
+		\hfill \em National Institute of Standards and Technology.\cite{Gallagher09fipspub}
+	\end{quotation}
+
+	Les items 2.b et 2.c permettent d'affirmer que $|p| = |q|$ en bits.
+	Même si le choix entre $p$ et $q$ n'a pas été exprimé dans la description du système de Paillier, il est dit que 
+	le choix doit respecter les recommandations usuelles, en particulier 2.b et 2.c garantissent la relation $p\not\equiv 1\mod{q}$, 
+	et alors, le cardinal de $\mathbb{E}_n$ est $1$ et on a l'isomorphisme de $\mathcal{E}_g$ désiré pour $g \in \mathcal{B}$. 
+	
+	\begin{property}{Si $p$ et $q$ ont la même taille en bits, alors, $p \not\equiv 1\mod{q}$.}
+		\begin{proof}
+			On suppose que $p \equiv1\mod{q}$:
+			\begin{align*}
+				p&\equiv 1 \mod{q} \\
+				&=1+qA, A\in\mathbb{Z}
+			\end{align*}
+			Comme $p$ et $q$ ont la même taille, $A$ doit être moins grand que $2$ ($A = 1$):
+			$$p = 1+q$$
+			On sait que, sauf 2 et 3, il n'existe pas deux premiers consécutifs. Alors, par l'absurde, 
+			si $p$ et $q$ ont la même taille en bits, $p\not\equiv1\mod{q}$.
+		\end{proof}
+	\end{property}
+
+
+

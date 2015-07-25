@@ -1,0 +1,413 @@
+\chapter{Sécurité}
+\label{secu}
+Paillier a prouvé que le problème de déchiffrer un message sans la con\-naissance 
+de la factorisation du nombre $n$ est réductible au problème \emph{RSA}, qui est 
+considéré difficile par la communauté scientifique. 
+
+Sont définies trois classes de problèmes (le tableau rétrospectif \ref{tab:classes} est disponible dans la page \pageref{tab:classes}):
+
+\begin{problem} \textbf{CR[$n$]:}% décider si un entier est un $n$-résidu modulo $n^2$.
+	\begin{rm}
+		\begin{itemize}	
+		\renewcommand{\labelitemi}{}
+		\item \textbf{Entrée:} 
+			\begin{itemize}
+				\item[$\cdot$] $x\in\Mgr{Z}{n^2}$: l'entier à être vérifié. 
+			\end{itemize}
+		\item \textbf{Question:} décider si un entier est un $n$-résidu modulo $n^2$.
+		\item\textbf{Sortie:}
+			$vrai$ si $x\in\mathrm{R}_n$ et $faux$ si $x\not\in\mathrm{R}_n$.
+		\end{itemize}
+	\end{rm}
+\end{problem}
+
+
+\begin{problem} \textbf{Class[$n$,$g$]:} %trouver $\benolah{w}_g$ avec $w \in \Mgr{Z}{n}$.
+	\begin{rm}
+		\begin{itemize}	
+		\renewcommand{\labelitemi}{}
+		\item\textbf{Entrée:} 
+			\begin{itemize}
+				\item[$\cdot$] $w\in\Mgrinv{Z}{n^2}$: le message à être déchiffré.
+			\end{itemize}
+		\item\textbf{Question:} trouver $\benolah{w}_g$ avec $w \in \Mgrinv{Z}{n^2}$.
+		\item\textbf{Sortie:}
+			$x \in \Mgr{Z}{n}$ tel que $\exists y \in \Mgrinv{Z}{n}$ avec $\mathcal{E}_g(x,y) = w$.
+		\end{itemize}
+	\end{rm}
+\end{problem}
+
+La question du problème précédent peut être interprété comme déchif\-frer une message $w$ qui à été chiffré sur la base $g\in\mathcal{B}$ sans
+avoir la factorisation de $n$ ni la valeur de $\lambda(n)$ (c.f.: seulement avec la clé publique).
+
+\begin{remark}
+	Dans la section \ref{sec:autored} il sera introduit la terminologie ``auto ré\-ducti\-bi\-lité'' et il sera prouvé
+	dans le lemme \ref{lemma:reduClassg}
+	que la difficulté d'un problème de la classe \textit{Class[$n$,$g$]} ne dépend pas de $g$ et alors on peut considérer la classe 
+	\textit{Class[$n$]}. 
+\end{remark}
+
+\begin{problem} \textbf{Class[$n$]:} %trouver $\benolah{w}_g$ avec $w \in \Mgr{Z}{n}$.
+	\begin{rm}
+		\begin{itemize}	
+		\renewcommand{\labelitemi}{}
+		\item\textbf{Entrée:} 
+			\begin{itemize}
+				\item[$\cdot$] $w\in\Mgrinv{Z}{n^2}$: le message à être déchiffré.
+				\item[$\cdot$] $g\in\Mgrinv{Z}{n}$: la base du chiffrement.
+			\end{itemize}
+		\item\textbf{Question:} trouver $\benolah{w}_g$ avec $w \in \Mgrinv{Z}{n^2}$.
+		\item\textbf{Sortie:}
+			$x \in \Mgr{Z}{n}$ tel que $\exists y \in \Mgrinv{Z}{n}$ et $\mathcal{E}_g(x,y) = w$.
+		\end{itemize}
+	\end{rm}
+\end{problem}
+
+\begin{problem} \textbf{D-Class[$n$]:}% décider si un entier donné $x$ dans $\Mgr{Z}{n}$ vérifie $w=\mathcal{E}_g(x,y)$ avec $y \in \Mgrinv{Z}{n}$. C'est-à-dire: Décider si $\exists y \in \Mgrinv{Z}{n}$ tel que $w = \mathcal{E}_g(x,y)$.
+	\begin{rm}
+		\begin{itemize}	
+		\renewcommand{\labelitemi}{}
+		\item\textbf{Entrée:} 
+			\begin{itemize}
+				\item[$\cdot$] $x\in\Mgr{Z}{n}$: le message d'origine.
+				\item[$\cdot$] $w\in\Mgrinv{Z}{n^2}$: le message à être déchiffré.
+				\item[$\cdot$] $g$ d'ordre  multiple de $n$ dans $\Mgrinv{Z}{n^2}$.
+			\end{itemize}
+		\item\textbf{Question:} Décider si $\exists y \in \Mgrinv{Z}{n}$ tel que $w = \mathcal{E}_g(x,y)$. Autrement dit, décider si $w$ chiffre $x$.
+		\item\textbf{Sortie:}
+			$vrai$ si il existe un y comme décrit et $faux$ si il n'existe pas.
+		\end{itemize}
+	\end{rm}
+\end{problem}
+
+Dans les preuves on comparera les problèmes énoncés et les problèmes \textit{RSA[$n$,$n$]} et \textit{Fact[$n$]}. Premièrement on les définit:
+
+
+\begin{problem} \textbf{RSA[$n$,$e$]:}% Trouver le seul $m$ qui vérifie $c = m^e\mod{n}$ avec $n$ le produit de deux premiers de grand taille, $m\in\Mgr{Z}{n}$ et $e$ tel que $\pgcd(e,\phi(n))= 1$.    
+\begin{rm}
+		\begin{itemize}	
+		\renewcommand{\labelitemi}{}
+		\item\textbf{Entrée:} 
+			\begin{itemize}
+%				\item[$\cdot$] $(n,e)$: la clé publique formée par $n$ semi premier et $e\in\Mgrinv{Z}{\phi(n)}$ 
+				\item[$\cdot$] $c$: le message à être déchiffré en \verb!RSA!.
+			\end{itemize}
+		\item\textbf{Question:} Trouver $m\in\Mgr{Z}{n}$ vérifiant $c = m^e\mod{n}$ avec $n$ le produit 
+		de deux premiers de grand taille tel que $\pgcd(e,\phi(n))= 1$.    
+		\item\textbf{Sortie:}
+			$m$ la racine $e$-ième de l'entier $c$ dans $\Mgr{Z}{n}$.
+		\end{itemize}
+	\end{rm}
+\end{problem}
+
+
+\begin{problem} \textbf{Fact[$n$]:}% Factoriser $n$, la multiplication de deux grands entiers. 
+	\begin{rm}
+		\begin{itemize}	
+		\renewcommand{\labelitemi}{}
+		\item\textbf{Entrée:} 
+%				Le nombre $n$ suffit pour caractériser le problème.
+%			\begin{itemize}
+%			\end{itemize}
+
+		\item\textbf{Question:} Trouver un facteur non trivial\footnote{Un facteur non trivial de $n$ est un facteur différent de $\pm1$ et $\pm n$.} de $n$.%Factoriser $n$, la multiplication de deux grands entiers. 
+
+		\item\textbf{Sortie:}
+			$f$ un facteur non trivial de $n$ et $n$ dans le cas échéant.
+%			$p$ ou $q$ positifs différents de $n$ et $1$ tel que $n = pq$.
+		\end{itemize}
+	\end{rm}	
+\end{problem}
+
+%Sont définis trois classes de problèmes, 
+%la classe du problème de décider si un entier est un résidu 
+%modulo $n$ carré est appelée \emph{CR[$n$]}, \emph{Class[$n$,$g$]} dénote 
+%la classe du problème de trouver $\benolah{w}_g$ avec $w$, $g$ et $n$, et finalement \emph{D-Class[$n$]} pour le problème décisionnel 
+%relié à \emph{Class[$n$,$g$]}. Il est énoncé aussi la \emph{DCRA}, l'assomption de difficulté de la classe \emph{CR[$n$]} et la
+%\emph{CCRA}, l'assomption de difficulté de la classe \emph{Class[$n$]}. La table \ref{tab:classes} 
+%est un résumé des classes qui seront discutés dans ce chapitre.
+
+\begin{table}[!htb]
+	\centering
+	\caption{Table des classes de problèmes}
+	\label{tab:classes}
+	\begin{tabular}{|c|c|c|c|c|}
+		\hline
+		Classe      	& Type\footnotemark[2]	 &Relations              & Question                  & Entrée		     	\\
+		\hline
+		\hline
+		CR[$n$]       	& D			 &                        & $x\in\mathrm{R}_n$?    & $x$	           	\\
+		Class[$n$,$g$]  & C			 & $w = g^mr^n [n^2]$     & $\benolah{w}_g$        & $w$	          	\\
+		Class[$n$]      & C			 & $w = g^mr^n [n^2]$     & $\benolah{w}_g$        & $w$ et $g$	          	\\
+		D-Class[$n$]  	& D			 & $w = g^mr^n [n^2]$     & $x = \benolah{w}_g$?   & $x$, $w$ et $g$	   	\\
+		\hline
+		RSA[$n$,$e$]    & C			 & $c = m^e    [n]$       & $m$                    & $c$	 		\\
+		Fact[$n$]     	& C			 & 			  & $d|n$, $d\not\in \{1,n\}$     & 	 			\\
+		QRP[$n$]	& D			 & 			  & $\exists y\in\Mgr{Z}{n}, a\equiv y^2 [n]$? & $a$		\\
+		\hline
+	\end{tabular}
+\end{table}\footnotetext[2]{`D' pour Problème Décisionnel et `C' pour Problème de Calcul.}
+
+%CR[n] 	**	-> Deciding Composite Residuosity 	       (decide whether a number is or not a n-th residue)
+%	
+%DCRA		-> Decisinal Composite Residuosity Assumption  (intractability assumption)
+%
+%D-Class[n] **	-> decisional problem associated to Class[n]
+%
+%Class[n,g] **	-> n-th Residuosity Class Problem of base g    (compute [[w]]g with w,g and n)
+%
+%RSA[n,n]	-> find the e-th root of a number modulo n
+%				C = m^e
+%				d = e^(-1) mod phi(n)
+%				C^d = m'
+%				m' = m.
+%				the problem is to find m with C, e and n.
+%Fact[n]		-> factor a number n = pq with p and q being big primes.
+
+Une définition non formelle de réduction entre problèmes est donnée par C.~Stein et al.~dans {\em Introduction To
+  Algorithms} \cite{stein2001introduction}: 
+
+{\em Un problème $A$ est dit réductible à un problème $B$ si, pour chaque instance $I_a$ du problème $A$, il est possible de trouver 
+un nombre $i$ polynomialement borné des instances
+du problème $B$ dont les résultats permettent de trouver la solution de $I_a$.}
+
+La définition formelle des mêmes auteurs:
+
+\begin{definition} (Réduction polynomial des problèmes de décision)
+Un langage $A$ (pro\-blè\-me dé\-ci\-sion\-nel) est dit réductible en temps polynomial à un langage $B$, noté $A \leq_P B$, si il existe une fonction évaluable en 
+temps polynomial $f:\{0,1\}^*\to\{0,1\}^*$ tel que pour tout $x\in\{0,1\}^*$, $x\in A \text{ si et seulement si } f(x) \in B$. Si $A\leq_PB$ et $B\leq_PA$,
+les problèmes sont dits équivalents et on utilise la notation $A\equiv_P B$
+%
+%	Un problème $A$ est dit réductible à un problème $B$ si, pour chaque instance $I_a$ du problème $A$, il est possible de trouver 
+%un nombre $i$ polynomialement borné des instances
+%du problème $B$ dont les résultats permettent de trouver la solution de $I_a$.
+\end{definition}
+
+Par exemple: résoudre une équation de degré $1$ (on dit $2x+1=0$) est réductible a résoudre une équation de degré $2$ ( $(2x+1)^2 = 0$ ).
+La transition d'un problème dans un autre sera notée ``transformation'', la transformation est faite par un algorithme qui qui implante une 
+telle fonction, ils sont appelés \textbf{algorithme de réduction} et \textbf{fonction de réduction} respectivement.
+
+%Si il existe une fonction qui permet la transformation d'une instance de $A$ dans une instance de $B$ et une fonction 
+%qui permet la traduction des résultats, et les deux fonctions sont calculables en temps polynomial, on dit que le problème $A$ est 
+%\textbf{réductible à $B$ en temps polynomial}. 
+
+\section{Auto Réductibilité}	
+	\label{sec:autored}
+	L'auto réductibilité est une propriété des problèmes. Étant donnée une instance d'un problème, si il est possible 
+	de la réduire en temps polynomial dans un ensemble d'instances aléatoires du même problème, alors la classe est appelé 
+	\textbf{auto réductible}. Cette propriété garantit que le temps pour la résolution d'une instance dite difficile n'est plus distant
+	que d'un facteur polynomial du temps de solution d'une instance moyenne et donc le cas moyen est aussi difficile que le pire cas.
+
+	\begin{quotation}
+		A random-self reduction maps an arbitrary, worst-case instance $x$ in the domain of $f$ to a set
+		of random instances $y_1, \dots, y_k$ \dots Thus the average-case complexity of $f$, where the 
+		average is taken with respect to the induced
+		distribution on instances $y_i$, is the same, up to polynomial factors, as the worst-case 
+		randomized complexity of $f$.
+
+		\hfill \em Joan Feigenbaum et Lance Fortnow\cite{Feigenbaum91onthe}
+	\end{quotation}
+
+%	Avant de prouver la réductibilité de \emph{Class[$n$,$g$]} à \emph{RSA[$n$]}, on prouve que 
+%	chaque instance du problème peut être transformé dans une autre instance aléatoire en temps polynomial.
+
+	\begin{lemma} \emph{Class[$n$,$g$]} est auto réductible sur $w\in\Mgrinv{Z}{n^2}$.
+		\begin{proof}
+			On pose $w' = wg^\alpha\beta^n\mod{n^2}$, en faisant le choix de $\alpha$ et $\beta$ 
+			uniforme sur l'espace $\Mgr{Z}{n} \times \Mgrinv{Z}{n}$, comme $\mathcal{E}_g$ est une 
+			bijection pour $g\in\mathcal{B}$ (c.f. Théorème \ref{theorem:bijective}), $w'$ est distribué uniformément dans
+			$\Mgrinv{Z}{n^2}$, finalement $\benolah{w}_g$ est égal à  $\benolah{w'}_g-\alpha$  et alors chaque 
+			instance peut être modifiée dans n'importe quel autre instance de façon aléatoire et la 
+			solution de la première peut être trouvée à partir de la solution de la deuxième.
+		\end{proof}
+	\end{lemma}
+
+	\begin{lemma} \emph{Class[$n$,$g$]} est auto réductible sur $g\in\mathcal{B}$: \label{lemma:reduClassg}
+				$$\forall g_1, g_2 \in \mathcal{B}, Class[n,g_1] \equiv_P Class[n,g_2].$$
+		\begin{proof}
+			Du Lemme \ref{lemma:equalbenolah} on a:
+				$$\benolah{w}_{g_1} \equiv \benolah{w}_{g_2}\benolah{g_2}_{g_1}\mod{n}$$
+				En remplaçant $w$ par $g_1$, on a:
+				$$\benolah{g_1}_{g_1} \equiv \benolah{g_1}_{g_2}\benolah{g_2}_{g_1}\mod{n}$$
+				Comme $\mathcal{E}_{g_1}(1,1) = g_1$, alors $\benolah{g_1}_{g_1} = 1$ et 
+				$\benolah{g_1}_{g_2} \equiv \benolah{g_2}_{g_1}^{-1}\mod{n}$. Ainsi:
+				$$\benolah{w}_{g_1} \equiv \benolah{w}_{g_2}\benolah{g_1}_{g_2}^{-1}\mod{n}$$
+				Il est alors possible de résoudre le problème \PC{Class}{n,g_1} à partir de la résolution de \PC{Class}{n,g_2}
+%				et on peut calculer $\benolah{w}_{g_2}$, le déchiffrement de $w$ sur $g_2$ 
+%				avec le calcul de $\benolah{w}_{g_2}$ et $\benolah{g_1}_{g_2}$ respectivement les déchiffrements 
+%				de $w$ et $g_1$ sur $g_2$, alors il est possible de réduire le problème 
+%				sur $g_1$ en ayant lui résolu sur $g_2$.
+		\end{proof}
+	\end{lemma}
+
+	Avec ces deux Lemmes on peut conclure que la difficulté pour chaque instance du système de Paillier est équivalente, 
+	et si une solution en temps polynomial est trou\-vée pour une instance aléatoire, on peut trouver des solutions 
+	pour d'autres instances.
+
+
+%	Random self-reducibility (RSR) is the rule that a good algorithm for the average case implies a good algorithm for the worst case. RSR is the ability to solve all instances of a problem by solving a large fraction of the instances.
+
+\section{Réductibilité à \emph{RSA[$x,x$]}}
+	\begin{theorem} \emph{Class[$n$,$g$]} est réductible à \emph{Fact[$n$]}.
+		\label{theorem:rsa}
+		\begin{proof}
+			Étant donné que la fonction définie en (\ref{equation:def}) permet
+			le déchif\-frement avec la valeur de $\lambda(n)$
+			(en faisant la puissance modulaire, l'algorithme est polynomial), et cette
+			valeur est facilement calculée avec la factorisation de $n$,
+			toute instance du problème \emph{Class[$n$,$g$]} peut être 
+			réduite à une instance du problème \emph{Fact[n]}.
+		\end{proof}
+	\end{theorem} 
+	\begin{theorem} \emph{Class[$n$,$g$]} est réductible à \PC{RSA}{n,n}.
+		\label{theorem:fact}
+		\begin{proof}
+		%	On suppose l'existence d'un oracle pour la classe \emph{RSA[$n,n$]}, et qu'on a
+			Soit $w$ un message chiffré avec $\mathcal{E}_g$. 
+
+			Grâce à la bijection on sait que il existent $x$ et $y$ tels que
+			$\mathcal{E}_{n+1}(x,y) = w$, alors on utilise la particularité de 
+			la base $n+1$:
+			$$w \equiv (1+n)^xy^n \equiv y^n\mod n$$
+			et on calcule $y$ (le problème \emph{RSA}) tel que $y^n \equiv w \mod{n}$. On divise $w$ par
+			$y^n$ modulo $n^2$ et on trouve: $$R_1=\frac{w}{y^n} \equiv (1+n)^x \equiv 1+nx\mod{n^2}$$
+
+			On fait le même raisonnement tel que $g$ était le mot chiffré ($w = g$ et $y_2^n \equiv g\mod{n}$):
+			$$R_2 \equiv \frac{g}{y_2^n} \equiv 1+n\benolah{g}_{n+1}\mod{n^2}$$
+			En appliquant la fonction $L$ sur les deux résultats:
+				$$\frac{L(R_1)}{L(R_2)} = \frac{\benolah{w}_{n+1}}{\benolah{g}_{n+1}} \equiv \benolah{x}_{g} \mod{n^2} $$ 
+			on a le déchiffrement de $w$ sur la base $g$.	
+		\end{proof}
+	\end{theorem}
+	\section{Récapitulatif et conclusion}
+
+
+	%%% Class[n,g] -> Class[n] -> D-Class[n] equiv CR pareil avec Quadratique equiv Fact
+%	\TODO{revisar francês}
+
+
+	On a vu que le problème \PC{Class}{n,g} est équivalent au problème \PC{Class}{n} et que ils garantissent\footnote{Si une 
+		personne trouve une solution polynomiale, alors elle peut déchiffrer les données sans avoir la clé privée.} la sécurité 
+	du système de Paillier et maintenant on prouve que \PC{CR}{n} $\equiv_P$ \PC{D-Class}{n}. Cette preuve est très importante 
+	du point de vue de la garantie théorique de la sécurité, étant donné que \PC{CR}{n} est une généralisation du problème 
+	\PC{QRP}{n} (Quadratic Residuosity Problem) accepté difficile. Ce problème sous-jacent aux système de Paillier appairait 
+	donc être une généralisation d'un problème réputé difficile.
+	
+	%Même si l'équivalence \PC{CR}{n} $\equiv_P$ \PC{QRP}{n} n'ai pas 
+	%été prouvé, il parait raisonnable que la équivalence soit vraie et par conséquence: $$\text{probablement: }\PC{QRP}{n} \equiv_P \PC{D-Class}{n},$$ 
+	%une situation souhaité.
+
+\begin{problem} \textbf{\PC{QRP}{n}:}% Factoriser $n$, la multiplication de deux grands entiers. 
+	\begin{rm}
+		\begin{itemize}	
+		\renewcommand{\labelitemi}{}
+		\item\textbf{Entrée:}
+			
+			\begin{itemize}
+				\item[$\cdot$] $a\in \Mgr{Z}{n}$.
+			\end{itemize}
+
+		\item\textbf{Question:} Décider si $a$ est un résidu quadratique modulo $n$, i.e. $\exists y \in \Mgrinv{Z}{n^2}, a \equiv y^2 \mod{n}$.
+
+		\item\textbf{Sortie:}
+			$vrai$ si il est un résidu quadratique et $faux$ sinon.
+		\end{itemize}
+	\end{rm}	
+\end{problem}
+
+
+	\begin{theorem} \emph{CR[$n$]} $\equiv_P$ \emph{D-Class[$n$]}.
+		\label{theorem:cr}
+		\begin{proof}
+		On prouve chaque réductibilité.
+
+			\begin{itemize} 
+				\item \emph{CR[$n$]} est réductible à \emph{D-Class[$n$]}:
+					
+				Soit $CR_x$  l'instance $(x)$ du problème \PC{CR}{n}, on décrit un algorithme polynomial de réduction de $CR_x$
+				dans une instance de \PC{D-Class}{n}:
+				\begin{enumerate}
+					\item \textbf{Transformation de l'instance}:
+						Soit $g \in_R \mathcal{B}$, l'instance $(0,x,g)$ de \PC{D-Class}{n} est: ``décider si $\exists y \in \Mgrinv{Z}{n}$ 
+						tel que $x \equiv g^0y^n \equiv y^n\mod{n^2}$''.
+					\item \textbf{Solution du problème \PC{D-Class}{n}}:
+						Retourne $vrai$ si il existe $y$ et $faux$ sinon.
+					\item \textbf{Traduction de la solution}:
+						La réponse est directe du pas 2. Parce que si il existe $y$, $x \equiv g^0y^n\equiv y^n\mod{n^2}$.
+%Le argument est la équivalence entre $g^0y^n$ et $y^n$.
+				\end{enumerate}
+			
+
+				\item \emph{D-Class[$n$]} est réductible à \emph{CR[$n$]}:
+					
+				Soit $DC_{x,w,g}$  l'instance $(x,w,g)$ du problème \PC{D-Class}{n}, on décrit un algorithme polynomial de réduction de l'instance $DC_{x,w,g}$
+				dans une instance de \PC{CR}{n}:
+				\begin{enumerate}
+					\item \textbf{Transformation de l'instance}:
+						Soit $x' \equiv g^{-x}w \mod{n^2}$, l'instance $(x')$ de \PC{CR}{n} est: ``décider si $\exists y \in \Mgrinv{Z}{n}$
+						tel que $x' \equiv y^n \mod{n^2}$''.
+%						Soit $g \in_R \mathcal{B}$, l'instance $(0,x,g)$ de \PC{D-Class}{n} est: `` décider si $\exists y \in \Mgrinv{Z}{n}$ 
+%						tel que $x \equiv g^0y^n \equiv y^n\mod{n^2}$''.
+					\item \textbf{Solution du problème \PC{CR}{n}}:
+						Retourne vrai si $x' \in \mathrm{R}_n$ et faux sinon.
+%						Retourne $vrai$ si il existe $y$ et $faux$ sinon.
+					\item \textbf{Traduction de la solution}:
+						La réponse est directe du pas $2$. L'argument est que \PC{CR}{n} est vrai si et seulement si $\exists y \in \Mgrinv{Z}{n}$
+						tel que $x'\equiv y^n\mod{n^2}$ $\iff$ $x'\equiv g^{-x}w \equiv y^n\mod{n^2}$ $\iff$ $w\equiv g^xx'\equiv g^xy^n\mod{n^2}$,
+						et on obtient la solution de \PC{D-Class}{n} sur l'instance $(x,w,g)$.
+%						La réponse est directe du pas $2$. Le argument est que \PC{CR}{n} est vrai si et seulement si $\exists y \in \Mgrinv{Z}{n}$
+%						tel que $x'=y^n\mod{n^2}$ $\iff$
+%						La réponse est directe du pas 2. Le argument est que $x = \benolah{w}_g$ si et seulement si
+%						il existe $r\in\Mgrinv{Z}{n}$ tel que $w \equiv g^xr^n$, et alors $x' \equiv g^xr^ng^{-x}\equiv r^n\mod{n}$. 
+%						La réponse est directe du pas 2. Le argument est que $x = \benolah{w}_g$ si et seulement si
+%						il existe $r\in\Mgrinv{Z}{n}$ tel que $w \equiv g^xr^n$, et alors $x' \equiv g^xr^ng^{-x}\equiv r^n\mod{n}$. 
+				\end{enumerate}
+
+%				\item \emph{CR[$n$]} est réductible à \emph{D-Class[$n$]}:
+%
+%					La classe \emph{CR[$n$]} désigne le problème de décider si il existe
+%					un $y$ tel que $x \equiv y^n\mod{n^2}$, pour réduire à \emph{D-Class[$n$]}, on 
+%					fait le choix aléatoire d'un $g\in\mathcal{B}$ et on résoudre le problème 
+%					``décider si  $x=\benolah{0}_g$'' qui est bien un problème de la classe \emph{D-Class[$n$]}
+%					et peut être interprété comme: ``décider si il existe un $y$ tel que $x\equiv g^0y^n\mod{n^2}$''.
+%
+%				\item \emph{D-Class[$n$]} est réductible à \emph{CR[$n$]}:
+%	
+%					De façon analogue, on pose le problème ``décider si il existe un $y$ tel que $wg^{-x}\equiv y^n\mod{n^2}$''
+%					qui est clairement un problème de la classe \emph{CR[$n$]} et est solution du problème 
+%					``décider si  $x=\benolah{w}_g$''.
+			\end{itemize}
+			Ainsi les deux classes étant réductibles entre elles, sont équivalentes. 
+		\end{proof}
+	\end{theorem}
+
+%	\begin{theorem} \emph{CR[$n$]} $\equiv$ \emph{D-Class[$n$]}.
+%		\label{theorem:cr}
+%		\begin{proof}
+%		On prouve chaque réductibilité.
+%
+%			\begin{itemize} 
+%				\item \emph{CR[$n$]} est réductible à \emph{D-Class[$n$]}:
+%
+%					La classe \emph{CR[$n$]} désigne le problème de décider si il existe
+%					un $y$ tel que $x \equiv y^n\mod{n^2}$, pour réduire à \emph{D-Class[$n$]}, on 
+%					fait le choix aléatoire d'un $g\in\mathcal{B}$ et on résoudre le problème 
+%					``décider si  $x=\benolah{0}_g$'' qui est bien un problème de la classe \emph{D-Class[$n$]}
+%					et peut être interprété comme: ``décider si il existe un $y$ tel que $x\equiv g^0y^n\mod{n^2}$''.
+%
+%				\item \emph{D-Class[$n$]} est réductible à \emph{CR[$n$]}:
+%	
+%					De façon analogue, on pose le problème ``décider si il existe un $y$ tel que $wg^{-x}\equiv y^n\mod{n^2}$''
+%					qui est clairement un problème de la classe \emph{CR[$n$]} et est solution du problème 
+%					``décider si  $x=\benolah{w}_g$''.
+%			\end{itemize}
+%			Ainsi les deux classes sont réductibles entre elles, étant équivalentes. 
+%		\end{proof}
+%	\end{theorem}
+
+	Depuis les théorèmes  \ref{theorem:rsa}, \ref{theorem:fact} et  \ref{theorem:cr} et le fait que 
+	\emph{D-Class[$n$]} est évidemment réductible\footnote{On calcule $\benolah{w}_g$ et compare avec $x$.} a \emph{Class[n]},
+	une hiérarchie peut être écrite: %en utilisant le symbole ``$\Leftarrow$'' pour la phrase ``est réductible à'':
+
+	%$$\PC{QRP}{n} \stackrel{?}{\equiv}_P
+	$$\emph{CR[n]} \equiv_P \emph{D-Class[n]} \leq_P \emph{Class[n]} \leq_P \emph{RSA[n,n]} \leq_P \emph{Fact[n]} $$

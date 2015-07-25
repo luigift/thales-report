@@ -1,0 +1,88 @@
+\section{Pipeline}
+
+    \subsection{Segmentation}
+
+        \subsubsection{Motivation}
+            Simplifier l'étape de extraction de descripteurs
+
+        \subsubsection{Algorithme}
+            RANSAC : estimation de plans
+            Average_3D : estimation de normales
+            Enveloppe convexe et distance euclidienne : cluster d'objets
+            
+        \subsubsection{Restrictions}
+            Tous les clusters segmentés sont considérés comme des objets. 
+            \begin{itemize}
+                \item Objets invisibles au infra-rouge (transaparents ou réflectives)
+                \item Distance entre cluster et le sol 
+                \item Distance entre deux points pour être considérés comme clusteurs differents 
+                \item Objets de petit taille et/ou complexes 
+
+        \subsubsection{Proposition d'Améilloration}
+            ( Sans suggestion, besoin de recherche )
+
+    \subsection {Extraction de Descripteurs}
+
+        \subsubsection{Motivation}
+            Réduction de la dimensionalité et exploration de l'invariance à transformées physiques
+
+        \subsubsection{Algorithme}
+            PFH  : Base construite, Publisher Online 
+            VFH  : ---------------, Publisher Online 
+            CVFH : ---------------, ----------------
+
+        \subsubsection{Restrictions}
+            Fiabilité dépend de la estimation de normales (raisonable)
+
+        \subsubsection{Proposition d'Améilloration}
+            Combinaison de features 
+
+    \subsection {Classification}
+
+        \subsubsection{Motivation}
+            Comparaison entre une image de teste et une base de données
+
+        \subsubsection{Algorithme}
+            K-Nearest Neighbors : Construction de l'arbre, recherche de voisins
+            Comparaison d'histogram Chi-squared
+
+        \subsubsection{Restrictions}
+            Fiabilité dépend Metrique de comparaison 
+        
+        \subsubsection{Proposition d'Améilloration}
+            Possibilité d'apprentissage de distances
+            Utilization d'une classificateur 'complet' (e.g. Overfeat)
+
+
+    \subsection {Classification Multi-vue}
+
+        \subsubsection{Motivation}
+            Augmenter mes confiance d'après une ensemble d'observations
+
+        \subsubsection{Algorithme}
+            Chaînes de Markov cachées 
+
+        \subsubsection{Restrictions}
+            Matching entre objets dans la scène
+        
+        \subsubsection{Proposition d'Améilloration}
+            Rédefinition de la matrice de transition pour prendre en compte le déplacement du robot
+            Utilization d'un autre modèle de suivi : Filtre Bayesien
+            Multi-objet multi-vue recognition (MOMVR)
+
+    \subsection {Déplacement}
+
+        \subsubsection{Motivation}
+            Capacité d'acquirir de nouvelles points de vue
+
+        \subsubsection{Algorithme}
+            Aucun pour l'instant
+
+        \subsubsection{Restrictions}
+            Odometrie problematique
+        
+        \subsubsection{Proposition d'Améilloration}
+            Avoid & Planification de trajectoires
+            SLAM (odometrie)
+            Optimization MOMVR (compromis entre déplacement et reconnaissance)
+            

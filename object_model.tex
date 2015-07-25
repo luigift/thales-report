@@ -1,0 +1,67 @@
+\chapter{Répresentation des objets}
+
+L'objectif c'est d'avoir un modèle que integre et respect certains principes appris après observation dans la reconnaissance chez les humas :
+
+1. Gazltat :  *Tendencia* à retrouver des formes et contours simples et naturels par regroupement de characteristiques et/ou comportements.
+
+2. Continuit'e : l'apprentissage d'un nouveau objet se fait de forme continue. Ne pas prendre en compte ce characteristique c'est ignorer un importante 'etape dans la reconnaissance
+
+2.2 Continuit'e dans le cas discret c'est avoir un modèle ou le transition entre superficies est sufisament *smooth*, cela peut être interpreter par un continuit'e du matching, où ces features continues à être suivies.
+
+3. Temporalit'e et sequentiel : Des 'etudes suggèrent que l'ordre de visualization de l'objet influencie sa reconnaissance à posteriori. Par cons'equent, la correlation entre superficies et la transformation/transition spatial semble être important. 
+
+3.2 Cela veux dire que pour la reconnaissance avoir la même sequence que celle appris apporterais plus d'information.
+
+
+
+\section {Hypotèses de départ}
+\begin{itemize}
+  \item Objet Rigide
+  \item \textbf{Lambertian reflectance}
+\end{itemize}
+
+\section{Charecteristique des objets}
+
+1.couleur et texture
+
+2. Forme geométrique
+2.1 sous formes primaire
+2.2 position et orientation relatif entre formes primaires
+
+3.patches de l'image
+
+4.affordance
+
+5. contexte dans l'environment
+5.1 position
+5.2 contraintes de space
+
+\section{Répresentation de l'objet}
+
+A.  En s'utilisant de sequence d'images
+
+1.Aspect-Graphs
+
+Cette forme de répresenter les objets consiste à avoir un graphe où chaque noeud correspond à une image et les liens entre noeuds les réeles transition visuelles pour un objet donné.
+
+Pourtant, ces graphes peuvent être de plusieurs types differents 
+1. Complet : Avoir le plus grande nombre d'images possible pour répresenter l'objet
+Pros : Garantie a priori d'avoir tout l'information possible concernant l'objet.
+Cons: Redundance d'information, dépense mémoire importante.
+
+2. Key-Frames : Une forme intéressante de réduire la taille du *aspect-graph* est celle d'avoir quelques images pour répresenter les objets.
+2.1 Randomique : Ces key-frames peuvent être choisies de forme complètement aléatoire. 
+Pros: Absence de calcul intermediare ou pre-processing
+Cons: perte d'information et possiblement le grand plus informative
+2.2 Une solution pour ce problème est estimer l'information de chaque scène, en autres mot, comment cette scène spécifiquement se différencie des autres scènes du même objet où, encore, des scènes d'autre objet. Une 
+Pros: Permet de trouver les vues plus représentatives  
+Cons: Perte d'information même si mois important que aléatoirement. 
+
+2. Modèle CAD
+Consiste à réprésenter l'objet par son modèle 3D fait à l'aide d outils de design numériques.
+Avantages: Le modèle incorpore tout les aspects physiques et est robust au point de vue.
+Inconvenients: Le modèle *requer* un precision important et du bruit, même si faible, peut rendre le processus de reconnaissane faux.
+
+
+3. Formes 
+Une autre approche est base sur les silluettes des objets. Contours....

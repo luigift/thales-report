@@ -1,0 +1,212 @@
+%	\section{Le système}
+	\section{Le Mécanisme de déchiffrement}	
+	\label{sec:mecanisme}
+	On déduira les propriétés ma\-thé\-ma\-ti\-ques sur lesquelles le système 
+	de Paillier est basé.
+
+%	En faisant la bonne choix de $p$ et $q$, on déduira les propriétés ma\-thé\-ma\-ti\-ques sur lesquelles le système 
+%	de Paillier est basé.
+
+	\begin{lemma} Pour tout $w \in \Mgrinv{Z}{n^2}$, on a $w^{n\lambda(n)}\equiv 1 \mod{n^2}$.
+
+		\label{lemma:nlambda}
+		\begin{proof}
+			Soit $w_0 \equiv w \mod{n}$, comme $w_0^{-1} \equiv w^{-1}\mod{n}$ alors $w_0\in \Mgrinv{Z}{n}$ et on peut appliquer le Théorème \ref{lambda:theo}:
+			$w^{\lambda(n)} \equiv w_0^{\lambda(n)} \equiv  1\mod{n}$, donc $w^{\lambda(n)}$ est de la forme
+			$1+nA, A\in \mathbb{Z}$ et on a:
+			$$w^{\lambda(n)n} = (1+nA)^n = 1+n\cdot An+(An)^2\cdot C, C \in \mathbb{Z}$$
+			Ou encore $w^{\lambda(n)n} \equiv 1\mod{n^2}$.
+		\end{proof}
+	\end{lemma}
+%	\TODO{Rever o titulo do lemma, usar fixo nao fica legal. h eh uma raiz n esima dentro de ZnZ}
+	\begin{lemma} Pour tout $z \in \mathrm{R}_n$, les racines $n$-ièmes de $z$ dans $\Mgrinv{Z}{n^2}$ sont de la 
+		forme $(h+kn)\mod{n^2}$ avec $h$ une racine $n$-ième de $z$ dans $\Mgrinv{Z}{n}$ 
+		et $0\leq k\leq n-1$.\label{lemma:racines}
+		\begin{proof}
+			On a vu dans le Lemme \ref{lemma:equivncarre} que si $h$ est une racine $n$-ième de $z$, $u\in\mathbb{E}_n$ 
+			et $h_u \equiv h\cdot u\mod{n}$ alors les nombres $(h_u+kn)^n$ sont aussi congrus à 
+			$z$ modulo $n^2$. Ainsi chaque valeur $(h_u+kn)$ est une racine $n$-ième d'un même $z$.
+			Alors le nombre de racines $n$-ièmes de ce type est $\sharp(\mathbb{E}_n)\cdot n = \pgcd(n,\phi(n))\cdot n$. Comme l'ordre 
+			de $\mathrm{R}_n$ est: $$\frac{\phi(n)}{\pgcd(n,\phi(n))}\text{,}$$ le nombre de racines est 
+			$\sharp(\mathbb{E}_n)\cdot n \cdot \frac{\phi(n)}{\pgcd(n,\phi(n))} = n\phi(n) = \sharp(\Mgrinv{Z}{n^2})$ alors
+			chaque $z$ dans $R_n$ possède seulement les racines $(h_u+kn), 0 \leq k \leq n-1$ . C'est-à-dire toutes les racines de $z$ sont 
+			de la forme $(h_u+kn)$.
+		\end{proof}
+	\end{lemma}
+
+%	\begin{lemma} Pour tout $z \in \mathrm{R}_n$, les racines $n$-ièmes de $z$ sont de la forme $(h+kn)\mod{n^2}$ avec $h$ une racine $n$-ième dans $\Mgrinv{Z}{n}$ 
+%	et $0\leq k\leq n-1$.
+%		\begin{proof}
+%			On a vu dans le Lemme \ref{lemma:equivncarre} que si $h$ est une racine $n$-ième de $z$, alors les nombres $(h+kn)^n$ sont aussi congrus à 
+%			$z$ modulo $n^2$. Ainsi chaque valeur dans $\Mgrinv{Z}{n}$ est une racine $n$-ième et engendre $n-1$ autres racines $n$-ièmes dans $\Mgrinv{Z}{n}$, 
+%			si l'ordre de $\mathrm{R}_n$ est $$\frac{\phi(n)}{\pgcd(n,\phi(n))}\text{,}$$
+%			on a aussi que $\pgcd(n,\phi(n))$ racines doivent engendre un même $n$-ième résidu modulo $n^2$. D'où on peut conclure
+%			que chaque $z \in \mathrm{R}_n$ possède $n\pgcd(n,\phi(n))$ racines.
+%		\end{proof}
+%	\end{lemma}
+
+	On note $\mathcal{B}_\alpha$ l'ensemble d'éléments d'ordre $n\alpha$ dans $\Mgrinv{Z}{n^2}$  et 
+	$$\mathcal{B} = \underset{1\leq \alpha\leq \lambda(n)}{\bigsqcup}{\mathcal{B}_\alpha}$$ l'union disjointe.
+
+
+	Si $p \not\equiv 1\mod{q}$ alors 
+%	En faisant la bonne choix de $p$ et $q$ pour fixer 
+	l'ordre de $\mathrm{R}_n$ est $\phi(n)$ 
+	et par conséquent 
+	$z \in \Mgrinv{Z}{n^2}$ n'admet qu'une seule racine $n$-ième dans \Mgrinv{Z}{n}
+%	ce le nombre de racines d'un $z\in\Mgrinv{Z}{n^2}$ dans 
+%	$\Mgrinv{Z}{n}$ est $1$. 
+	On se place maintenant dans cette situation,
+	on reprend la fonction de chiffrement et on prouve qu'elle est bijective sous certaines conditions sur $g$:
+
+	\begin{theorem}
+		\label{theorem:bijective}
+		Si $g \in \mathcal{B}$, alors $\mathcal{E}_g$ est bijective.
+		\begin{proof}
+			Le nombre d'éléments dans $\Mgrinv{Z}{n^2}$ est $\phi(n^2) = n\phi(n)$, donc l'anneau a le même nombre
+			d'éléments que $\Mgr{Z}{n} \times \Mgrinv{Z}{n}$ et il reste juste à prouver que $\mathcal{E}_g$ est injective.
+
+			Soient $(x_1,y_1)$ et $(x_2, y_2)$ des paires dans l'anneau $\Mgr{Z}{n}\times\Mgrinv{Z}{n}$ tels que 
+			$\mathcal{E}_{g}(x_1,y_1) = \mathcal{E}_{g}(x_2,y_2)$, c'est-à-dire
+			$g^{x_1}y_1^n \equiv g^{x_2}y_2^n\mod{n^2}$, comme $y_1^n$ et $y_2^n$ ont chacun une 
+			seule $n$-ième racine dans $\Mgrinv{Z}{n}$ (Lemme \ref{lemma:racines}), l'équivalence $\frac{y_1^n}{y_2^n} \equiv (\frac{y_1}{y_2}\mod{n})^n$ 
+			est valide dans $\Mgrinv{Z}{n^2}$ et on a:
+				\begin{equation*}
+					g^{x_1-x_2}\left(\frac{y_1}{y_2}\right)^n \equiv 1\mod{n^2}
+				\end{equation*}
+			Si on élève les deux membres à la $\lambda$-ième puissance en appliquant le Lemme \ref{lemma:nlambda}:
+				\begin{equation*}
+					g^{(x_1-x_2)\lambda(n)}\left(\frac{y_1}{y_2}\right)^{n\lambda(n)}\equiv g^{(x_1-x_2)\lambda(n)} \equiv 1\mod{n^2}
+				\end{equation*}
+				et comme $|x_1-x_2| < n$ , $x_1 = x_2$ (si l'ordre de $g$ est un multiple de $n$, alors la puissance $x_1-x_2$ est $0$) et $y_1y_2^{-1}\equiv 1\mod{n^2}$
+				ainsi $y_1 = y_2$.
+		\end{proof}
+	\end{theorem}
+
+	Depuis ce théorème on considère que $g$ appartient à $\mathcal{B}$ et on note $\benolah{w}_g$ 
+	l'unique élément $x$ de $\Mgr{Z}{n}$ tel que $\exists y \in \Mgrinv{Z}{n}$, $\mathcal{E}_g(x,y) = w$. C'est-à-dire 
+	que si le résultat d'un message chiffré avec $g$ est $w$, $\benolah{w}_g$ est ce message.
+%	si un message a été chiffre avec $g$, $\benolah{w}_g$ est ce message.% d'origine.
+
+	\begin{lemma} $\benolah{w}_g = 0$ si, et seulement si, $w$ est un $n$-résidu modulo  $n^2$.
+		\begin{proof}
+			Si $\benolah{w}_g = 0$, alors $w = \mathcal{E}_g(0,y) = y^n$. Dans l'autre côté, si $w$ est un $n$-résidu modulo ${n^2}$,
+			il existe un $y$ tel que $y^n \equiv w\mod{n^2}$ et comme $g \in \mathcal{B}$ (et l'ordre est multiple de n) le seul $x$ tel que $g^x \equiv 1$ (et par conséquence $g^xy^n \equiv w$ ) est $x = 0$. 
+		\end{proof}
+	\end{lemma}
+
+	\begin{property}{Propriété multiplicative du système: $\benolah{w_1w_2}_g = \benolah{w_1}_g+\benolah{w_2}_g\mod{n}$.}
+		\label{prop:mult}
+		\begin{proof}
+			Si $x_1 = \benolah{w_1}_g$ et  $x_2 = \benolah{w_2}_g$, on a:
+			\begin{align*}
+				w_1w_2 = g^{\benolah{w_1}}y_1^n \cdot g^{\benolah{w_2}}y_2^n 
+			\end{align*}
+			Alors, avec le même chemin du Théorème \ref{theorem:bijective}, $y_1^ny_2^n =(y_1y_2\mod{n})^n$ et:
+			\begin{align*}
+				w_1w_2 \equiv g^{\benolah{w_1}_g+\benolah{w_2}_g}(y_1y_2\mod{n})^n \equiv g^{\benolah{w_1}_g+\benolah{w_2}_g}(y)^n \mod{n^2}
+			\end{align*}
+%			\begin{align*}
+%				w_1w_2 &= g^{\benolah{w_1}}y_1^n \cdot g^{\benolah{w_2}}y_2^n\\ 
+%					&\equiv g^{\benolah{w_1}+\benolah{w_2}}(y_1y_2\mod{n})^n  \\
+%					&\equiv g^{\benolah{w_1}+\benolah{w_2}}(y)^n \mod{n^2}
+%			\end{align*}
+			ainsi il existe un $y = y_1y_2$ tel que $\benolah{w_1w_2}_g = x_1+x_2 = \benolah{w_1}_g + \benolah{w_2}_g$
+		\end{proof}
+	\end{property}
+
+	\begin{remark}
+		Le théorème précédent peut être interprété comme ``la fonction $w \mapsto \benolah{w}_g$ est 
+		un morphisme du groupe multiplicatif $(\Mgrinv{Z}{n^2},\times)$ dans le groupe additif $(\Mgr{Z}{n},+)$''. 
+	\end{remark}
+	
+	\begin{lemma} $\benolah{w}_{g_1} = \benolah{w}_{g_2}\benolah{g_2}_{g_1}\mod{n}$
+		\label{lemma:equalbenolah}
+		\begin{proof} Soient $r_a$,$r_b$ et $r_c \in \Mgrinv{Z}{n}$ tels que:
+			\begin{equation}
+				\begin{array}{lll}
+					\mathcal{E}_{g_1}(\benolah{w  }_{g_1},r_a) &= {g_1}^{\benolah{w  }_{g_1}}r_a^n &=w \\ 
+					\mathcal{E}_{g_2}(\benolah{w  }_{g_2},r_b) &= {g_2}^{\benolah{w  }_{g_2}}r_b^n &=w \\ 
+					\mathcal{E}_{g_1}(\benolah{g_2}_{g_1},r_c) &= {g_1}^{\benolah{g_2}_{g_1}}r_c^n &=g_2 
+				\end{array}
+			\end{equation}
+			La première et la deuxième ont la même valeur $w$, alors on peut dire que:
+			\begin{equation*}
+				\mathcal{E}_{g_1}(\benolah{w  }_{g_1},r_a) = \mathcal{E}_{g_2}(\benolah{w  }_{g_2},r_b) = {g_2}^{\benolah{w  }_{g_2}}r_b^n 
+			\end{equation*}
+			En remplaçant $g_2$ par  $\mathcal{E}_{g_1}(\benolah{g_2}_{g_1},r_c)$:
+			\begin{equation*}
+				\mathcal{E}_{g_1}(\benolah{w  }_{g_1},r_a) = \left({g_1}^{\benolah{g_2}_{g_1}}r_c^n \right)^{\benolah{w  }_{g_2}}r_b^n = \left({g_1}^{\benolah{g_2}_{g_1} \benolah{w  }_{g_2} } \right) \left(r_c^{\benolah{w  }_{g_2}}r_b\right)^n \end{equation*}						
+			Alors, comme $\mathcal{E}_{g_1}$ est un isomorphisme:
+			$$\mathcal{E}_{g_1}(\benolah{w  }_{g_1},r_a) = \mathcal{E}_{g_1}(\benolah{g_2}_{g_1} \benolah{w  }_{g_2},r_c^{\benolah{w  }_{g_2}}r_b) $$
+			et $\benolah{w  }_{g_1} = \benolah{g_2}_{g_1} \benolah{w  }_{g_2}$ et $r_a = r_c^{\benolah{w  }_{g_2}}r_b$.
+%
+%			\begin{align*}
+%				\mathcal{E}_{g_1}(\benolah{w  }_{g_1},r_a) &= \left({g_1}^{\benolah{g_2}_{g_1}}r_c^n \right)^{\benolah{w  }_{g_2}}r_b^n \\
+%								           &= \left({g_1}^{\benolah{g_2}_{g_1} \benolah{w  }_{g_2} } \right) \left(r_c^{\benolah{w  }_{g_2}}\right)^nr_b^n \\ 
+%								           &= \left({g_1}^{\benolah{g_2}_{g_1} \benolah{w  }_{g_2} } \right) \left(r_c^{\benolah{w  }_{g_2}}r_b\right)^n   \\
+%								           &= \mathcal{E}_{g_1}(\benolah{g_2}_{g_1} \benolah{w  }_{g_2},r_c^{\benolah{w  }_{g_2}}r_b)
+%			\end{align*}
+%			Alors, comme $\mathcal{E}_{g_1}$ est un isomorphisme, $\benolah{w  }_{g_1} = \benolah{g_2}_{g_1} \benolah{w  }_{g_2}$ et $r_a = r_c^{\benolah{w  }_{g_2}}r_b$
+		\end{proof}
+	\end{lemma}
+
+	On reprend la fonction $L$ introduite dans la Section \ref{section:dech}:
+	\begin{rappel}
+		Pour $x\equiv 1\mod{n}$,
+		$$L(x) =  \frac{x-1}{n}$$
+	\end{rappel}
+
+	\begin{lemma}
+		$\forall w \in \Mgrinv{Z}{n^2}, L(w^{\lambda(n)}\mod{n^2}) \equiv \lambda(n)\benolah{w}_{n+1}\mod{n}$.
+		\begin{proof}
+		Soit $r$ tel que:
+			\begin{equation}
+%				\begin{array}{lll}
+					\mathcal{E}_{n+1}(\benolah{w  }_{n+1},r) \equiv {g  }^{\benolah{w  }_{n+1}}r^n \equiv w  \mod{n^2}
+%					\mathcal{E}_{n+1}(\benolah{g  }_{n+1},r_b) &= (n+1)^{\benolah{g  }_{n+1}}r_b^n &=g 
+%				\end{array}
+			\end{equation}
+
+%			\begin{align}
+%				\mathcal{E}_{g  }(\benolah{w  }_{g  },r_a) =   {g  }^{\benolah{w  }_{g  }}r_a^n 
+%			\end{align}
+			On a la relation:
+			\begin{align*}
+				w^{\lambda(n)}  =  ({g  }^{\benolah{w  }_{n+1}}r^n )^{\lambda(n)} &= (n+1)^{\benolah{w  }_{n+1}\lambda(n)} r^{n\lambda(n)} \\
+						 					      &= (1+n\benolah{w}_{n+1}\lambda(n) + n^2A)\cdot 1, A\in\mathbb{Z}\\
+											      &\equiv 1+n\benolah{w}_{n+1}\lambda(n)\mod{n^2}
+			\end{align*}
+			D'où $L\left(w^{\lambda(n)} \mod{n^2}\right) \equiv \benolah{w}_{n+1}\lambda(n)\mod{n} $
+%			En remplaçant $g$ par $(n+1)^{\benolah{g  }_{n+1}}r_b^n$ dans la première équation:
+%			\begin{equation*}
+%			\mathcal{E}_{g  }(\benolah{w  }_{g  },r_a) =   {((n+1)^{\benolah{g  }_{n+1}}r_b^n)}^{\benolah{w  }_{g  }}r_a^n =   {(n+1)^{\benolah{g  }_{n+1}\benolah{w  }_{g  }}}(r_b^{\benolah{w  }_{g  }}r_a)^n 
+%			\end{equation*}
+%			avec le Lemme \ref{lemma:equalbenolah}, $ \benolah{g  }_{n+1}\benolah{w  }_{g  } = \benolah{w  }_{n+1}$ et:
+%			 $$\mathcal{E}_{g  }(\benolah{w  }_{g  },r_a) = {(n+1)^{\benolah{w  }_{n+1}}}(r_b^{\benolah{w  }_{g  }}r_a)^n $$
+%			alors, $w^{\lambda(n)}$ vaut:
+%			\begin{align*}
+%				w^{\lambda(n)} &=  {(n+1)^{\benolah{w  }_{n+1}\lambda(n)}}(r_b^{\benolah{w  }_{g  }}r_a)^{n\lambda(n)} \\
+%					       &=  1+  n\cdot \benolah{w  }_{n+1}\lambda(n) + n^2\cdot A, A \in \mathbb{Z}  \\
+%					       &\equiv 1+  n\cdot \benolah{w  }_{n+1}\lambda(n)\mod{n^2} 
+%			\end{align*}
+%			D'où $L\left(w^{\lambda(n)}\right)$ vaut:
+%			$$ L\left(w^{\lambda(n)}\right) = \frac{1+  n\cdot \benolah{w  }_{n+1}\lambda(n) - 1}{n} = \benolah{w  }_{n+1}\lambda(n) $$
+		\end{proof}
+	\end{lemma}
+
+	Le lemme précédent est la dernière pièce nécessaire pour comprendre la fonction de déchiffrement.
+	Avec un développement analogue, on peut calculer $L\left(g^{\lambda(n)}\mod{n^2}\right)$ et changer la valeur $w$ à $g$.
+	$$L\left(g^{\lambda(n)}\mod{n^2}\right) = \frac{1+n\cdot \benolah{g}_{n+1} \lambda(n) -1}{n}  = \benolah{g}_{n+1}\lambda(n)$$
+	
+	La fonction de déchiffrement devient:
+	\begin{equation}\label{equation:def}
+	D(w) \equiv \frac{L\left(w^{\lambda(n)}\mod{n^2}\right) }{L\left(g^{\lambda(n)}\mod{n^2}\right)} \equiv \frac{\benolah{w  }_{n+1}\lambda(n) }{\benolah{g}_{n+1}\lambda(n)} \equiv \frac{\benolah{w  }_{n+1}}{\benolah{g}_{n+1}} \equiv \benolah{w  }_{g}\mod{n}
+	\end{equation}
+
+	Alors, comme $\benolah{w}_{g}$ est la valeur $x$ solution de la fonction bijective $$\mathcal{E}_g(x,r) = w\text{,}$$ $x$ est le message clair correspondant au mot chiffré.
+
+%	\subsection{Implémentation}
+
+
+	

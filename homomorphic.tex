@@ -1,0 +1,269 @@
+\chapter{Chiffrement Homomorphe}
+
+Le système de Paillier muni de la Propriété \ref{prop:mult} permet l'addition des données chiffrées,
+cette caractéristique est souhaitable dans divers domaines de l'informatique, tels quels les systèmes
+de vote électronique, réseaux de capteurs et tous qui est calcul dans la nuage. Par contre, 
+l'addition n'est pas suffisante pour que les opérations - et par conséquent, les applications - puissent
+manipuler les anneaux sans exposer les mots clairs, c'est-à-dire faire la multiplication 
+et addition des données chiffrés sans avoir la clé privé.
+%composer un système Turing-complet, et alors, on se pose dans un environnement assez limité.
+
+
+\section{Les schémas homomorphes}
+%Comme dit avant, un schéma cryptographique homomorphe possède un morphisme entre 
+%le groupe algébri\-que des données clairs et le groupe algé\-bri\-que des mots chiffrés. Ou plus précisément:
+
+
+Les schémas cryptographiques déjà décrits possèdent un morphisme entre le groupe algébrique 
+des données claires et le groupe algébrique des mots chiffrés. Ils sont dits Homomorphes.
+Une définition plus formelle des schémas homomorphes:
+
+Un schéma cryptographique asymétrique $\mathcal{E}$ possède trois algorithmes principales 
+\verb!KeyGen!$_\mathcal{E}$, \verb!Encript!$_\mathcal{E}$ et \verb!Decript!$_\mathcal{E}$, pour définir l'homomorphisme on introduit l'algorithme
+\verb!Evaluate!$_\mathcal{E}$ qui est capable de exécuter un ensemble d'instructions avec des données chiffrées 
+(On note $\mathcal{C}_\mathcal{E}$ l'ensemble de circuits 
+logiques qui peuvent être traités par le schéma).
+
+Un schéma homomorphe est dit {\bf correcte} si l'exécution de l'ensemble d'instructions avec \verb!Evaluate!$_\mathcal{E}$ sur les 
+mots chiffrés et l'exécution directe sur les mots clairs produit la même valeur pour chaque combinaison vraie 
+entre mots chiffrés et mots clairs. Un schéma homomorphe est dit {\bf compacte} si l'algorithme \verb!Decript!$_\mathcal{E}$ 
+peut être décrit avec un circuit appartient a $\mathcal{C}_\mathcal{E}$ avec un nombre polynomial des portes logiques.
+On dit qu'un schéma {\bf évalue de façon compacte} un ensemble de circuits $\mathcal{C}'$ si il est compacte et 
+correcte pour cet ensemble. Finalement, on dit qu'un schéma est {\bf complètement homomorphe} si il évalue de façon 
+compacte n'importe quel $\mathcal{C}'$. La complétude fonctionnelle peut être attendue avec les plus petites ensembles 
+d'opérations (voir bibliographie \cite{wernick1942complete}):
+
+\begin{table}[H]
+\caption{Plus petits ensembles d'opérations qui fournissent la complétude fonctionnelle.}
+\label{table:operations}
+\center
+\begin{tabular}{|c|m{6cm}|}
+\hline
+Nombre d'opérations & Plus petit ensemble \\
+\hline
+\hline
+	1	& \ $\{$\verb!NON-ET!$\}$,$\{$\verb!NON-OU!$\}$ \\
+		\hline
+	2	& $\{\vee,\neg\}$, %
+		$\{\wedge,\neg\}$, %
+		$\{\rightarrow,\neg\}$, %
+		$\{\leftarrow,\neg\}$, %
+		$\{\rightarrow,\bot\}$, %
+		$\{\leftarrow,\bot\}$, %
+		$\{\leftarrow,\not\leftrightarrow\}$, %
+		$\{\rightarrow,\not\leftrightarrow\}$, %
+		$\{\rightarrow,\not\rightarrow\}$, %
+		$\{\rightarrow,\not\leftarrow\}$, %
+		$\{\leftarrow,\not\rightarrow\}$, %
+		$\{\leftarrow,\not\leftarrow\}$, %
+		$\{\not\rightarrow,\neg\}$, %
+		$\{\not\leftarrow,\neg\}$, %
+		$\{\not\rightarrow,\top\}$, %
+		$\{\not\leftarrow,\top\}$, %
+		$\{\not\leftarrow,\top\}$, %
+		$\{\not\rightarrow,\leftrightarrow\}$, %
+		$\{\not\leftarrow,\leftrightarrow\}$ \\
+			\hline
+	3 	& $\{\lor,\leftrightarrow,\bot\}$,%
+		$\{\lor,\leftrightarrow,\not\leftrightarrow\}$,%
+		$\{\lor,\not\leftrightarrow,\top\}$,%
+		$\{\land,\leftrightarrow, \bot\}$,%
+		$\{\land,\leftrightarrow,\not\leftrightarrow\}$,%
+		$\{\land,\not\leftrightarrow,\top\}$\\
+		\hline
+\end{tabular}
+\end{table}
+
+Pour une définition plus formelle, voir la bibliographie \cite{homenc}.
+
+
+Le système de Paillier est homomorphe pour $\mathcal{C}_\mathcal{E}= \{+\}$, par contre, il n'exis\-tent pas 
+d'algorithmes linéaires (circuits) connus qui puissent implanter $+$ et $\cdot$ sans exposer la clé secrète ou 
+le mot clair (une addition des entiers est l'opé\-ra\-tion $\oplus$ dans le bit de l'unité, il manque $\wedge$  
+pour la complétude), et alors le système ne peut pas être appelé compacte.
+
+
+%\begin{definition} {\bf Système Homomorphe:} Soient $\mathcal{E}: M \to C$ une fonction de chiffrement 
+%et $\mathcal{D}: C \to M$ une fonction de déchiffrement, un cryptosystème est dit homomorphe 
+%si $M$ et $C$ sont munis des opérations arithmétiques $\oplus$ et $\otimes$ respectivement tels que, pour $\forall x_1,x_2 \in M $ 
+%et $\forall y_1,y_2 \in C$:
+%	$$ \mathcal{E}(x_1\oplus x_2) = \mathcal{E}(x_1)\otimes \mathcal{E}(x_2) \text{ et } \mathcal{D}(y_1\otimes y_2) = \mathcal{D}(y_1)\oplus \mathcal{D}(y_2) $$
+%\end{definition}
+%
+%\TODO{Pour une définition plus }
+
+Si un système cryptographique est correcte mais n'est pas prouvé d'être 
+complètement homomorphe, il est dit {\bf semi-homomorphe}. Il existent divers systèmes semi-homomorphes:
+
+\begin{itemize}
+	\item Paillier/Damgård–Jurik
+	\item RSA
+	\item Benaloh
+	\item Boneh–Goh–Nissim
+	\item Okamoto–Uchiyama
+	\item Naccache–Stern
+	\item ElGamal
+	\item Goldwasser-Micali
+\end{itemize}
+
+\section{Bootstrap}
+
+Une façon de manipuler les données sans restriction est les déchiffrer, calculer c'est qu'on veut et 
+chiffrer une autre fois, ce chemin clairement expose les données chiffrées, alors il faut que
+chaque partie de cet algorithme se passe dans le domaine des données chiffrées. Le {\it bootstrap} est la 
+capacité de décrire chaque élément d'un des plus petits ensembles d'opérations (voir Table \ref{table:operations}) 
+et un algorithme de ``réchiffrement'' avec $\mathcal{C}_\mathcal{E}$,
+l'algorithme résultant appartient à $\mathcal{C}_\mathcal{E}$ et peut être traité avec \verb!Evaluate!$_\mathcal{E}$.
+Un tel schéma est dit {\it bootstrapable}, un système {\it bootstrapable} est complètement homomorphe (voir \cite{homenc}).
+
+Le {\it Bootstrap} est crucial dans les systèmes basées sur les réseaux. Comme le système introduit par Craig Gentry 
+en 2009, dont la fonction \verb!Evaluate!$_\mathcal{E}$ ajoute du bruit au résultat de chaque opération. 
+Dans le système de Gentry une séquence d'opérations augmente le bruit en fonction de leur taille. Même si le ré\-chif\-fre\-ment corrige le bruit,
+il faut considérer que ors cet algorithme est accompli avec \verb!Evaluate!$_\mathcal{E}$, il lui même ajoute  du  bruit. Résultat: Le bruit
+produit par la fonction de ré\-chif\-fre\-ment plus le bruit qui est ajouté par l'opération effectuée ne peut pas 
+dépasser leurs limites de correction.
+
+\section{Le système homomorphe de Gentry}
+
+Le système de Gentry avant le {\it Bootstrapping} est un système symétrique, à savoir un système dont il existe une seule clé, 
+un tel système est aussi dit ``à clé privée''. Un exemple connu de système à clé privée
+est l'algorithme \verb!AES!, grâce à ça performance il est utilisé largement dans touts les domaines. 
+
+	\begin{algo}{\verb!Keygen!$_\mathcal{E}$}
+		\begin{itemize}\renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$\cdot$}
+			\item{\bf Entrée:} 
+				\begin{itemize}
+					\item $\Lambda$: Le paramètre de sécurité.
+				\end{itemize}
+			\item{\bf Calcul:}
+				\begin{enumerate} %			
+				\renewcommand{\theenumi}{\arabic{enumi}}
+				\renewcommand{\theenumii}{\arabic{enumii}}
+				\renewcommand{\theenumiii}{\arabic{enumiii}}
+				\renewcommand{\labelenumi}{\theenumi.}
+				\renewcommand{\labelenumii}{\theenumi.\theenumii.}
+				\renewcommand{\labelenumiii}{\theenumi.\theenumii.\theenumiii.}
+				\makeatletter
+				\renewcommand{\p@enumii}{\theenumi.}
+				\renewcommand{\p@enumiii}{\theenumi.\theenumii.}
+				\makeatother
+					\item Calculer $N=\Lambda$, $P=\Lambda^2$, $Q=\Lambda^5$.
+					\item Trouver $p$ un nombre impair aléatoire de taille $N$ bits.	
+				\end{enumerate}
+	%		\item{\bf Transmettre:}
+	%			\begin{enumerate}[]
+	%			\item $p$.
+	%			\end{enumerate}
+
+		\end{itemize}
+	\end{algo}
+
+%keygen(lambda):
+%	N=lambda
+%	P=lambda*lambda
+%	Q=P*P*N
+%	p = random(N)
+
+	\begin{algo}{\verb!Encrypt!$_\mathcal{E}$}
+		\begin{itemize}\renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$\cdot$}
+			\item{\bf Entrée:} 
+				\begin{itemize}
+					\item $x\in{0,1}$.
+					\item $pk$: la clé publique.
+				\end{itemize}
+			\item{\bf Calcul:}
+				\begin{enumerate} %			
+				\renewcommand{\theenumi}{\arabic{enumi}}
+				\renewcommand{\theenumii}{\arabic{enumii}}
+				\renewcommand{\theenumiii}{\arabic{enumiii}}
+				\renewcommand{\labelenumi}{\theenumi.}
+				\renewcommand{\labelenumii}{\theenumi.\theenumii.}
+				\renewcommand{\labelenumiii}{\theenumi.\theenumii.\theenumiii.}
+				\makeatletter
+				\renewcommand{\p@enumii}{\theenumi.}
+				\renewcommand{\p@enumiii}{\theenumi.\theenumii.}
+				\makeatother
+					\item Calculer $m'$ un nombre aléatoire de parité $x$ et de taille $N$ bits, et $q$ un nombre de taille $Q$ en bits.
+					\item Calculer $c = m'+p\cdot q$.
+					\item Retourner $c$, le mot chiffré. 
+				\end{enumerate}
+			\end{itemize}
+	\end{algo}
+%encrypt(x):
+%	m'= 2*random(N-1)+x
+%	q = random(Q)
+%	c = m'+pq
+%	return c
+
+	\begin{algo}{\verb!Decrypt!$_\mathcal{E}$}
+		\begin{itemize}\renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$\cdot$}
+			\item{\bf Entrée:} 
+				\begin{itemize}
+					\item $c\in \mathbb{Z}$.
+					\item $pk$: la clé publique.
+				\end{itemize}
+			\item{\bf Calcul:}
+				\begin{enumerate} %			
+				\renewcommand{\theenumi}{\arabic{enumi}}
+				\renewcommand{\theenumii}{\arabic{enumii}}
+				\renewcommand{\theenumiii}{\arabic{enumiii}}
+				\renewcommand{\labelenumi}{\theenumi.}
+				\renewcommand{\labelenumii}{\theenumi.\theenumii.}
+				\renewcommand{\labelenumiii}{\theenumi.\theenumii.\theenumiii.}
+				\makeatletter
+				\renewcommand{\p@enumii}{\theenumi.}
+				\renewcommand{\p@enumiii}{\theenumi.\theenumii.}
+				\makeatother
+					\item Retourner $m = (c\bmod{p})\mod{2}$. $c\in [-\frac{p-1}{2},\frac{p+1}{2}]$. 
+				\end{enumerate}
+	%		\item{\bf Transmettre:}
+	%			\begin{enumerate}[]
+	%			\item $c$.
+	%			\end{enumerate}
+		\end{itemize}
+	\end{algo}
+
+
+%decrypt(c):
+%	return (c mod p) mod 2
+
+	\begin{algo}{\verb!Evaluate!$_\mathcal{E}$}
+		\begin{itemize}\renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$\cdot$}
+			\item{\bf Entrée:} 
+				\begin{itemize}
+					\item $f$: une suite d'opérations $XOR$ et $AND$.
+					\item $\{c_1,\dots,c_t\}$: les arguments de $f$
+				\end{itemize}
+			\item{\bf Calcul:}
+				\begin{enumerate} %			
+				\renewcommand{\theenumi}{\arabic{enumi}}
+				\renewcommand{\theenumii}{\arabic{enumii}}
+				\renewcommand{\theenumiii}{\arabic{enumiii}}
+				\renewcommand{\labelenumi}{\theenumi.}
+				\renewcommand{\labelenumii}{\theenumi.\theenumii.}
+				\renewcommand{\labelenumiii}{\theenumi.\theenumii.\theenumiii.}
+				\makeatletter
+				\renewcommand{\p@enumii}{\theenumi.}
+				\renewcommand{\p@enumiii}{\theenumi.\theenumii.}
+				\makeatother
+					\item Substituer les opérations $XOR$ par $\cdot$ et $AND$ par $+$.
+					\item Calculer la fonction dans avec les arguments $\{c_1,\dots,c_t\}$
+%					\item calculer $m = (c\bmod{p})\mod{2}$
+				\end{enumerate}
+	%		\item{\bf Transmettre:}
+	%			\begin{enumerate}[]
+	%			\item $c$.
+	%			\end{enumerate}
+		\end{itemize}
+	\end{algo}
+
+%evaluate(f,i1,i2,i3,..):
+%	f' = replace(f,(and,or),(+,*))
+Le {\it Bootstrapping} du système prendre en considération la difficulté de évaluer $c\bmod p$ dans le domaine 
+chiffré en remplaçant le déchiffrement par le calcul de $\text{\verb!LSB!}(c)~XOR~\text{\verb!LSB!}(\lfloor c/p\rceil)$ et un vecteur
+de valeurs sommant $1/p$ pour effectuer rapidement le calcul de $c/p$. La description avec {\it Bootstrap} est disponible sur \cite{homenc}.
+%\section{Homomorphisme}
+
+
+
+

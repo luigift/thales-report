@@ -1,0 +1,295 @@
+\chapter{Implantation du Système Étendu}
+
+
+	Différemment de l'implantation du système de Paillier, l'implantation du système étendu a été faite seulement en \verb!Python!.
+	Comme dit dans la page \pageref{chap:implantation}, dans \verb!Python! le traitement des grand entiers est intégré et permet 
+	le dé\-ve\-lop\-pe\-ment plus concerné avec l'algorithme qu'avec les particularités des structures et représentations.
+
+
+	Dans l'extension, grâce à la utilisation de la base fixe $n+1$, on a diverses optimisations qui peuvent être mises en œuvre, comme
+	par exemple le calcul de $(1+n)^m\mod{n^{s+1}}$ qui peut être développé $1+mn+\frac{m(m-1)}{2}n^2+\dots+n^s\binom{m}{s}\mod{n^{s+1}}$, 
+	cette optimisation est implantée par la méthode ~\verb!powGOpt!. Une table des fonctions disponibles se trouve dans la page \pageref{syset:listef}.
+
+
+	L'utilisation du logiciel de profil \verb!cProfile! permet de trouver le goulet d'étranglement, qui ne diffère pas de l'implantation
+	précédente, à savoir: la méthode \verb!pow!.
+
+
+	\begin{lstlisting}[language=python,caption=Fonction de chiffrement du système étendu en Python, label=code:chiffet]	
+	def encrypt(self,m,pubKey,r = None,s=None):
+		if r == None:
+			r = randomPhi(pubKey.n);
+		if s == None:
+			s = self.upper_boundNCache(pubKey.n,m);
+		if 2*s*s > pubKey.n:
+			raise Exception("Impossible to encrypt, the block is too large");
+		potnn = self.getCachePot('n',pubKey.n,s+1);
+		potn  = self.getCachePot('n',pubKey.n,s);
+		return (self.powGOpt(pubKey.n,m,s)*pow(r,potn,potnn))%potnn;
+	
+	def decrypt(self,c,pvtKey,s=None):
+		if s == None:
+			s = self.upper_boundNCache(pvtKey.n,c);
+			s-=1;	
+		if 2*s*s > pvtKey.n:
+			raise Exception("Impossible to decrypt, the block is too large");
+		if not self.optimizeCRT:
+			potnn = self.getCachePot('n',pvtKey.n,s+1);
+			potn  = self.getCachePot('n',pvtKey.n,s  );
+			d=pvtKey.lam*number.inverse(pvtKey.lam,potn); 
+			pjid = pow(c ,d,potnn);
+			jid  = self.findI(pjid,'n',pvtKey.n,'n',pvtKey.n,s);
+			return jid;
+		potpp = self.getCachePot('p',pvtKey.p,s+1);
+		potqq = self.getCachePot('q',pvtKey.q,s+1);
+		potp  = self.getCachePot('p',pvtKey.p,s);
+		potq  = self.getCachePot('q',pvtKey.q,s);
+		potn  = self.getCachePot('n',pvtKey.n,s);
+		cp = c%potpp;
+		cq = c%potqq;
+		cp = pow(cp,pvtKey.p-1,potpp);
+		cq = pow(cq,pvtKey.q-1,potqq);
+		ppjid = self.findI(cp,'n',pvtKey.n,'p',pvtKey.p,s,q=pvtKey.q);
+		qqjid = self.findI(cq,'n',pvtKey.n,'q',pvtKey.q,s,q=pvtKey.p);
+		ppjid*=number.inverse(pvtKey.p-1,potp);
+		qqjid*=number.inverse(pvtKey.q-1,potq);
+		return CRT(ppjid,qqjid,potp,potq)%(potn)
+	\end{lstlisting}
+
+
+	\section{Liste de fonctions Implantées}
+	\label{syset:listef}
+	
+	Les classes qui gardent les informations sur les clés publiques et privées en \verb!Python!:
+	\begin{lstlisting}[language=python,caption=Structures des Clés en Python, label=code:structgen]
+dir(GenPaillierPvtKey()): ['__doc__', '__init__', '__module__', '__str__', 'lam', 'n', 'p', 'q']
+dir(GenPaillierPubKey(pvt)): ['__doc__', '__init__', '__module__', '__str__', 'n']
+	\end{lstlisting}
+
+Les fonctions mises en œuvre avec la langage \verb!python!:
+
+	\begin{itemize} \renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$~~argument$}
+
+		\item \textbf{GenPaillier}:Constructeur.
+			\begin{itemize}
+				\item \verb!cachepowN = True!:Si \verb!True!, active 
+				le cache de puissances de $n$. Par défaut \verb!True!.
+				\item \verb!cachefact= True!:Si \verb!True!, active 
+				le cache des factoriels. Par défaut \verb!True!.
+				\item \verb!optimizeg = True!: Si \verb!True!, optimise  
+				l'exponentiation de $n+1$ dans le chiffrement.
+				\item \verb!optimizeCRT = True!: Si \verb!True!, optimise  
+				avec le Théo\-rè\-me du Reste Chinois.
+			\end{itemize}
+		\item \textbf{powGOpt}: Mètre en œuvre l'optimisation dans le développent de $(1+n)^{po} \mod{n^{s+1}}$.
+			\begin{itemize}
+				\item \verb!n!: Entière, la valeur $n$ dans $(1+n)^{po}$.
+				\item \verb!po!: Entière, la valeur $po$.
+				\item \verb!s!: Entière, la valeur $s$.
+			\end{itemize}
+		\item \textbf{getCachePot}: Retourne une puissance en cache et si nécessaire, calcule.
+			\begin{itemize}
+				\item \verb!name!: Nom de la valeur. Ex.:\verb!'n'! 
+				\item \verb!val!: Valeur de la base.
+				\item \verb!s!: Exposant.
+			\end{itemize}
+		\item \textbf{getFactNSCache}: Retourne les valeurs mémorisées (programmation dynamique) de factoriel de $n$ modulo $nbase^s$.
+			\begin{itemize}
+				\item \verb!n!: Entière $n$.
+				\item \verb!basename!: Nom de la base (en cache). Ex.:\verb!'nbase'! 
+				\item \verb!nbase!:Entière $nbase$.
+				\item \verb!s!: Entière $s$.
+			\end{itemize}
+		\item \textbf{upper\_boundNCache}: Retourne la valeur estimée pour $s$ dans le chiffrement  de 
+		$m$ depuis la valeur chiffré $value$. C'est-à-dire, le plus petit $s$ tel que $value \in \Mgr{Z}{n^{s+1}}$.
+			\begin{itemize}
+				\item \verb!n!: La base (clé publique).
+				\item \verb!value!: La valeur chiffrée.
+			\end{itemize}
+		\item \textbf{findI}: Implante l'algorithme de logarithme modulaire vu dans le Chapitre \ref{chap:jurik}.
+			\begin{itemize}
+				\item \verb!a!: La puissance de $1+n$ dans l'anneau $\Mgr{Z}{n^{s}}$.
+				\item \verb!namen!: Le nom de \verb!n! pour le cache.
+				\item \verb!n!:  L'entier $n$ de la clé publique.
+				\item \verb!namep!: Le nom de \verb!p! pour le cache (voir en bas).
+				\item \verb!p!: L'entier à être utilisé par la fonction $L$
+				\item \verb!s!: La valeur estimé par \verb!findI!. Il est recommandé l'utilisation de la fonction \verb!findI!, par contre si le protocole force $s$ il n'est pas nécessaire.
+				\item \verb!q=1!: $n/p$, par défaut $1$.
+			\end{itemize}
+		\item \textbf{encrypt}: Chiffre le message $m$.
+			\begin{itemize}
+				\item \verb!m!: Un entier, le message à être chiffré.
+				\item \verb!pubKey!: La clé publique.
+				\item \verb!r = None!: La valeur aléatoire qui 
+				sera ajoutée au chiffrement. Si \verb!None!, 
+				la va\-leur est prise aléatoirement avec
+				la fonction par défaut de la bibliothèque
+				\verb!PyCrypto!.
+				\item \verb!s=None!: La valeur de $s$ qui 
+				doit être utilisé. Si $s$ est trop petit, 
+				la fonction jette l'exception 	{\em Impossible 
+				to encrypt, the block is too large}. Si \verb!None!, 
+				la valeur est trouvé avec le méthode \verb!upper\_boundNCache!
+			\end{itemize}
+	
+		\item \textbf{decrypt}: La fonction de déchiffrement.
+			\begin{itemize}
+				\item \verb!c!: La valeur à être déchiffrée.
+				\item \verb!pvtKey!: La clé privé.
+				\item \verb!s=None!: Le paramètre $s$ de déchiffrement. Si \verb!None! il est estimé depuis la taille en bits de $c$.
+			\end{itemize}
+	\end{itemize}
+
+
+%	\begin{itemize} \renewcommand{\labelitemi}{} \renewcommand{\labelitemii}{$~~argument$}
+%		\item \textbf{GenPaillier}: Constructeur.
+%			\begin{itemize}
+%				\item \verb!cachepowN!: Si \verb!True!, active 
+%				le cache de puissances de $n$. Par défaut \verb!True!.
+%				\item \verb!cachefact!: Si \verb!True!, active 
+%				le cache des factoriels. Par défaut \verb!True!.
+%				\item \verb!optimizeg!: Si \verb!True!, optimise  
+%				l'exponentiation de $n+1$ dans le chiffrement.
+%				Par défaut \verb!True!.
+%			\end{itemize}
+%			%self,cachepowN = True,cachefact= True,optimizeg = True}
+%		\item \textbf{powGOpt}: Mètre en œuvre l'optimisation dans le développent de $(1+n)^{po} \mod{n^{s+1}}$.
+%			\begin{itemize}
+%				\item \verb!n!: Entière, la valeur $n$ dans $(1+n)^{po}$.
+%				\item \verb!po!: Entière, la valeur $po$.
+%				\item \verb!s!: Entière, la valeur $s$.
+%			\end{itemize}
+%
+%		\item \textbf{getFactNSCache}: Retourne les valeurs mémorisées (programmation dynamique) de factoriel de $n$ modulo $nbase^s$. 
+%			\begin{itemize}
+%				\item \verb!n!: Entière $n$.
+%				\item \verb!nbase!: Entière $nbase$.
+%				\item \verb!s!: Entière $s$.
+%			\end{itemize}
+%
+%		\item \textbf{getPowNCache}: Retourne les valeurs mémorisées de $n^{powv}$
+%			\begin{itemize}
+%				\item \verb!n!: Entière $n$
+%				\item \verb!powv!: Entière $powv$
+%			\end{itemize}
+%		\item \textbf{upper\_boundNCache}: Retourne la valeur estimé pour $s$ dans la chiffrage de $m$ depuis la valeur chiffré $value$. C'est-à-dire, le plus petit $s$ tel que $value \in \Mgr{Z}{n^{s+1}}$.
+%			\begin{itemize}
+%				\item \verb!n!: La base (clé publique).
+%				\item \verb!value!: La valeur chiffré.
+%			\end{itemize}
+%		\item \textbf{findI}: Implante le algorithme de logarithme modulaire vu dans le Chapitre \ref{chap:jurik}.
+%			\begin{itemize}
+%				\item \verb!a!: La puissance de $1+n$ dans l'anneau $\Mgr{Z}{n^{s}}$.
+%				\item \verb!n!: Le entière $n$ de la clé publique.
+%				\item \verb!s!: La valeur estimé par \verb!findI!. Il est recommandé la utilisation de la fonction \verb!findI!, par contre si le protocole force $s$ il n'est pas nécessaire.
+%			\end{itemize}
+%		\item \textbf{encrypt}: Chiffre le message $m$.
+%			\begin{itemize}
+%				\item \verb!m!: Un entière, le message à être chiffré.
+%				\item \verb!pubKey!: La clé publique.
+%				\item \verb!r = None!: La valeur aléatoire qui 
+%				sera ajouté au chiffrement. Si \verb!None!, 
+%				la va\-leur est prise aléatoirement avec
+%				la fonction par défaut de la bibliothèque
+%				\verb!PyCrypto!.
+% 
+%				\item \verb!s = None!: La valeur de $s$ qui 
+%				doit être utilisé. Si $s$ est trop petit, 
+%				la fonction jette la exception 	{\em Impossible 
+%				to encrypt, the block is too large}. Si \verb!None!, 
+%				la valeur est trouvé avec le méthode \verb!upper\_boundNCache!
+%			\end{itemize}
+%		\item \textbf{decrypt}: La fonction de déchiffrement.
+%			\begin{itemize}
+%				\item \verb!c!: La valeur à être déchiffré.
+%				\item \verb!pvtKey!: La clé privé.
+%				\item \verb!s = None!: Le paramètre $s$ de déchiffrage. Si \verb!None! il est estimé depuis la taille en bits de $c$.
+%			\end{itemize}
+%
+%%	def powGOpt(self,n,po,s):
+%%	def getFactNSCache(self,n,nbase,s):
+%%	def getPowNCache(self,n,powv):
+%%	def upper_boundNCache(self,n,value):
+%%	def findI(self,a,n,s):
+%%	def encrypt(self,m,pubKey,r = None,s=None):
+%%	def decrypt(self,c,pvtKey,s=None):
+%	\end{itemize}
+
+	\section{Génération des clés}
+
+	La génération des clés suit la méthode du système de Paillier.
+
+	\section{Benchmark}
+
+L'optimisation par l'application du Théorème du Reste Chinois est surprenant,
+elle rends le déchiffrement plus rapide avec la augmentation de la taille de $n$ et la valeur de $s$, en attendant 
+ $14.78$ fois plus rapide par rapport à l'instance sans le TRC quand $s = 3$ et $|n| = 2048$. 
+ Dans le déchiffrement, l'optimisation de l'exponentiation de $n+1$ avec le développent de Newton rends le code plus rapide 
+ avec un facteur de $1.88$ quand $s=3$ et $|n|=2048$.
+
+Processeur: \verb!Intel(R) Core(TM)2 Duo CPU E6550  @ 2.33GHz!
+
+Système d'exploitation:\hfill \verb!Linux version 3.3.5-2.fc16.x86_64!
+
+	\hfill		\verb!(mockbuild@x86-04.phx2.fedoraproject.org)!
+
+	\hfill		\verb!(gcc version 4.6.3 20120306 (Red Hat 4.6.3-2) (GCC))!
+
+	\hfill		\verb!#1 SMP Tue May 8 11:24:50 UTC 2012i!
+
+Version de \verb!Python!: \verb!Python 2.7.3!
+
+Version de \verb!GMP!: \verb!libgmp.so.3.5.2!
+
+
+\begin{table}[hlc]
+\center
+\caption{Temps du programme en secondes avec $|n|$ = 1024/2048 bits pour 300 appels.}
+\begin{tabular}{|c |c|c|c|c| |c | c|c|}
+\hline
+%\hline
+%$\multirow{2}{*}{$|n|$}$&\multicolumn{4}{|c|}{C}\\
+%		\cline{2-5}
+%                    &gen&chiff&dechiff&TRC\\
+%\hline
+\begin{sideways}s\end{sideways}&%
+\begin{sideways}Cache dans $n^i$\end{sideways}&%
+\begin{sideways}Cache du Factoriel\end{sideways}&%
+\begin{sideways}Optimisation de $(n+1)^i$\end{sideways}&%
+\begin{sideways}Reste Chinois\end{sideways}&%
+%\begin{sideways}$|n|$\end{sideways}&%
+\begin{sideways}G\'en\'eration des cl\'es\end{sideways}&%
+\begin{sideways}Chiffrement\end{sideways}&%
+\begin{sideways}D\'echiffrement\end{sideways}\\%
+\hline
+\hline
+1 & N& N& N& N & 13.88 / 61.48 & 21.72 / 147.8 & 33.7 / 223.76 \\
+1 & N& N& N& O & 14.37 / 62.97 & 22.43 / 155.47 & 5.14 / 25.72 \\
+1 & N& N& O& N & 13.99 / 63.07 & 14.92 / 107.59 & 31.54 / 217.81 \\
+1 & N& O& N& N & 14.07 / 65.48 & 22.58 / 143.16 & 33.87 / 224.18 \\
+1 & O& N& N& N & 14.31 / 61.68 & 23.08 / 149.68 & 31.01 / 227.2 \\
+1 & O& O& O& O & 13.95 / 60.28 & 15.95 / 113.09 & 5.46 / 29.05 \\
+\hline
+\hline
+2 & N& N& N& N & 14.51 / 60.51 & 97.7 / 645.38 & 88.58 / 617.4 \\
+2 & N& N& N& O & 14.36 / 58.84 & 96.97 / 680.33 & 9.08 / 58.65 \\
+2 & N& N& O& N & 13.2 / 61.82 & 59.98 / 403.15 & 87.46 / 625.18 \\
+2 & N& O& N& N & 13.53 / 62.35 & 96.5 / 650.89 & 90.39 / 624.16 \\
+2 & O& N& N& N & 14.49 / 59.65 & 95.03 / 672.41 & 87.88 / 612.15 \\
+2 & O& O& O& O & 13.36 / 62.93 & 57.43 / 402.16 & 9.94 / 50.18 \\
+\hline
+\hline
+3 & N& N& N& N & 13.93 / 61.13 & 236.46 / 1671.15 & 178.9 / 1242.47 \\
+3 & N& N& N& O & 13.66 / 63.88 & 238.38 / 1598.63 & 14.88 / 85.71 \\
+3 & N& N& O& N & 13.75 / 61.51 & 125.63 / 937.21 & 177.32 / 1265.05 \\
+3 & N& O& N& N & 13.42 / 58.82 & 238.36 / 1642.77 & 182.26 / 1250.68 \\
+3 & O& N& N& N & 13.42 / 63.97 & 227.38 / 1651.81 & 174.48 / 1236.89 \\
+3 & O& O& O& O & 13.99 / 62.99 & 126.34 / 939.06 & 14.62 / 84.35 \\
+\hline
+\end{tabular}
+\end{table}
+
+
+
+
+	

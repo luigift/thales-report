@@ -1,0 +1,16 @@
+%% Header and footer config
+\pagestyle{fancy}
+\fancyhead{}
+\fancyfoot{}
+%\addtolength{\headheight}{\baselineskip}
+%\renewcommand{\sectionmark}[1]{\markboth{#1}{}}
+%\renewcommand{\subsectionmark}[1]{\markright{#1}}
+%\rhead{\leftmark\\\rightmark}
+\renewcommand{\chaptermark}[1]{% 
+\markboth{\thechapter.\ #1}{}} 
+\renewcommand{\sectionmark}[1]{\markright{\thesection\ #1}}
+\fancyhead[LE,RO]{\slshape {\normalsize \rightmark}}
+\fancyhead[LO,RE]{\slshape {\normalsize  Etude du cryptosystème de Paillier}}
+\fancyfoot[C]{FRANCO TEDESCO, Luigi - ENSTA Paristech - ANDROIDE UPMC \\{\color{red}Rapport non confidentiel et publiable sur internet}}
+\fancyfoot[RO,LE]{\thepage}
+\renewcommand{\footrulewidth}{0.4pt}
