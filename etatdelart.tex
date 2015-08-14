@@ -1,0 +1,127 @@
+
+\chapter{État de l'art}
+  
+\subsection { quelques applications}
+ La détection d'objets par un robot mobile est traitée dans des articles comme : 
+
+\textit{Object Search and Localization for an Indoor Mobile Robot} [1] et , dont, l'intérêt central, est d'effectuer une recherche/exploration dans un environnement ou le plan est connu par avance ce qui permets la discretisation en zones de recherche, pour retrouver un objet donné a priori. Les systèmes sont capables de retrouver des objets dans des environnements complexes, pourtant cet approche exige un traitement premier pour la localisation.
+
+\textit{Learning Search Heuristics for Finding Objects in Structured Environments} 
+
+
+\textit{Active Object Recognition in Parametric Eigenspace}
+Matrice de covariance entre images à partir de correlation entre elles. Les vecteurs propres de cette matrice sont utilisées comme base du space. Une image de test est, ensuite, projetée sur cette base et l'image est identifié avec celle correspondant au plus proche, au sens euclidean, vecteur de la base. Cela apporte aussi une estimation de l'orientation de l'objet, une fois que les images sont labellisées. Pour découvrir quelle est la prochaine action à faire, l'algorithme propose la réduction de l'entropie en s'utilisant des probabilités de reconnaissance à partir des informations anterieures.
+ 
+Autrement, l'algorithme \textit{Next Best View} traite l'optimisation du nombre d'actions nécessaires par un bras mécanique de six dégrees de libertés pour réparer des surfaces chachées et des évenements visuels d'un objet à fin d'atteindre un modèle CAD à 3 dimensions. Pour un robot terrestre de deplacement contrainte en deux dimensions tout l'information concernant un objet peut être aquis en faisant un tour complèt autour du même, ce qui réduit la complexité du espace de recherche. La distance, aussi, joue un rôle important lorsque la résolution des capteurs est limité, mais la capacité de se rapprocher compense ce handicap.
+
+
+
+\subsection{characteristiques qu'on veut avoir, inspiration humaine}
+
+La reconnaissance d'objet est une tâche évident pour des humans et partir dessous sers comme font d'inspiration.
+Selon les études réalisés en \textbf{reference [5]}, les humans sembles construir un modèle géometrique rotationnel continu, en autre mots, une composition de vues sequentielles qui font le lien entre differentes faces du objet. 
+
+C'est continuité espaciel est, donc, une characteristique fortement souhaitable. Cette continuité est representée dans l'article {\color{red} TODO} où un graphe d'aspect hierarchique est contruit d'après la variation de features. 
+
+Autre étude *réf* suggère que l'ensemble de vues augmente le taux de reconnaissance des objet chez les humans, ce qui paraît intuitif.
+
+
+1. View-based dynamic object recognition based on human perception 
+
+Cet article élabore l'importance de une observation temporelle pour la réconnaissance des objets, fait remarqué dans le processus de reconnaissance humaine.
+La méthode utilisé consisté à partir de l'image initial prise comme key-frame où ses features sont calculées. Ensuite, ses features sont trackées jusqu'à diminuition de features détectées tombe à un nombre inferieur à un seuil définis à priori. La reconnaissance est faite par le comparaison de 
+
+
+
+
+4. TableTop Algorithm
+La segmentation...
+recognition
+for each cluster, a simple iterative fitting technique (a distant cousin of ICP) is used to see how well it corresponds to each mesh in our database of models. If a good fit is found, the database id of the model is returned along with the cluster.
+note that our current fitting method operates in 2D, since based on our assumptions (object resting upright on the known surface of the table) the other 4 dimensions are fixed
+
+5. ENSTA 
+Les traveaux qui rasemblent plus l'étude réalisé par cet article sont ceux du {\color{blue} ENSTA...}. Le premier s'utilise d'un algorithme de segmentation à partir d'extration de plans correspondant aux murs et au sole, et ensuite classifie l'histogramme PFH global de chaque cluster avec une multi-layer-perceptron.l
+
+6. ICUBE
+Le traveaux réalisé par {\color{blue} TODO } traité la réconnaissance d'objets multi-vues comme un problème de localisation et suivi par filtre particulaire. 
+
+
+L'intérêt de cet étude est d'avoir une reconnaissance active de l'objet faite par une plateforme mobile.  
+
+Répresentation des objets
+
+La figure *xx* dépeind la projection azimutal du modèle décrit. Ce modèle est basé sur 
+
+
+La taille varie de ....cm à ...
+
+
+ Une liste de tous est présent dans les annexes.
+
+
+\section{Segmentation}
+
+L’algorithme de segmentation tabletop était dévelloppé dans le cadre de recherche d’objets sur une table. Les objets sont considérés comme de clusters de points *immédiatement* au dessus du plan de la table, ce qui impose comme contrainte que ce plan dois être le plus important du nuage aquis.
+La démarche faite par ENSTA, s'utilise du même principe pour réaliser sa segmentation. Le plan plus important est considéré comme sol et les objets sont juste au dessus. De plus, un traitement qui enlève les plans orthogonales à normal du sol aide à l'extraction du fond.
+
+On a choisi un \textit{multi-layer perceptron} comme classificateur. L'entré du réseaux réçois les histogrammes de features concatenés un après les autres. Le résultat c'est un histogramme d'entré de taille *700* - 615 pfh, 100 - sift, 26 -rgb. Le classificateur est entrainé de façon supervisé ver l'agorithme \textit{backpropagation}. La sortie correspond à une couche \textit{softmax} dont sa taille correspond au nombre d'objets entrainés.
+
+
+\section{Features}
+
+adotamos o pipeline padrao :  segmentacao, features e classificacao. (pos-tratamento)
+
+La problématique de la reconnaissance d'objets est largement simplifié lors qu'une segmentation initiale d'objets candidats peuve être faite, cependent, cet étape de selection est un domaine de recherche tout seule. L'avènement de capteurs RGB-D ont donné une nouvelle façade permetant d'exploiter des aspects géometriques pour atteindre la différentiation entre le fond et les objets intéressants. L'algorithme presenté par {\color{blue} ENSTA}
+
+ 
+\subsection{Estimation de la normale}
+
+Pour constituer les informations géométriques l'estimation de la normale du point est d'extrême importance. 
+
+Sont calcul est fait de la manière suivant :
+1. Un nombre de voisins est choisi 
+2. Ces point *servem* à trouver des paramètres de l'équation du plan tangent et, par consequent, la normale correspondent.
+
+Le méthode adopté pour la bibliothéque PCL correspond à prendre un certain nombre de plus proches voisins définis par un seiul. Un petit seil rendre le calcul faux et un grand prend en compte points distants que peuvent ne pas faire partie du plan estimé.
+
+\url{http://www.pointclouds.org/documentation/tutorials/vfh_recognition.php#vfh-recognition} \\
+
+\url{http://pointclouds.org/documentation/tutorials/fpfh_estimation.php} \\
+
+\url{https://github.com/PointCloudLibrary/pcl/wiki/Overview-and-Comparison-of-Features} \\
+
+\section{Autres features}
+
+
+\subsection{Features 2-Dimensions}
+    \begin{itemize}
+         \item 
+    \end{itemize}
+
+
+
+\subsection{Features 3-Dimensions}
+Our stereo data is noisier and sparser than typical line scan data which
+motivated the use of our new features
+
+    \begin{itemize}
+        \item Spherical harmonic invariants [5] : Spherical harmonic invariants and spin images have been
+          successfully used for the problem of object recognition for
+          densely sampled datasets, though their performance seems
+          to degrade for noisier and sparser datasets
+
+        \item Spin images [6], 
+        \item Curvature maps [7] :  Conformal factors are
+          based on conformal geometry, which is invariant to isometric
+          transformations, and thus obtains good results on databases
+          of watertight models. Its main drawback is that it can only
+          be applied to manifold meshes which can be problematic
+          in stereoXS
+        \item Point Feature Histograms (PFH) [8]
+        \item Conformal factors [9]
+    \end{itemize}
+
+
+
+
