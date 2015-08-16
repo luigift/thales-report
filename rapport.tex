@@ -7,18 +7,18 @@
 
 % \documentclass[twocolumn,notitlepage,11pt]{report}
 % \documentclass[a4paper,notitlepage,11pt]{report}
-\documentclass[a4paper,notitlepage,twoside,10pt]{report}
+% \documentclass[a4paper,notitlepage,twoside,10pt]{report}
 % \documentclass[a4paper,notitlepage,twoside,11pt]{report}
-
+\documentclass{report}
 
 \usepackage[english,french]{babel}
 \usepackage[utf8]{inputenc}
 % \usepackage{lmodern}
 % \usepackage{textcomp}% symboles supplémentaires
 \usepackage{rotating}
+
 \usepackage{amsmath}
 \usepackage{amsfonts}
-\usepackage{graphicx}
 \usepackage{latexsym}
 \usepackage{amssymb}
 \usepackage{probsoln}
@@ -45,14 +45,14 @@
 \usepackage{subfig}
 \usepackage[noend]{algpseudocode}
 \include{environments}
-
-% Luigi's packages
 \usepackage{hyperref}
 \usepackage{enumitem}
 \usepackage{etoolbox}
+
 \newtoggle{rapport}
 \toggletrue{rapport}
 
+%\usepackage[a4paper, left=3cm, right=2cm, top=2.5cm, bottom=2.5cm]{geometry}
 \usepackage[a4paper,total={6in,9in}]{geometry}
 
 \iftoggle{rapport}{ } {
@@ -81,7 +81,7 @@
 %%%% Introduction
 \include{descriptif}
 %%%% State of the Art
-\include{etatdelart}
+%\include{etatdelart}
 %%%% Approche
 \include{approche}
 %%%% Evaluation
@@ -98,7 +98,7 @@
 %%%% bibliografie
 \include{bibliographie}
 %%%% Apêndices
-%\include{annexe}
+\include{annexe}
 % \appendix
 % \include{implantation_gen}
 % \include{profils}

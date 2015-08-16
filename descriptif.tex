@@ -1,10 +1,13 @@
 
-
-
 \iftoggle{rapport} {
  \chapter{Introduction}
-}
-\textbf{La perception de l'environment par machines est indispensable pour son integration à la vie quotidienne. Compétences telle comme se localiser, prise de décisions et capacité d'apprentissage sont nécessaire pour la réalisation de les plus simples tâches. Dans cet étude, on s'intéresse à la compréhension d'éléments constituent d'une scène, sujet récurrent dans le domaine de la vision par ordinateur. Plusieurs approches proposés dans la littérature explorent une sous-partie du pipiline de la réconnaissance pour faire face au difficile défi de représenter la forme visuelle des objets, pendent qu'autres s'intéresses à l'utilisation du système de reconnaissance pour tâches de recherche dans l'environment, *graspping*, par exemple.  Notre démarche correspond, initialement, à l'intégration de techniques de l'état de l'art pour arriver à un système fonctionnel de reconnaissance incorporé sur une plateforme mobile équipée d'un capteur RGB-D capable. Dans une première temps, la plateforme est capable d'acquérir une base de données d'images d'un objet et, ensuite, d'utiliser ces informations apprises pour vérifier si un objet candidat est ou non celui présenté auparavant, et, finalement, renforcer sa perception avec les information de son déplacement pour lever les possibles ambiguités.} 
+}{}
+
+\begin{center}
+{\color{green}EN VERT SONT DES PARTIES QUE NE SONT PAS ENCORE FINI}
+\end{center}
+
+\textbf{La perception de l'environment par machines est indispensable pour son integration à la vie quotidienne. Compétences telle comme se localiser, prise de décisions et capacité d'apprentissage sont nécessaire pour la réalisation de les plus simples tâches. Dans cet étude, on s'intéresse à la compréhension d'éléments constituent d'une scène, sujet récurrent dans le domaine de la vision par ordinateur. Plusieurs approches proposés dans la littérature explorent une sous-partie du \textit{pipiline} de la reconnaissance pour faire face au difficile défi de représenter la forme visuelle des objets, pendent qu'autres s'intéressent à l'utilisation du système de reconnaissance pour tâches de recherche dans l'environnement et saisie {\color{blue}(empoignement)} , par exemple.  Notre démarche correspond, initialement, à l'intégration de techniques de l'état de l'art pour arriver à un système fonctionnel de reconnaissance incorporé sur une plateforme mobile équipée d'un capteur RGB-D capable. Dans une première temps, la plateforme est capable d'acquérir une base de données d'images d'un objet et, ensuite, d'utiliser ces informations apprises pour vérifier si un objet candidat est ou non celui présenté auparavant, et, finalement, renforcer sa perception avec les information de son déplacement pour lever les possibles ambiguités.} 
 
 \iftoggle{rapport} {
   \section{Thématiques du stage.} 
@@ -13,3 +16,35 @@
 \begin{center}
     Vision par ordinateur - Reconnaissance d'objets multi-vue - Robotique
 \end{center}
+
+
+\section{État de l'art}
+  
+	La problématique de la recherche d'objets par un robot mobile est traitée dans l'article \textbf{\textit{Object Search and Localization for an Indoor Mobile Robot}} [1], dont, l'intérêt central, est d'effectuer une exploration dans un environnement où le plan est généré par avance avec des capteur laser et du SLAM, ce qui permets la discrétisation en zones de recherche, pour retrouver un objet donné a priori. Le système est capable de retrouver des objets dans des environnements assez complexes, en s'utilisant des descripteurs SIFTs pour la reconnaissance et des heuristiques pour l'estimation de la distance. 
+	
+	Dans l'autre côté, le travail \textbf{\textit{Active Object Recognition in Parametric Eigenspace}} s'intéresse à la reconnaissance d'objet active avec traitement de vues ambigües par le repositionnement de la camera. Une étape initial d'entrainement, transforme les images d'objets dans la base du espace propre et la reconnaissance est fait par le projection d'une image de teste dans cet espace. Cela apporte aussi une estimation de l'orientation de l'objet, une fois que les images sont labellisées. Pour décider la prochaine action, l'algorithme propose la réduction de l'entropie en s'utilisant des probabilités de reconnaissance à partir des informations antérieures.
+	 
+	Autrement, l'algorithme \textbf{\textit{Next Best View}} traite l'optimisation du nombre d'actions nécessaires par un bras mécanique de six dégrees de libertés pour réparer des surfaces chachées et des évenements visuels d'un objet à fin d'atteindre un modèle CAD à 3 dimensions. Pour un robot terrestre de deplacement contrainte en deux dimensions tout l'information concernant un objet peut être aquis en faisant un tour complèt autour du même, ce qui réduit la complexité du espace de recherche. La distance, aussi, joue un rôle important lorsque la résolution des capteurs est limité, mais la capacité de se rapprocher compense ce handicap.
+	
+	Dans, une autre perpective, la reconnaissance d'objet est une tâche évident pour des humans et partir dessous sers comme font d'inspiration. Selon les études réalisés en \textbf{reference [5]}, les humans sembles construir un modèle géometrique rotationnel continu, en autre mots, une composition de vues sequentielles qui font le lien entre differentes faces du objet.
+	
+	L'oeuvre \textbf{\textit{Neural Network Fusion of Color, Depth and Location for Object Instance Recognition on a Mobile Robot}} part d'un algorithme de segmentation, à partir de l'extration de plans correspondant aux murs et au sol, pour ensuite classifier la concaténation de descripteurs - PFH, SIFT et RGB - de l'objet par un \textit{multi-layer perceptron} où la sortie correspond à une couche \textit{softmax}. Dans un premier temps, le classificateur est entrainé de façon supervisé ver l'algorithme \textit{backpropagation} dans une base d'objets initiale, pour, ensuite, à l'aide de la cartographie et localisation simultanée, étiqueter les objets présents dans l'environnement. 
+
+	{\color{green}	\textbf{\textit{Active Object Recognition on a Humanoid Robot}} traité la reconnaissance d'objets multi-vues pour un robot humanoïde comme un problème de localisation et suivi par un filtre particulaire. } 
+	
+	Au terme de l'analyse, l'ouvrage \textbf{\textit{Three-Dimensional Object Recognition and 6 DoF Pose Estimation}} décrit une méthode simultanée d'estimation de pose et reconnaissance d'objet selon deux types perspectives de traitements : global et local, avec un compte rendu des leur respectives descripteurs. L'article suggère une segmentation, nécessaire dans le traitement global, simple qui considère les objets comme des points sur un plan support. L'étape de correspondance entre vues est faite par le classificateur K-plus proche voisin 
+
+{\color{green}
+
+%\textit{Learning Search Heuristics for Finding Objects in Structured Environments} 
+\subsection{characteristiques qu'on veut avoir, inspiration humaine} 
+
+C'est continuité espaciel est, donc, une characteristique fortement souhaitable. Cette continuité est representée dans l'article {\color{red} TODO} où un graphe d'aspect hierarchique est contruit d'après la variation de features. Autre étude *réf* suggère que l'ensemble de vues augmente le taux de reconnaissance des objet chez les humans, ce qui paraît intuitif.
+
+
+1. View-based dynamic object recognition based on human perception 
+
+Cet article élabore l'importance de une observation temporelle pour la réconnaissance des objets, fait remarqué dans le processus de reconnaissance humaine.
+La méthode utilisé consisté à partir de l'image initial prise comme key-frame où ses features sont calculées. Ensuite, ses features sont trackées jusqu'à diminuition de features détectées tombe à un nombre inferieur à un seuil définis à priori. La reconnaissance est faite par le comparaison de 
+}
+

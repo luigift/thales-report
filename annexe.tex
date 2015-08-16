@@ -33,6 +33,10 @@ Résolution du capteur infrarouge
 Résolution de l'image :
 Range de vision : ** degrees:
 
+\footnote{ limitation de 5 mètres des capteurs infra-rouges.}
+\footnote{Les objets qui touchent les bordes.}
+\footnote{ illumination solaire, par exemple}
+
 
 \section { Floor Detection } 
 
@@ -41,6 +45,38 @@ The major concern goal of the algorithm is to well estimate the floor plan coord
 Some parameters need to be set, such as deviation from the plan mathematical model.
 
 The parameters used for the robot are described at the annex section.
+
+\begin{figure}[H]
+	\subfloat{\includegraphics[width=\textwidth]{box_seq.png}}
+\end{figure}
+
+\begin{figure}[H]
+	\subfloat{\includegraphics[width=\textwidth]{chair_db.jpg}}
+\end{figure}
+
+\begin{figure}[H]
+	\subfloat{\includegraphics[width=\textwidth]{chair_seq.png}}
+\end{figure}
+
+\begin{figure}[H]
+	\subfloat{\includegraphics[width=\textwidth]{chair4w.png}}			
+\end{figure}
+
+\subsection{Estimation de la normale}
+
+Pour constituer les informations géométriques l'estimation de la normale du point est d'extrême importance. 
+
+Sont calcul est fait de la manière suivant :
+1. Un nombre de voisins est choisi 
+2. Ces point *servem* à trouver des paramètres de l'équation du plan tangent et, par consequent, la normale correspondent.
+
+Le méthode adopté pour la bibliothéque PCL correspond à prendre un certain nombre de plus proches voisins définis par un seiul. Un petit seil rendre le calcul faux et un grand prend en compte points distants que peuvent ne pas faire partie du plan estimé.
+
+\url{http://www.pointclouds.org/documentation/tutorials/vfh_recognition.php#vfh-recognition} \\
+
+\url{http://pointclouds.org/documentation/tutorials/fpfh_estimation.php} \\
+
+\url{https://github.com/PointCloudLibrary/pcl/wiki/Overview-and-Comparison-of-Features} \\
 
 \subsection { RANSAC } 
 
@@ -97,14 +133,6 @@ d'information sur les descripteur et ses implementations sur la
 librarie PCL peuvent être retrouvés sur le site
 internet \url{http://pointclouds.org}.
 
-
-\section{ Base de données}
-
-\subsection{Acquisition de la base des données}
-L'asservissement du robot permet d'obtenir plusieurs vues d'un certain objet. Pour l'instant le robot suit une trajectoire circulaire autour de l'objet cible, commandé en boucle ouverte. La base de données est constituée, pour chaque vue, d'une image RGB, d'un nuage de points et des objets segmentés, ainsi que la commande envoyée au robot et, par conséquent, sa trajectoire approchée.
-
-\subsection{Constituition detailée}
-
 Les images sont sauvegardées à l'aide de la librarie OpenCv dans le format 8\_U et .png (Portable Network Graphics).
 
 Les nauges de points sont sauvegardées dans le format .pcd (Point Cloud Data).
@@ -121,7 +149,7 @@ Pour sauvegarder les information *provenientes* de la segmentation, les [it]topi
 \end{itemize}
 
 
-\section{Travaux déjà effectués.}
+\section{Planning de Travail}
 \begin{itemize}
     \item[\checkmark] Mise en place de l'architecture et des protocoles de communication entre composants physiques.
     \item[\checkmark] Étude bibliographique initiale pour situer le travail par rapport à l'existant.
