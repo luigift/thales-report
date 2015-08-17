@@ -1,0 +1,13 @@
+\chapter{Conclusion}
+
+
+L'apport de ce projet *relie* se place dans la partie finale du
+traitement/pipeline de la reconnaissance. Au remarque que le pos-traitement proposé pourrait être fait pour
+n'importe quel système de reconnaissance avec estimation de l'orientation du objet reconnu et un système mobile capable d'informer son déplacement. La reconnaissance d'objet multi-vue augment la capacité de résoudre situations d'ambiguité et gére les problèmes provenants de l'absence de vues base de données et erreurs de segmentation, en conséquence ...
+
+\section{ Améliorations }
+
+...
+
+
+

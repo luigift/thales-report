@@ -26,25 +26,15 @@
 	 
 	Autrement, l'algorithme \textbf{\textit{Next Best View}} traite l'optimisation du nombre d'actions nécessaires par un bras mécanique de six dégrees de libertés pour réparer des surfaces chachées et des évenements visuels d'un objet à fin d'atteindre un modèle CAD à 3 dimensions. Pour un robot terrestre de deplacement contrainte en deux dimensions tout l'information concernant un objet peut être aquis en faisant un tour complèt autour du même, ce qui réduit la complexité du espace de recherche. La distance, aussi, joue un rôle important lorsque la résolution des capteurs est limité, mais la capacité de se rapprocher compense ce handicap.
 	
-	Dans, une autre perpective, la reconnaissance d'objet est une tâche évident pour des humans et partir dessous sers comme font d'inspiration. Selon les études réalisés en \textbf{reference [5]}, les humans sembles construir un modèle géometrique rotationnel continu, en autre mots, une composition de vues sequentielles qui font le lien entre differentes faces du objet.
 	
 	L'oeuvre \textbf{\textit{Neural Network Fusion of Color, Depth and Location for Object Instance Recognition on a Mobile Robot}} part d'un algorithme de segmentation, à partir de l'extration de plans correspondant aux murs et au sol, pour ensuite classifier la concaténation de descripteurs - PFH, SIFT et RGB - de l'objet par un \textit{multi-layer perceptron} où la sortie correspond à une couche \textit{softmax}. Dans un premier temps, le classificateur est entrainé de façon supervisé ver l'algorithme \textit{backpropagation} dans une base d'objets initiale, pour, ensuite, à l'aide de la cartographie et localisation simultanée, étiqueter les objets présents dans l'environnement. 
 
-	{\color{green}	\textbf{\textit{Active Object Recognition on a Humanoid Robot}} traité la reconnaissance d'objets multi-vues pour un robot humanoïde comme un problème de localisation et suivi par un filtre particulaire. } 
+	{\color{green}	\textbf{\textit{Active Object Recognition on a Humanoid Robot}} traité la reconnaissance d'objets multi-vues pour un robot humanoïde comme un problème de localisation et suivi par un filtre particulaire... 
+
+         Dans, une autre perpective, la reconnaissance d'objet est une tâche évident pour des humans et partir dessous sers comme font d'inspiration. Selon les études réalisés en \textit{ View-based dynamic object recognition based on human perception }, les humans sembles construir un modèle géometrique rotationnel continu, en autre mots, une composition de vues sequentielles qui font le lien entre differentes faces du objet. a La méthode utilisé consisté à partir de l'image initial prise comme key-frame où ses features sont calculées. Ensuite, ses features sont trackées jusqu'à diminuition de features détectées tombe à un nombre inferieur à un seuil définis à priori. La reconnaissance est faite par le comparaison de 
+
+... \textit{3d object recognition through next view planning} ...
+} 
 	
-	Au terme de l'analyse, l'ouvrage \textbf{\textit{Three-Dimensional Object Recognition and 6 DoF Pose Estimation}} décrit une méthode simultanée d'estimation de pose et reconnaissance d'objet selon deux types perspectives de traitements : global et local, avec un compte rendu des leur respectives descripteurs. L'article suggère une segmentation, nécessaire dans le traitement global, simple qui considère les objets comme des points sur un plan support. L'étape de correspondance entre vues est faite par le classificateur K-plus proche voisin 
-
-{\color{green}
-
-%\textit{Learning Search Heuristics for Finding Objects in Structured Environments} 
-\subsection{characteristiques qu'on veut avoir, inspiration humaine} 
-
-C'est continuité espaciel est, donc, une characteristique fortement souhaitable. Cette continuité est representée dans l'article {\color{red} TODO} où un graphe d'aspect hierarchique est contruit d'après la variation de features. Autre étude *réf* suggère que l'ensemble de vues augmente le taux de reconnaissance des objet chez les humans, ce qui paraît intuitif.
-
-
-1. View-based dynamic object recognition based on human perception 
-
-Cet article élabore l'importance de une observation temporelle pour la réconnaissance des objets, fait remarqué dans le processus de reconnaissance humaine.
-La méthode utilisé consisté à partir de l'image initial prise comme key-frame où ses features sont calculées. Ensuite, ses features sont trackées jusqu'à diminuition de features détectées tombe à un nombre inferieur à un seuil définis à priori. La reconnaissance est faite par le comparaison de 
-}
+	Au terme de l'analyse, l'ouvrage \textbf{\textit{Three-Dimensional Object Recognition and 6 DoF Pose Estimation}} décrit une méthode simultanée d'estimation de pose et reconnaissance d'objet selon deux types perspectives de traitements : global et local, avec un compte rendu des leur respectives descripteurs. L'article suggère une segmentation, nécessaire dans le traitement global, simple qui considère les objets comme des points sur un plan support. L'étape de correspondance entre vues est faite par le classificateur K-plus proche voisin.
 
