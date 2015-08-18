@@ -5,19 +5,32 @@
 En ce que concerne les aspects matériels, le robot bimoteur Wifibot v2, qui transporte un ordinateur embarqué, sera utilisé comme plateforme mobile. L'acquisition des données est faite par une camera RGB-D portée par une tourelle qui permet son orientation indépendamment du positionnement du robot. Par rapport au choix logiciel, l'environnement robotique ROS a été adopté pout avoir les bibliothèques pour gérer les nuages de points, Freenect, OpenNi2 et PCL - Point Cloud Library, et d'autres nombreux outils de contrôle du robot et sauvegarde d'informations.
 
 \subsection{ Plateforme mobile } 
-\newlength{\oldparindent} \setlength{\oldparindent}{\parindent}
-\setbox0=\hbox{\includegraphics[width=0.4\textwidth]{xtion.jpg}}
+\noindent
+\begin{tabular}{cc}
+ \begin{minipage}{0.5\textwidth} 
+ \textbf{Robot Wifibot v2} \\ \textbf{Dimensions:}\\Hauteur : 18 cm \\ Largeur : 35 cm \\ Longueur : 30 cm \\ Distance entre roues : 0.32 cm \\ Diamètre des roues : 0.18 cm   \end{minipage}
+ & 
+ \begin{minipage}{0.5\textwidth}
+	\begin{figure}[H]
+	  \subfloat{\includegraphics[width=\textwidth]{wbot_mesures.png}}
+	\end{figure}
+  \end{minipage}
+\end{tabular}
 
-\noindent\begin{tabularx}{\textwidth}{@{}Xc@{}}
-  \hskip\oldparindent \begin{minipage}{0.5\textwidth} \textbf{Robot Wifibot v2} \\ \textbf{Dimensions:}\\Hauteur : 18 cm \\ Largeur : 35 cm \\ Longueur : 30 cm \\ Distance entre roues : 0.32 cm \\ Diamètre des roues : 0.18 cm \\ \\  \textbf{Oridnateur portable embarqué :} \\ HD : 8 Go \\ RAM : 2 Go \\ Batterie : 12V NiMH 3.8A 9000mAH \\ Processeur : Intel\textsuperscript{\textregistered} Atom\textsuperscript{TM} N270 @ 1.60GHz \\ Systèm opérationnel : Ubuntu 14.04 \\ Version ROS : ROS Indigo \\   \end{minipage} & \raisebox{-\ht0}{\usebox0}%
-\end{tabularx}
-
-
-
-
+\noindent
+\begin{tabular}{cc}
+\begin{minipage}{0.5\textwidth}  \textbf{Oridnateur portable embarqué :} \\ HD : 8 Go \\ RAM : 2 Go \\ Batterie : 12V NiMH 3.8A 9000mAH \\ Processeur : Intel\textsuperscript{\textregistered} Atom\textsuperscript{TM} N270 @ 1.60GHz \\ Systèm opérationnel : Ubuntu 14.04 \\ Version ROS : ROS Indigo \end{minipage} 
+ & 
+ \begin{minipage}{0.5\textwidth}
+	\begin{figure}[H]
+	  \subfloat{\includegraphics[width=\textwidth]{real_wbot.png}}
+	\end{figure}
+  \end{minipage}
+\end{tabular}
 
 \subsection{Description Ordinateur Portable}
-
+\noindent
+\begin{tabular}{cc}
 \begin{minipage}{0.5\textwidth}
 \textbf{HP Pavilion g6} \\
 Processeur :  Intel\textsuperscript{\textregistered} Core\textsuperscript{TM} i5-3230M @ 2.60GHz \\
@@ -27,7 +40,13 @@ RAM : 4Go \\
 Systèm opérationnel : Ubuntu 14.04 \\
 Version ROS : ROS Indigo \\
 \end{minipage}
-
+	 & 
+	\begin{minipage}{0.5\textwidth}
+		\begin{figure}[H]
+		  \subfloat{\includegraphics[width=\textwidth]{hp.jpg}}
+		\end{figure}
+	\end{minipage}
+\end{tabular}
 
 % {
 %   \raggedleft
@@ -38,19 +57,24 @@ Version ROS : ROS Indigo \\
 % }
 
 \subsection{Capteur RGB-D}
-\setbox1=\hbox{\includegraphics[width=0.4\textwidth]{xtion.jpg}}
 \noindent
-\begin{tabularx}{\textwidth}{@{}Xc@{}}
-  \hskip\oldparindent \begin{minipage}{0.5\textwidth} \textbf{Asus Xtion PRO LIVE} \\
-\textbf{Distance d'utilisation : }\\
-de 0.8 à 3.5 mètres \\
-\textbf{Range de vision : } \\
-58\degree Horizontal, 45\degree Vertical, 70\degree Diagonal \\
-\textbf{Resolution : } \\
-VGA (640x480) : 30 fps \\
-\textbf{Utilisation intérieur}
-\end{minipage} & \raisebox{-\ht0}{\usebox1}%
-  \end{tabularx}
+\begin{tabular}{cc}
+	\begin{minipage}{0.5\textwidth} \textbf{Asus Xtion PRO LIVE} \\
+	\textbf{Distance d'utilisation : }\\
+	de 0.8 à 3.5 mètres \\
+	\textbf{Range de vision : } \\
+	58\degree Horizontal, 45\degree Vertical, 70\degree Diagonal \\
+	\textbf{Resolution : } \\
+	VGA (640x480) : 30 fps \\
+	\textbf{Utilisation intérieur}
+	\end{minipage}
+	 & 
+	\begin{minipage}{0.5\textwidth}
+		\begin{figure}[H]
+		  \subfloat{\includegraphics[width=\textwidth]{xtion.jpg}}
+		\end{figure}
+	\end{minipage}
+\end{tabular}
 
 
 
@@ -90,8 +114,6 @@ L' ordinateur embarqué a un puissance de calcul reduit ce que ne permet pas que
 \end{itemize}
 
 La plus parts de valeurs étaient choisis telle comme ils était proposé dans la librarie PCL. Quelque autre ont été modifiés pour atteint charactéristique attendue.
-
-
 
 \subsection { Floor Detection } 
 
@@ -142,7 +164,7 @@ The iterative algorithm is composed of two different stages :
 \item Finishes when a sufficient number of point belongs to the \textit{consensus}
 \end{itemize}
 
-\center \large{\color{blue} If the variables are linear and normally distributed the Bayes filter becomes equal to the Kalman filter.}
+{ \large{\color{blue} If the variables are linear and normally distributed the Bayes filter becomes equal to the Kalman filter.}}
 
 %% \caption{My algorithm}\label{euclid}
 %% \begin{algorithmic}[1]
@@ -188,6 +210,16 @@ Pour sauvegarder les information *provenientes* de la segmentation, les [it]topi
 
 \end{itemize}
 
+\subsection{Fusion de données}
+
+L'estimation de l’odométrie diverge au long du temps dû à
+l'accumulation d'erreurs mesure. Cette divergence est encore plus
+considérable . Dans l'autre côté, l'utilisation du senseur RGB-D
+estime la distance au centroïde de chaque objet. Une correspondance
+entre les objets de deux observations consécutives nous donné une
+autre repère de positionnement. Un couplage des deux mesure, une
+provenant de l’encodeur moteur et l'autre du capteur infrarouge, fait
+que l'odométrie doive être
 
 \section{Planning de Travail}
 \begin{itemize}

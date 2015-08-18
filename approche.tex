@@ -403,7 +403,7 @@ jouer avec sa densité d'information - nombre d'images incorporées.
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.4\textwidth]{object_model.png}
-  \caption{Fonction \`{a} \^{e}tre optimis\'{e} et la solution voulu.}
+  \caption{Modèle polaire des objets.}
 \end{figure}
 
 Formellement, un référentiel polaire entrelace toutes ces informations
@@ -446,6 +446,23 @@ chaque observation au filtre selon l'ordre de vraisemblance de cette
 matrice. Lorsqu’une ambiguïté se produit dans l'étape
 d'identification, la classification peut aider à prendre une décision
 de mettre un filtre à jour ou, alors, créer un nouveau filtre.
+
+\begin{equation*}
+	\begin{array}{ccl}
+		\hat{\textbf{x}}_{k|k-1} &=& \textbf{F}_{k}\hat{\textbf{x}}_{k-1|k-1} + \textbf{B}_{k} \textbf{u}_{k-1}\\
+		\textbf{P}_{k|k-1} &=& \textbf{F}_{k} \textbf{P}_{k-1|k-1} \textbf{F}_{k}^{T} + \textbf{Q}_{k}
+	\end{array}
+\end{equation*}
+
+\begin{equation*}
+	\begin{array}{ccl}
+\tilde{\textbf{y}}_{k} &=& \textbf{z}_{k} - \textbf{H}_{k}\hat{\textbf{x}}_{k|k-1} \\
+\textbf{S}_{k} &=& \textbf{H}_{k}\textbf{P}_{k|k-1} \textbf{H}_{k}^{T}+\textbf{R}_{k} \\
+\textbf{K}_{k} &=& \textbf{P}_{k|k-1}\textbf{H}_{k}^{T}\textbf{S}_{k}^{-1} \\
+\hat{\textbf{x}}_{k|k} &=& \hat{\textbf{x}}_{k|k-1} + \textbf{K}_{k}\tilde{\textbf{y}}_{k} \\
+\textbf{P}_{k|k} &=& (I - \textbf{K}_{k} \textbf{H}_{k}) \textbf{P}_{k|k-1}
+	\end{array}
+\end{equation*}
 
 \section {Chaînes de Markov Cachées}
 
@@ -519,18 +536,13 @@ des deux roues motorises dans les deux sens possibles permets au
 robot d'avoir les comportements suivants:
 
 \begin {itemize}
-\item Déplacement en ligne droite : équivalent aux deux roues roulant
-  avec la même vitesse et dans le même sens.
+\item Déplacement en ligne droite : deux roues roulant avec la même vitesse et dans le même sens.
 
-\item Déplacement en arc de cercle : La différence entre les vitesses
-  de roues résulta dans un mouvement de cercle. Le rapport entre cette
-  différence permettre définir la courbature de la trajectoire.
+\item Déplacement en arc de cercle : différence entre les vitesses des roues.
 
-\item Rotation : Dans ce cas, les deux roues sont commandées à la même
-  vitesse, mais avec de sens différents.
+\item Rotation : deux roues à la même vitesse, mais avec de sens différents.
 \end{itemize}
 
-*Illustration*
 
 Finalement, la combinaison de ces mouvements permet au robot de
 accéder n'importe quelle position de l’espace.
@@ -544,7 +556,15 @@ roues. Une intégration, au sens mathématique, de la différence entre
 l'odométrie entre deux intervalles de temps permet de retrouver la
 position global du robot.
 
+\begin{equation*}
+	\begin{array}{rcl}
+		x_t &=& x_{t-1} + \delta x_{t-1} * cos(\theta_{t-1}) - \delta y_{t-1} * sin(\theta_{t-1}) \\
+		y_t &=& y_{t-1} + \delta x_{t-1} * sin(\theta_{t-1}) + \delta y_{t-1} * cos(\theta_{t-1}) \\
+		\theta_t &=& \theta_{t-1} + \delta\theta_{t-1}
+	\end{array}
+\end{equation*}
 \subsection{Problèmes de déplacement}
+
 
 La roulette de support originalement installée avait deux axes de
 rotation. Pourtant, quelques mouvements de rotation du robot alignent
@@ -555,16 +575,7 @@ bloquait sur la moquette avec le poids du robot, a fait que
 l'originale était réinstallée. Une deuxième solution serait d'interdire
 certains mouvements du robot pour éviter cette déviation.
 
-\subsection{Fusion de données}
 
-L'estimation de l’odométrie diverge au long du temps dû à
-l'accumulation d'erreurs mesure. Cette divergence est encore plus
-considérable . Dans l'autre côté, l'utilisation du senseur RGB-D
-estime la distance au centroïde de chaque objet. Une correspondance
-entre les objets de deux observations consécutives nous donné une
-autre repère de positionnement. Un couplage des deux mesure, une
-provenant de l’encodeur moteur et l'autre du capteur infrarouge, fait
-que l'odométrie doive être
 
 \section{Architecture}
 
