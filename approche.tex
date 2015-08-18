@@ -69,15 +69,15 @@ Plus spécifiquement, elle peut être découpée dans les étapes suivantes
 \item Calcul de la normale des superficies comprises dans la scène
 
 \item Élimination de murs, considérés comme de plans orthogonaux au
-sol de taille suffisamment grande, d'après un seuil.
+  sol de taille suffisamment grande, d'après un seuil.
 
 \item Projection des points appartenant aux objets dans le plan du
-sol.
+  sol.
 
 \item Détermination de l’enveloppe convexe correspondant au sol détecté.
 
 \item Réduction de la densité de discrétisation pour accélérer l'étape
-de \textit{clustering}.
+  de \textit{clustering}.
 
 \item Clustering des objets par l'algorithme *point growing*
 
@@ -86,7 +86,7 @@ de \textit{clustering}.
 \item Calcul du centroïde et \textit{bouding boxes} 2D et 3D
 
 \item extraction d’imagettes, et autre informations pertinents aux
-objets détectés.
+  objets détectés.
 \end{enumerate}
 
 Une calibration initiale est nécessaire pour définir l'équation du
@@ -120,7 +120,7 @@ résultant dans les restrictions suivantes :
 
 
 \item L'objet est assez grand et dépasse le seuil d'appartenance au
-sol.
+  sol.
 
 \item L'objet n'est ni transparents et ni trop réflective.
 
@@ -141,8 +141,8 @@ transformations affines et changement de luminosité. On classifie les
 descripteurs selon la caractéristique qu'il exprime. Une première
 group sont les descripteurs géométriques qui essaient de traduire les
 idées de courbure, forme et taille dans histogrammes, et sont intéressant
- pour etudier les ambiguïtés de reconnaissance, un fois que la plus parts 
- d'objet ont une certaine symétrie spatiel.
+pour etudier les ambiguïtés de reconnaissance, un fois que la plus parts 
+d'objet ont une certaine symétrie spatiel.
 
 \subsection{Point Feature Histogram - PFH}
 
@@ -165,13 +165,13 @@ et normales des dois point - à un espace de quatre dimension.
 \begin{equation*}
   {\mathsf u} = \boldsymbol{n}_s \qquad
   {\mathsf v} =  {\mathsf u} \times \frac{(\boldsymbol{p}_t-\boldsymbol{p}_s)}{{\|\boldsymbol{p}_t-\boldsymbol{p}_s\|}_{2}}  \qquad
- {\mathsf w} = {\mathsf u} \times {\mathsf v}
+  {\mathsf w} = {\mathsf u} \times {\mathsf v}
 \end{equation*}
 
 \begin{figure}[H]
-\centering
-\includegraphics[width=0.6\textwidth]{pfh_frame.png}
-%\caption{{\color{blue} Image d'explication du repère}.}
+  \centering
+  \includegraphics[width=0.6\textwidth]{pfh_frame.png}
+  % \caption{{\color{blue} Image d'explication du repère}.}
 \end{figure}
 
 
@@ -234,18 +234,18 @@ En revanche, le découpement exige un soin un plus avec la résolution des surfa
 quelles restent représentatives de l'objet.
 
 \begin{figure}[H]
-	\subfloat[PFH ]{\includegraphics[width=4.5cm]{pfh_diagram.png}}
-	\subfloat[FPFH]{\includegraphics[width=4.5cm]{fpfh_diagram.png}}
-	\subfloat[subcaption]{\includegraphics[width=6cm]{second_component.jpg}}		
+  \subfloat[PFH ]{\includegraphics[width=4.5cm]{pfh_diagram.png}}
+  \subfloat[FPFH]{\includegraphics[width=4.5cm]{fpfh_diagram.png}}
+  \subfloat[subcaption]{\includegraphics[width=6cm]{second_component.jpg}}		
 \end{figure}
 
 \section {Classification} L'étape de classification correspond à la différentiation entre les
 histogrammes caractéristiques de chaque vue de chaque objet. Cette
 mesure pourrait être apprise, par exemple, avec un réseau de neurone
 ou n'importe quel autre méthode classique de \textit{machine learning}.{\color{green}Le travail * three dimensional
-dof cluster vfh...* suggère l'utilisation de la mesure chi-squared
-similarité entre histogrammes accouplé au classificateur k plus
-proches voisins. }  Le grand avantage de ce classificateur c'est l'étape
+  dof cluster vfh...* suggère l'utilisation de la mesure chi-squared
+  similarité entre histogrammes accouplé au classificateur k plus
+  proches voisins. }  Le grand avantage de ce classificateur c'est l'étape
 d’apprentissage correspond à création d’un arbre de recherche,
 construit d'après la comparaison croisée entre les éléments de la base,
 que pour l'ordre de grandeur de la base de données envisagé, est
@@ -286,50 +286,50 @@ vue qui permet de s’intéresser, ensuite, par le couplage de résultat de la
 reconnaissance avec les informations de déplacement du robot.
 
 {\color {green}
-\subsection {Principes de la Reconnaissance Humaine}
+  \subsection {Principes de la Reconnaissance Humaine}
 
-Commençant par le modèle de l'objet, le but c'est de intégrer et
-respecter certains principes appris après observation dans la
-reconnaissance chez les humains :
+  Commençant par le modèle de l'objet, le but c'est de intégrer et
+  respecter certains principes appris après observation dans la
+  reconnaissance chez les humains :
 
-\begin{enumerate}
-\item Gazltat : Tendance à retrouver des formes et contours simples et
-naturels par regroupement de caractéristiques et/ou comportements.
+  \begin{enumerate}
+  \item Gazltat : Tendance à retrouver des formes et contours simples et
+    naturels par regroupement de caractéristiques et/ou comportements.
 
-\item Continuité : l'apprentissage d'un nouvel objet se fait de forme
-continue. Dans le cas discret, cela revient à un modèle qui simule les
-transitions entre superficies.
+  \item Continuité : l'apprentissage d'un nouvel objet se fait de forme
+    continue. Dans le cas discret, cela revient à un modèle qui simule les
+    transitions entre superficies.
 
-\item Temporalité et séquentialité : Des études {\color{blue} ref} suggèrent que l'ordre
-de visualisation de surfaces des objets influence sa reconnaissance à
-posteriori. Par conséquent, la séquence spatiale entre vues joue un rôle sur le concept d'objet, où parcourir
-séquence dans la même ordre que celle appris apporterais plus d'information.
+  \item Temporalité et séquentialité : Des études {\color{blue} ref} suggèrent que l'ordre
+    de visualisation de surfaces des objets influence sa reconnaissance à
+    posteriori. Par conséquent, la séquence spatiale entre vues joue un rôle sur le concept d'objet, où parcourir
+    séquence dans la même ordre que celle appris apporterais plus d'information.
 
-\end{enumerate}
+  \end{enumerate}
 
-Malheureusement, avoir tous ces principes est une tâche assez complexe
-pour l’état courant de la technologie, pourtant, en même temps, ils inspirent
-possibles solutions et représentations. L'apport de cet étude se place dans les
-domaines de la temporalité et séquentialité.
+  Malheureusement, avoir tous ces principes est une tâche assez complexe
+  pour l’état courant de la technologie, pourtant, en même temps, ils inspirent
+  possibles solutions et représentations. L'apport de cet étude se place dans les
+  domaines de la temporalité et séquentialité.
 
-\subsection{Caractéristique des objets} 
+  \subsection{Caractéristique des objets} 
 
-En regardant dans la perspective des objets, certaines de ses caractéristiques sont utiles pour le différencier un des autres:
+  En regardant dans la perspective des objets, certaines de ses caractéristiques sont utiles pour le différencier un des autres:
 
-\begin {enumerate}
-\item Taille
-\item Position global
-\item couleur et texture
-\item Contraintes d’espace
-\item Contexte dans l'environnement
-\item Forme géométrique : 
-\subitem Sous formes primaire 
-\subitem Position et orientation relatif entre formes primaires
-\item Affordance : se réfère au concept d’interactions possibles
-avec un objet. De manière illustratif, dans le cadre du robot utilisé,
-cela reviendrait à capacité de pousser un certain objet, d’où
-l’intérêt de l’identification de l’orientation de l’objet.
-\end{enumerate} 
+  \begin {enumerate}
+  \item Taille
+  \item Position global
+  \item couleur et texture
+  \item Contraintes d’espace
+  \item Contexte dans l'environnement
+  \item Forme géométrique : 
+    \subitem Sous formes primaire 
+    \subitem Position et orientation relatif entre formes primaires
+  \item Affordance : se réfère au concept d’interactions possibles
+    avec un objet. De manière illustratif, dans le cadre du robot utilisé,
+    cela reviendrait à capacité de pousser un certain objet, d’où
+    l’intérêt de l’identification de l’orientation de l’objet.
+  \end{enumerate} 
 }
 
 Le modèle proposé doit être capable d'exprimer au
@@ -358,8 +358,8 @@ démontre mathématiquement compliqué au niveau de la modélisation de
 fonctions de contour et de leur transformation. Cependant, une fois
 modélise, une prévision
 
-%\subsubsection{Squelettes}
-%...
+% \subsubsection{Squelettes}
+% ...
 
 \subsubsection{Aspect-Graphs}
 
@@ -372,19 +372,19 @@ principale est de trouver des point de vues représentatives, nommés
 \textit{key-Frames}, qui peuvent être choisi avec politiques suivants:
 \begin{enumerate}
 \item Aléatoire : Ces key-frames peuvent être choisies de forme
-complètement aléatoire. Absence de calcul intermédiaire ou
-prétraitement.
+  complètement aléatoire. Absence de calcul intermédiaire ou
+  prétraitement.
 
 \item Intervalle constant : Une façon simple c'est de conditionner les
-\textit{key-frames} à un écart angulaire fixe. Cela permet d'unifier
-le nombre de frames pour chaque objet, ce qui peut être intéressant
-pour certaines applications
+  \textit{key-frames} à un écart angulaire fixe. Cela permet d'unifier
+  le nombre de frames pour chaque objet, ce qui peut être intéressant
+  pour certaines applications
 
 \item Événement visuels : Cela correspond à déterminer des grands
-variations d'intensité des features pour estimer les key-frames plus
-représentatifs de l'objet. L'inconvénient vient du besoin d'un
-prétraitement, en plus, orienté différemment pour chaque feature,
-lors de la création de la base de données.
+  variations d'intensité des features pour estimer les key-frames plus
+  représentatifs de l'objet. L'inconvénient vient du besoin d'un
+  prétraitement, en plus, orienté différemment pour chaque feature,
+  lors de la création de la base de données.
 
 \end{enumerate}
 
@@ -401,9 +401,9 @@ résulte dans la possibilité de construire le modèle à la volée et de
 jouer avec sa densité d'information - nombre d'images incorporées.
 
 \begin{figure}[H]
-\centering
-\includegraphics[width=0.4\textwidth]{object_model.png}
-\caption{Fonction \`{a} \^{e}tre optimis\'{e} et la solution voulu.}
+  \centering
+  \includegraphics[width=0.4\textwidth]{object_model.png}
+  \caption{Fonction \`{a} \^{e}tre optimis\'{e} et la solution voulu.}
 \end{figure}
 
 Formellement, un référentiel polaire entrelace toutes ces informations
@@ -414,7 +414,7 @@ construction du modèle les conventions suivantes étaient adoptées :
 \item l'angle zéro est attribué à la première observation
 \item L'origine du référentiel est la position globale de l’objet
 \item Les features sont labellisées d'après le déplacement angulaire
-et la distance au centroïde de l'objet.
+  et la distance au centroïde de l'objet.
 \end{itemize}
 
 Une grande majorité de features visuelles sont variantes à échelle, une
@@ -464,11 +464,11 @@ chaîne de Markov cachée.
 Concrètement, les états cachées correspondent à des objets connus au
 préalable et déjà incorporés dans la mémoire du robot. Cela contraint le
 nombre d'états et on se rencontre avec un chaîne fini. Puis, une
-matrice de transition décrit l'évolution du processus et c'est là où
+matrice de transition, $a_{i,j}$, décrit l'évolution du processus et c'est là où
 l'odométrie et la relation entre vues et entre objets sont
-incorporés. Finalement, une autre matrice, dit matrice d'émission,
-estime la vraisemblance entre l'observation et les états de la
-chaînes.
+incorporés. Finalement, une autre matrice, $\mathrm{P}\big( y_1 \ | \ k \big)$
+, dit matrice d'émission, estime la vraisemblance entre l'observation
+et les états de la chaînes.
 
 Une autre deuxième modélisation serait d'avoir une chaîne de Markov
 Cachée distincte pour chaque objet et ensuite décider quel était le
@@ -477,13 +477,35 @@ antérieur où les transitions entre deux objets ne sont pas
 considérés. Pourtant, ce qui peut être utile s'on considère
 l'évolution d'objets, par exemple, la transition entre une chaise vide
 et une personne assise sur une chaise ou encore un personne
-commence à marcher.
+commence à marcher \footnote{Le fait de se mettre en mouvement
+  altère les formes d'une personne, ce qui possibilite sa détection
+  comme un nouveau objet.}.
 
-{\color{green} 
 \section{Algorithme de Viterbi}
-A fin de retrouver la séquence d'états la plus vraisemblable selon les
-observations, 
-}
+
+Il reste, donc, extraire des informations de la modélisation Markovienne proposée.
+La séquence d'états la plus vraisemblable qui pourraient avoir géneré
+les observations  $y_1,\dots, y_T$, correspondrait exactement à la séquence d'objets reconnus.
+A fin de retrouver cette séquence, aussi appéllé chemin, on fait 
+appel à la programmation dynamique, spécifiquement à l'algorithme de Viterbi, d'où viens le nom chemin de Viterbi.
+L'algorithme retrouve de façon récursive l'état current le plus probable, 
+prennant en compte seulement les observations jusqu'au instant donné et son
+estimation au instant intérieur, comme décrit par les équations suivants:
+
+\begin{equation*}
+  \begin{array}{rcl}
+    V_{1,k} &=& \mathrm{P}\big( y_1 \ | \ k \big) \cdot \pi_k \\
+    V_{t,k} &=& \max_{x \in S} \left(  \mathrm{P}\big( y_t \ | \ k \big) \cdot a_{x,k} \cdot V_{t-1,x}\right)
+  \end{array}
+\end{equation*}
+
+La probabilité que la séquence d'états le plus probable finissant dans l'état $k$, avait généré les observation au moment $t$, est sauvegardé dans $V_{t,k}$, pendent que $\pi_i$ c'est la probabilité initiale de se rencontrer en chaque état. Pour retrouver le chemin de Viterbi, il suffit de trouver le maximum de $V_{t,k}$ :
+
+\begin{equation*}
+  \begin{array}{rcl}
+    x_T &=& \arg\max_{x \in S} (V_{T,x})
+  \end{array}
+\end{equation*}
 
 \section{Déplacement du robot}
 
@@ -498,14 +520,14 @@ robot d'avoir les comportements suivants:
 
 \begin {itemize}
 \item Déplacement en ligne droite : équivalent aux deux roues roulant
-avec la même vitesse et dans le même sens.
+  avec la même vitesse et dans le même sens.
 
 \item Déplacement en arc de cercle : La différence entre les vitesses
-de roues résulta dans un mouvement de cercle. Le rapport entre cette
-différence permettre définir la courbature de la trajectoire.
+  de roues résulta dans un mouvement de cercle. Le rapport entre cette
+  différence permettre définir la courbature de la trajectoire.
 
 \item Rotation : Dans ce cas, les deux roues sont commandées à la même
-vitesse, mais avec de sens différents.
+  vitesse, mais avec de sens différents.
 \end{itemize}
 
 *Illustration*

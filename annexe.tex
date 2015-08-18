@@ -5,52 +5,53 @@
 En ce que concerne les aspects matériels, le robot bimoteur Wifibot v2, qui transporte un ordinateur embarqué, sera utilisé comme plateforme mobile. L'acquisition des données est faite par une camera RGB-D portée par une tourelle qui permet son orientation indépendamment du positionnement du robot. Par rapport au choix logiciel, l'environnement robotique ROS a été adopté pout avoir les bibliothèques pour gérer les nuages de points, Freenect, OpenNi2 et PCL - Point Cloud Library, et d'autres nombreux outils de contrôle du robot et sauvegarde d'informations.
 
 \subsection{ Plateforme mobile } 
-\textbf{Robot Wifibot v2} 
-\textbf{Dimensions:}
-Hauteur : 18 cm 
-Largeur : 35 cm 
-Longueur : 30 cm 
+\newlength{\oldparindent} \setlength{\oldparindent}{\parindent}
+\setbox0=\hbox{\includegraphics[width=0.4\textwidth]{xtion.jpg}}
 
-\textbf{Oridnateur portable embarqué : } \\
-Processeur : Intel(R) Atom(TM) CPU N270   @ 1.60GHz \\
-HD : 8 Go \\
-RAM : 2 Go \\
-Batterie : 12V NiMH 3.8A 9000mAH \\
+\noindent\begin{tabularx}{\textwidth}{@{}Xc@{}}
+  \hskip\oldparindent \begin{minipage}{0.5\textwidth} \textbf{Robot Wifibot v2} \\ \textbf{Dimensions:}\\Hauteur : 18 cm \\ Largeur : 35 cm \\ Longueur : 30 cm \\ Distance entre roues : 0.32 cm \\ Diamètre des roues : 0.18 cm \\ \\  \textbf{Oridnateur portable embarqué :} \\ HD : 8 Go \\ RAM : 2 Go \\ Batterie : 12V NiMH 3.8A 9000mAH \\ Processeur : Intel\textsuperscript{\textregistered} Atom\textsuperscript{TM} N270 @ 1.60GHz \\ Systèm opérationnel : Ubuntu 14.04 \\ Version ROS : ROS Indigo \\   \end{minipage} & \raisebox{-\ht0}{\usebox0}%
+\end{tabularx}
 
-Systèm opérationnel : Ubuntu 14.04 \\
-Version ROS : ROS Indigo \\ 
+
+
+
 
 \subsection{Description Ordinateur Portable}
 
+\begin{minipage}{0.5\textwidth}
 \textbf{HP Pavilion g6} \\
-Processeur :  Intel(R) Core(TM) i5-3230M CPU @ 2.60GHz \\
+Processeur :  Intel\textsuperscript{\textregistered} Core\textsuperscript{TM} i5-3230M @ 2.60GHz \\
 HD : 750Go \\
 RAM : 4Go \\
 
 Systèm opérationnel : Ubuntu 14.04 \\
 Version ROS : ROS Indigo \\
+\end{minipage}
+
+
+% {
+%   \raggedleft
+%   \begin{tikzpicture} 
+%     \node (asus) {\includegraphics[width=0.4\textwidth]{xtion.jpg}};
+%     \node [left=0.5cm of asus.north west, yshift=-5mm]{sdfsf};
+%   \end{tikzpicture}
+% }
 
 \subsection{Capteur RGB-D}
-
-{
-  \raggedleft
-  \begin{tikzpicture} 
-    \node (asus) {\includegraphics[width=0.4\textwidth]{xtion.jpg}};
-    \node [left=0.5cm of asus.north west, yshift=-5mm]{sdfsf};
-  \end{tikzpicture}
-}
-
-\textbf{Asus Xtion PRO LIVE} \\
+\setbox1=\hbox{\includegraphics[width=0.4\textwidth]{xtion.jpg}}
+\noindent
+\begin{tabularx}{\textwidth}{@{}Xc@{}}
+  \hskip\oldparindent \begin{minipage}{0.5\textwidth} \textbf{Asus Xtion PRO LIVE} \\
 \textbf{Distance d'utilisation : }\\
-de 0.8 à 3.5 mètres
-
+de 0.8 à 3.5 mètres \\
 \textbf{Range de vision : } \\
-58\degree Horizontal, 45\degree Vertical, 70\degree Diagonal
-
+58\degree Horizontal, 45\degree Vertical, 70\degree Diagonal \\
 \textbf{Resolution : } \\
-VGA (640x480) : 30 fps
-
+VGA (640x480) : 30 fps \\
 \textbf{Utilisation intérieur}
+\end{minipage} & \raisebox{-\ht0}{\usebox1}%
+  \end{tabularx}
+
 
 
 \section{Base de données }
