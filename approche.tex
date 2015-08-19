@@ -1,11 +1,21 @@
 
-\chapter{Description du Travail}
-
+\chapter{Méthode proposée}
 
 L'utilisation d'un algorithme de reconnaissance basée sur une seule image apporte l'inconvénient de
 n'incorporer pas les notions de vue et de transition entre elles, au contraire, la majorité de ces systèmes souhaitent être invariant aux faces d'objets, en autres mots, avoir la capacité de l'identifier de n'importe quel point de vue. Un système mono-vue pourrait traiter le concept de vues plus représentatives et transitions, par contre, de façon moins intuitive. De cette manière, les articles présentés auparavant travaillent sur le domaine multi vue, incorporant des aspectes géométriques, pour augmenter la qualité de son estimation.
 
 En dernière analyse, l'objectif ultime c'est d'avoir une reconnaissance multi vue, en instance, capable d'incorporer son déplacement pour résoudre des ambiguïtés et faux positifs. Pour incorporer les notions voulus, on présente, simultanément, un simple modèle d’objet suffisamment général et un système capable d'estimer l'orientation de l'objet reconnu, ou bien un système de reconnaissance de vue, pour, ensuite traiter l’information motrice du robot pour augmenter le taux de réussite.
+
+\section{Architecture générale}
+Expliquer qu'est on a comme materiel....
+
+expliquer schéma....
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{gen_arc.pdf}
+  \caption{Modèle polaire des objets.}
+\end{figure}
 
 \section{Segmentation}
 
@@ -158,7 +168,168 @@ $$\sum _I \frac{\left(H_1(I)-H_2(I)\right)^2}{H_1(I)} $$
 % \end{itemize}
 
 
-\section {Graphe d'aspect polaire}
+
+\section{Localisation et suivi d'objet}
+
+\subsection{Déplacement du robot}
+
+Le robot est équipé de trois roues, desquelles les symétriques
+arrières sont motorisés et responsables pour le déplacement
+motrice. Au même temps que la dernière sert à donner un support pour
+la partie derrière du châssis. Les moteurs sont contrôlés à
+partir de commandes sériel, préétablis pour le fabricant, qui
+définissent la vitesse de roulement. La combinaison des rotations
+des deux roues motorises dans les deux sens possibles permets au
+robot d'avoir les comportements suivants:
+
+\begin {itemize}
+\item Déplacement en ligne droite : deux roues roulant avec la même vitesse et dans le même sens.
+
+\item Déplacement en arc de cercle : différence entre les vitesses des roues.
+
+\item Rotation : deux roues à la même vitesse, mais avec de sens différents.
+\end{itemize}
+
+
+Finalement, la combinaison de ces mouvements permet au robot de
+accéder n'importe quelle position de l’espace.
+
+\subsubsection{Estimation de l'odométrie}
+
+Certains robots sont dotés de capteurs aptes d'estimer de façon
+approximé sont déplacement. C'est aussi le cas du robot ciblé qui
+possède encodeurs capables d'estimer la rotation angulaire des
+roues. Une intégration, au sens mathématique, de la différence entre
+l'odométrie entre deux intervalles de temps permet de retrouver la
+position global du robot.
+
+\begin{equation*}
+	\begin{array}{rcl}
+		x_t &=& x_{t-1} + \delta x_{t-1} * cos(\theta_{t-1}) - \delta y_{t-1} * sin(\theta_{t-1}) \\
+		y_t &=& y_{t-1} + \delta x_{t-1} * sin(\theta_{t-1}) + \delta y_{t-1} * cos(\theta_{t-1}) \\
+		\theta_t &=& \theta_{t-1} + \delta\theta_{t-1}
+	\end{array}
+\end{equation*}
+\subsubsection{Problèmes de déplacement}
+
+
+La roulette de support originalement installée avait deux axes de
+rotation. Pourtant, quelques mouvements de rotation du robot alignent
+la roulette orthogonalement au sens du prochain mouvement ce qui crées
+une torche parasite que perturbe la trajectoire voulue. Une tentative
+frustrée d'installer une bille omnidirectionnelle à roulement, qui se
+bloquait sur la moquette avec le poids du robot, a fait que
+l'originale était réinstallée. Une deuxième solution serait d'interdire
+certains mouvements du robot pour éviter cette déviation.
+
+\subsection{Filtre de Kalman }
+
+La modélisation des objets entraîne le besoin initiale de les
+localiser dans la scène pour, postérieurement, les identifier. À cause
+de la divergence de l'odométrie, la mauvaise segmentation et le calcul
+du centroïde de l'objet, la position estimée est fortement bruitée
+ayant un écart type qui rend la suive et identification infaisable
+lorsque plusieurs objets sont minimalement proches. Un filtre de
+Kalman ayant un modèle unitaire pour la matrice de transition d'états,
+moyenne les observations pour s'adapter au bruit de mesure.
+
+Cependant, le caractère monomodal du filtre de Kalman fait en sorte
+qu'un seul objet cible peut être suivis à la fois. Pour atteindre
+l'aspect multimodal, il faut que plusieurs filtres tournent en
+parallèle. Ainsi, le problème passe d’estimer la position à décider
+quelle observation appartient à quel filtre, l'étape
+d'identification. Cela se fait à l'aide d'une matrice de corrélation
+de distances entre les nouvelles observations et les états courants de
+chaque filtre existant. Une solution simplificatrice est d'associer
+chaque observation au filtre selon l'ordre de vraisemblance de cette
+matrice. Lorsqu’une ambiguïté se produit dans l'étape
+d'identification, la classification peut aider à prendre une décision
+de mettre un filtre à jour ou, alors, créer un nouveau filtre.
+
+
+
+\begin{equation*}
+	\begin{array}{ccl}
+		\hat{\textbf{x}}_{k|k-1} &=& \textbf{F}_{k}\hat{\textbf{x}}_{k-1|k-1} + \textbf{B}_{k} \textbf{u}_{k-1}\\
+		\textbf{P}_{k|k-1} &=& \textbf{F}_{k} \textbf{P}_{k-1|k-1} \textbf{F}_{k}^{T} + \textbf{Q}_{k}
+	\end{array}
+\end{equation*}
+
+innovation
+
+\begin{equation*}
+	\begin{array}{ccl}
+\tilde{\textbf{y}}_{k} &=& \textbf{z}_{k} - \textbf{H}_{k}\hat{\textbf{x}}_{k|k-1} \\
+\textbf{S}_{k} &=& \textbf{H}_{k}\textbf{P}_{k|k-1} \textbf{H}_{k}^{T}+\textbf{R}_{k} \\
+\textbf{K}_{k} &=& \textbf{P}_{k|k-1}\textbf{H}_{k}^{T}\textbf{S}_{k}^{-1} \\
+\hat{\textbf{x}}_{k|k} &=& \hat{\textbf{x}}_{k|k-1} + \textbf{K}_{k}\tilde{\textbf{y}}_{k} \\
+\textbf{P}_{k|k} &=& (I - \textbf{K}_{k} \textbf{H}_{k}) \textbf{P}_{k|k-1}
+	\end{array}
+\end{equation*}
+
+\section {Reconnaissance Multi-vue}
+
+\subsection {Chaînes de Markov Cachées}
+
+Le déplacement physique du robot résulte dans une séquence
+d'observations, en angles différents, d'un même objet. On exploit
+l'information odométrique entre les visualisations pour prédire les
+prochaines possibles orientations. De cette manière, l'évolution de la
+reconnaissance au long du temps est représenté par un processus
+stochastique, dont une modélisation possible correspond à le traiter
+de façon discrète dans un espace d'état. Ayant l'apriori que la
+dernière image et le dernier déplacement suffisent pour faire cette
+prédiction, en respectant, donc, la propriété de Markov de premier
+ordre, le processus stochastique est modélisée sur le cadre d'une
+chaîne de Markov cachée.
+
+Concrètement, les états cachées correspondent à des objets connus au
+préalable et déjà incorporés dans la mémoire du robot. Cela contraint le
+nombre d'états et on se rencontre avec un chaîne fini. Puis, une
+matrice de transition, $a_{i,j}$, décrit l'évolution du processus et c'est là où
+l'odométrie et la relation entre vues et entre objets sont
+incorporés. Finalement, une autre matrice, $\mathrm{P}\big( y_1 \ | \ k \big)$
+, dit matrice d'émission, estime la vraisemblance entre l'observation
+et les états de la chaînes.
+
+Une autre deuxième modélisation serait d'avoir une chaîne de Markov
+Cachée distincte pour chaque objet et ensuite décider quel était le
+processus le plus vraisemblable. Ce cas est un sous-ensemble du cas
+antérieur où les transitions entre deux objets ne sont pas
+considérés. Pourtant, ce qui peut être utile s'on considère
+l'évolution d'objets, par exemple, la transition entre une chaise vide
+et une personne assise sur une chaise ou encore un personne
+commence à marcher \footnote{Le fait de se mettre en mouvement
+  altère les formes d'une personne, ce qui possibilite sa détection
+  comme un nouveau objet.}.
+
+\subsection{Algorithme de Viterbi}
+
+Il reste, donc, extraire des informations de la modélisation Markovienne proposée.
+La séquence d'états la plus vraisemblable qui pourraient avoir géneré
+les observations  $y_1,\dots, y_T$, correspondrait exactement à la séquence d'objets reconnus.
+A fin de retrouver cette séquence, aussi appéllé chemin, on fait 
+appel à la programmation dynamique, spécifiquement à l'algorithme de Viterbi, d'où viens le nom chemin de Viterbi.
+L'algorithme retrouve de façon récursive l'état current le plus probable, 
+prennant en compte seulement les observations jusqu'au instant donné et son
+estimation au instant intérieur, comme décrit par les équations suivants:
+
+\begin{equation*}
+  \begin{array}{rcl}
+    V_{1,k} &=& \mathrm{P}\big( y_1 \ | \ k \big) \cdot \pi_k \\
+    V_{t,k} &=& \max_{x \in S} \left(  \mathrm{P}\big( y_t \ | \ k \big) \cdot a_{x,k} \cdot V_{t-1,x}\right)
+  \end{array}
+\end{equation*}
+
+La probabilité que la séquence d'états le plus probable finissant dans l'état $k$, avait généré les observation au moment $t$, est sauvegardé dans $V_{t,k}$, pendent que $\pi_i$ c'est la probabilité initiale de se rencontrer en chaque état. Pour retrouver le chemin de Viterbi, il suffit de trouver le maximum de $V_{t,k}$ :
+
+\begin{equation*}
+  \begin{array}{rcl}
+    x_T &=& \arg\max_{x \in S} (V_{T,x})
+  \end{array}
+\end{equation*}
+
+\subsection {Graphe d'aspect polaire}
 
 On considère que les objets sont décrits par deux dimensions
 d'information : une spatiale, concernant la position absolu de l'objet
@@ -193,156 +364,5 @@ détection de features, comme les patches SIFTs. Ainsi, avoir la distance
 que l’image étais prise peut être intéressant pour limiter la
 classification à une échelle valable.
 
-\section{Filtre de Kalman }
-
-La modélisation des objets entraîne le besoin initiale de les
-localiser dans la scène pour, postérieurement, les identifier. À cause
-de la divergence de l'odométrie, la mauvaise segmentation et le calcul
-du centroïde de l'objet, la position estimée est fortement bruitée
-ayant un écart type qui rend la suive et identification infaisable
-lorsque plusieurs objets sont minimalement proches. Un filtre de
-Kalman ayant un modèle unitaire pour la matrice de transition d'états,
-moyenne les observations pour s'adapter au bruit de mesure.
-
-Cependant, le caractère monomodal du filtre de Kalman fait en sorte
-qu'un seul objet cible peut être suivis à la fois. Pour atteindre
-l'aspect multimodal, il faut que plusieurs filtres tournent en
-parallèle. Ainsi, le problème passe d’estimer la position à décider
-quelle observation appartient à quel filtre, l'étape
-d'identification. Cela se fait à l'aide d'une matrice de corrélation
-de distances entre les nouvelles observations et les états courants de
-chaque filtre existant. Une solution simplificatrice est d'associer
-chaque observation au filtre selon l'ordre de vraisemblance de cette
-matrice. Lorsqu’une ambiguïté se produit dans l'étape
-d'identification, la classification peut aider à prendre une décision
-de mettre un filtre à jour ou, alors, créer un nouveau filtre.
-
-\begin{equation*}
-	\begin{array}{ccl}
-		\hat{\textbf{x}}_{k|k-1} &=& \textbf{F}_{k}\hat{\textbf{x}}_{k-1|k-1} + \textbf{B}_{k} \textbf{u}_{k-1}\\
-		\textbf{P}_{k|k-1} &=& \textbf{F}_{k} \textbf{P}_{k-1|k-1} \textbf{F}_{k}^{T} + \textbf{Q}_{k}
-	\end{array}
-\end{equation*}
-
-\begin{equation*}
-	\begin{array}{ccl}
-\tilde{\textbf{y}}_{k} &=& \textbf{z}_{k} - \textbf{H}_{k}\hat{\textbf{x}}_{k|k-1} \\
-\textbf{S}_{k} &=& \textbf{H}_{k}\textbf{P}_{k|k-1} \textbf{H}_{k}^{T}+\textbf{R}_{k} \\
-\textbf{K}_{k} &=& \textbf{P}_{k|k-1}\textbf{H}_{k}^{T}\textbf{S}_{k}^{-1} \\
-\hat{\textbf{x}}_{k|k} &=& \hat{\textbf{x}}_{k|k-1} + \textbf{K}_{k}\tilde{\textbf{y}}_{k} \\
-\textbf{P}_{k|k} &=& (I - \textbf{K}_{k} \textbf{H}_{k}) \textbf{P}_{k|k-1}
-	\end{array}
-\end{equation*}
-
-\section {Chaînes de Markov Cachées}
-
-Le déplacement physique du robot résulte dans une séquence
-d'observations, en angles différents, d'un même objet. On exploit
-l'information odométrique entre les visualisations pour prédire les
-prochaines possibles orientations. De cette manière, l'évolution de la
-reconnaissance au long du temps est représenté par un processus
-stochastique, dont une modélisation possible correspond à le traiter
-de façon discrète dans un espace d'état. Ayant l'apriori que la
-dernière image et le dernier déplacement suffisent pour faire cette
-prédiction, en respectant, donc, la propriété de Markov de premier
-ordre, le processus stochastique est modélisée sur le cadre d'une
-chaîne de Markov cachée.
-
-Concrètement, les états cachées correspondent à des objets connus au
-préalable et déjà incorporés dans la mémoire du robot. Cela contraint le
-nombre d'états et on se rencontre avec un chaîne fini. Puis, une
-matrice de transition, $a_{i,j}$, décrit l'évolution du processus et c'est là où
-l'odométrie et la relation entre vues et entre objets sont
-incorporés. Finalement, une autre matrice, $\mathrm{P}\big( y_1 \ | \ k \big)$
-, dit matrice d'émission, estime la vraisemblance entre l'observation
-et les états de la chaînes.
-
-Une autre deuxième modélisation serait d'avoir une chaîne de Markov
-Cachée distincte pour chaque objet et ensuite décider quel était le
-processus le plus vraisemblable. Ce cas est un sous-ensemble du cas
-antérieur où les transitions entre deux objets ne sont pas
-considérés. Pourtant, ce qui peut être utile s'on considère
-l'évolution d'objets, par exemple, la transition entre une chaise vide
-et une personne assise sur une chaise ou encore un personne
-commence à marcher \footnote{Le fait de se mettre en mouvement
-  altère les formes d'une personne, ce qui possibilite sa détection
-  comme un nouveau objet.}.
-
-\section{Algorithme de Viterbi}
-
-Il reste, donc, extraire des informations de la modélisation Markovienne proposée.
-La séquence d'états la plus vraisemblable qui pourraient avoir géneré
-les observations  $y_1,\dots, y_T$, correspondrait exactement à la séquence d'objets reconnus.
-A fin de retrouver cette séquence, aussi appéllé chemin, on fait 
-appel à la programmation dynamique, spécifiquement à l'algorithme de Viterbi, d'où viens le nom chemin de Viterbi.
-L'algorithme retrouve de façon récursive l'état current le plus probable, 
-prennant en compte seulement les observations jusqu'au instant donné et son
-estimation au instant intérieur, comme décrit par les équations suivants:
-
-\begin{equation*}
-  \begin{array}{rcl}
-    V_{1,k} &=& \mathrm{P}\big( y_1 \ | \ k \big) \cdot \pi_k \\
-    V_{t,k} &=& \max_{x \in S} \left(  \mathrm{P}\big( y_t \ | \ k \big) \cdot a_{x,k} \cdot V_{t-1,x}\right)
-  \end{array}
-\end{equation*}
-
-La probabilité que la séquence d'états le plus probable finissant dans l'état $k$, avait généré les observation au moment $t$, est sauvegardé dans $V_{t,k}$, pendent que $\pi_i$ c'est la probabilité initiale de se rencontrer en chaque état. Pour retrouver le chemin de Viterbi, il suffit de trouver le maximum de $V_{t,k}$ :
-
-\begin{equation*}
-  \begin{array}{rcl}
-    x_T &=& \arg\max_{x \in S} (V_{T,x})
-  \end{array}
-\end{equation*}
-
-\section{Déplacement du robot}
-
-Le robot est équipé de trois roues, desquelles les symétriques
-arrières sont motorisés et responsables pour le déplacement
-motrice. Au même temps que la dernière sert à donner un support pour
-la partie derrière du châssis. Les moteurs sont contrôlés à
-partir de commandes sériel, préétablis pour le fabricant, qui
-définissent la vitesse de roulement. La combinaison des rotations
-des deux roues motorises dans les deux sens possibles permets au
-robot d'avoir les comportements suivants:
-
-\begin {itemize}
-\item Déplacement en ligne droite : deux roues roulant avec la même vitesse et dans le même sens.
-
-\item Déplacement en arc de cercle : différence entre les vitesses des roues.
-
-\item Rotation : deux roues à la même vitesse, mais avec de sens différents.
-\end{itemize}
-
-
-Finalement, la combinaison de ces mouvements permet au robot de
-accéder n'importe quelle position de l’espace.
-
-\subsection{Estimation de l'odométrie}
-
-Certains robots sont dotés de capteurs aptes d'estimer de façon
-approximé sont déplacement. C'est aussi le cas du robot ciblé qui
-possède encodeurs capables d'estimer la rotation angulaire des
-roues. Une intégration, au sens mathématique, de la différence entre
-l'odométrie entre deux intervalles de temps permet de retrouver la
-position global du robot.
-
-\begin{equation*}
-	\begin{array}{rcl}
-		x_t &=& x_{t-1} + \delta x_{t-1} * cos(\theta_{t-1}) - \delta y_{t-1} * sin(\theta_{t-1}) \\
-		y_t &=& y_{t-1} + \delta x_{t-1} * sin(\theta_{t-1}) + \delta y_{t-1} * cos(\theta_{t-1}) \\
-		\theta_t &=& \theta_{t-1} + \delta\theta_{t-1}
-	\end{array}
-\end{equation*}
-\subsection{Problèmes de déplacement}
-
-
-La roulette de support originalement installée avait deux axes de
-rotation. Pourtant, quelques mouvements de rotation du robot alignent
-la roulette orthogonalement au sens du prochain mouvement ce qui crées
-une torche parasite que perturbe la trajectoire voulue. Une tentative
-frustrée d'installer une bille omnidirectionnelle à roulement, qui se
-bloquait sur la moquette avec le poids du robot, a fait que
-l'originale était réinstallée. Une deuxième solution serait d'interdire
-certains mouvements du robot pour éviter cette déviation.
 
 
