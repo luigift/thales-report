@@ -1,39 +1,16 @@
 
 \chapter{Description du Travail}
 
-La majorité de la littérature traite le problème de la reconnaissance d'après une seule image de l'objet. Typiquement, une ensemble de \textit{features} est extrait et, ensuite, comparé aux modèles d'objets présents dans une base de données initiale, en contraste aux méthodes directes, comme deep learning, où l'image d'entré est associée directement avec des classes des objets correspondants au compromis d'une étape d'entrainement importante, pour l'apprentissage de \textit {features}, encore plus dans un espace à 3 dimensions provenant du capteur RGB-D. 
-
-Un grand effort était fait pour améliorer l'extraction, le \textit {matching}, ainsi que le \textit{features} elles-mêmes pour qu'elles soient invariantes à transformations affinés de l'image et représentatives de l'objet. Ce traitement classique a l’avantage d'être, à la fois modulaire, avec des étapes bien définies de segmentation, Extraction de features, classification et post-traitement, et, au même temps, d'avoir des résultats satisfaisants d’après une implémentation plus immédiate. Malgré son intérêt dans certains cas, rapidement on s’aperçoit de limitations lors que vues ambiguës apparaissent.
 
 L'utilisation d'un algorithme de reconnaissance basée sur une seule image apporte l'inconvénient de
-n'incorporer pas les notions de vue et de transition entre elles, au contraire, la majorité de ces systèmes souhaitent être invariant à les
-vues d'objets, en autres mots, avoir la capacité de l'identifier de n'importe quel point de vue. Un système dérivé de celui-ci pourrait
-traiter le concept de vues plus représentatives et transitions, par contre, de façon moins intuitive. De cette manière, les articles présentés
-auparavant travaillent sur le domaine multi vue, incorporant des aspectes géométriques, pour augmenter la qualité de son estimation.
+n'incorporer pas les notions de vue et de transition entre elles, au contraire, la majorité de ces systèmes souhaitent être invariant aux faces d'objets, en autres mots, avoir la capacité de l'identifier de n'importe quel point de vue. Un système mono-vue pourrait traiter le concept de vues plus représentatives et transitions, par contre, de façon moins intuitive. De cette manière, les articles présentés auparavant travaillent sur le domaine multi vue, incorporant des aspectes géométriques, pour augmenter la qualité de son estimation.
 
-En dernière analyse, l'objectif ultime c'est d'avoir une reconnaissance multi vue, en
-instance, capable d'incorporer son déplacement pour résoudre des
-ambiguïtés et faux positifs. Pour incorporer les notions voulus, on présente, simultanément,
-un simple modèle d’objet suffisamment général et un système capable
-d'estimer l'orientation de l'objet reconnu, ou bien un système de
-reconnaissance de vue, pour, ensuite traiter l’information motrice du
-robot pour augmenter le taux de réussite.
+En dernière analyse, l'objectif ultime c'est d'avoir une reconnaissance multi vue, en instance, capable d'incorporer son déplacement pour résoudre des ambiguïtés et faux positifs. Pour incorporer les notions voulus, on présente, simultanément, un simple modèle d’objet suffisamment général et un système capable d'estimer l'orientation de l'objet reconnu, ou bien un système de reconnaissance de vue, pour, ensuite traiter l’information motrice du robot pour augmenter le taux de réussite.
 
 \section{Segmentation}
 
-La segmentation consiste de la soustraction des objets d'une image brute, en autres mots, différencier les éléments non constituent du
-objet de lui-même. La compréhension de la continuité des objets est
-considérée comme un défi majeur dans le traitement d'image étant
-donné qu'une fois l'objet séparé du fond, la reconnaisse devient
-beaucoup plus évident. Une énorme partie de sa difficulté vient du fait
-de la projection de la scène dans le plan supprimer l'information
-correspondant à distance. Les capteurs stéréoscopiques et
-infra-rouges ont recomposé cette absence d'information et simplifié
-énormément le traitement nécessaire pour obtenir des objets
-potentiels. Les cartes de profondeur pourraient être utilisées pour
-représenter cette nouvelle information, pourtant, encore plus
-naturelle, le concept de nuage de points propose une représentation
-spatial en trois dimensions de l'environnement capturé.
+La segmentation consiste de la soustraction des objets d'une image brute, en autres mots, différencier les éléments non constituent du objet de lui-même. La compréhension de la continuité des objets est considérée comme un défi majeur dans le traitement d'image étant donné qu'une fois l'objet séparé du fond, la reconnaisse devient beaucoup plus évident. Une énorme partie de sa difficulté vient du fait de la projection de la scène dans le plan supprimer l'information
+correspondant à distance. Les capteurs stéréoscopiques et infra-rouges ont recomposé cette absence d'information et simplifié énormément le traitement nécessaire pour obtenir des objets potentiels. Les cartes de profondeur pourraient être utilisées pour représenter cette nouvelle information, pourtant, encore plus naturelle, le concept de nuage de points propose une représentation spatial en trois dimensions de l'environnement capturé.
 
 La démarche proposée par la littérature considère les objets comme des
 ensembles de points définis par un seuil initial de proximité. Cette
@@ -107,23 +84,14 @@ objets dans l'image et, principalement, la définition de sol et murs,
 résultant dans les restrictions suivantes :
 
 \begin{itemize}
-
 \item L'objet se trouve par terre.
-
 \item L'objet se trouve au centre de l'image
 \item Ambiant isolés de lumière infra-rouge 
-
 \item Le sol où le robot se déplace n'est pas accidenté.
-
-
 \item L'objet se trouve à une distance inférieure à 3 mètres 
-
-
 \item L'objet est assez grand et dépasse le seuil d'appartenance au
   sol.
-
 \item L'objet n'est ni transparents et ni trop réflective.
-
 \end{itemize}
 
 Un grand nombre d'objets, entre chaises tables, écrans, boîtes en
@@ -144,102 +112,13 @@ idées de courbure, forme et taille dans histogrammes, et sont intéressant
 pour etudier les ambiguïtés de reconnaissance, un fois que la plus parts 
 d'objet ont une certaine symétrie spatiel.
 
-\subsection{Point Feature Histogram - PFH}
+\textbf{Prend le resultat de la segmentation et transforme en features....}
 
-Le PFH incorporé les notions de courbure des objets par le calcul de
-l'écart entre les normales de points. Ce descripteur peut être calculé
-localement ou globalement, en changeant l'importance du rayon de
-comparaison. Il est la base d'une grande famille de descripteurs, desquels
-quelques-uns seront expliqués dans la suite.
+\section {Reconnaissance mono-vue} 
 
-En revenant à son calcul, l'histogramme est évalué à partir des pairs
-de points à l'intérieur d’un ensemble prédéfini. D'abord, un repère
-initial, illustré dans l'image *9* est établis sachant le vecteur distance normalisé et les deux
-normales. Ensuite, trois angles, qui correspondent à la transformation
-angulaire entre les deux normales, et la distance euclidienne entre le
-deux points sont estimés. Ces quatres valeurs seront considérés comme
-features pour réduire l’espace initial de douze dimensions - coordonnées
-et normales des dois point - à un espace de quatre dimension.
+matching des descripteurs avec la base de données...
 
-
-\begin{equation*}
-  {\mathsf u} = \boldsymbol{n}_s \qquad
-  {\mathsf v} =  {\mathsf u} \times \frac{(\boldsymbol{p}_t-\boldsymbol{p}_s)}{{\|\boldsymbol{p}_t-\boldsymbol{p}_s\|}_{2}}  \qquad
-  {\mathsf w} = {\mathsf u} \times {\mathsf v}
-\end{equation*}
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.6\textwidth]{pfh_frame.png}
-  % \caption{{\color{blue} Image d'explication du repère}.}
-\end{figure}
-
-
-Puis, les normales sont traduites en features angulaires décrit par les équations :
-\begin{equation*}
-  \alpha = {\mathsf v} \cdot \boldsymbol{n}_t  \qquad
-  \phi   = {\mathsf u} \cdot \frac{(\boldsymbol{p}_t - \boldsymbol{p}_s)}{d} \qquad
-  \theta = \arctan ({\mathsf w} \cdot \boldsymbol{n}_t, {\mathsf u} \cdot \boldsymbol{n}_t) \qquad
-  d={\|\boldsymbol{p}_t-\boldsymbol{p}_s\|}_2 
-\end{equation*}
-
-La prochaine étape c'est de calculer l'histogramme en-soi. Un
-subdivision du range de valeur de chaque feature angulaire, 
-normalisés pour rester dans le même intervalle trigonométrique,
-est faite et chaque cellule du histogramme est incrémenté dès
-qu'une feature tombe dans cet intervalle. 
-
-Le PFH se présente robuste à des différents échelles de densité de points et de bruit, au même temps que invariant à les transformations affines. Des inconvénients vient de la dépendance de la qualité de l'estimation de la normale\footnote{ Une discussion des méthodes présentés sur PCL est mis dans les annexes.}.
-
-\subsection{Fast Point Feature Histogram - FPFH}
-
-L'avènement du FPFH viens de la motivation de réduire la complexité de
-calcule du descripteur PFH, $ O(nk^2) $, pour un nuage avec $n$ points 
-où chaqu'un des points à $k$ voisins . Pour cela, l'algorithme au
-lieu de calculer la relation bidirectionnelle entre tous deux points 
-de l’ensemble définis, les features de chaque point sont pondérées 
-par les voisins à l'intérieur d'un rayon de recherche, selon la formule
-au-dessous :
-
-$$FPFH(\boldsymbol{p}_q) = SPFH(\boldsymbol{p}_q) + {1 \over k}
-\sum_{i=1}^k {{1 \over \omega_k} \cdot SPFH(\boldsymbol{p}_k)}$$
-
-Cette procédure résulte dans une complexité O(n*k). Le gain en vitesse est considérable,
-ce qui permet des applications en temps réelles. De plus, pour éviter une perte d'information considérable, le FPFH
-incorpore quelques point externes au rayon de voisinage, mais que sont compris dans un rayon de taille.
-
-\subsection{Viewpoint Feature Histogram- VFH}
-
-Le VFH, différemment du rapport entre PFH et FPFH, c'est une extension
-du deuxième descripteur où la variance de point de vue est prise en
-compte. De forme succincte, des angles entre la normale de chaque point
-et la direction principale d'observation est concaténée à l’histogramme
-provenant du SPFH (Simplified PFH). En gardant le repère utilisé dans
-les descripteurs d'avant, le vecteur direction principale est défini
-par la différence entre l'origine du capteur jusqu'au centroide du
-\textit{cluster}. Ce résultat permet, au même temps, de reconnaitre
-l'objet et son orientation spatiale, et, par conséquent, c'est le
-feature utilisé dans les premières expériences.
-
-\subsection{Clustered Viewpoint Feature Histogram - CVFH} CVFH -
-Clustered VFH - est une feature semi-global capable de gérer
-occlusions partiels, mauvaise segmentation et bruit par la
-décomposition du \textit{cluster}, segmenté comme objet, en sous-clusters de
-structure spatiale homogène. Le descripteur est obtenu d'après un premier
-filtrage de zones de haute gradient de courbure, considérés comme zones de
-transitions entre surfaces, et, puis, et l'estimation de l'histogramme VFH pour chaque surface 
-donnée par l'algorithme \textit{point growing}. Ainsi, pour un seul objet, le CVFH ne
-généré pas un seul histogramme VFH, mais un vecteur des histogrammes.
-En revanche, le découpement exige un soin un plus avec la résolution des surfaces pour
-quelles restent représentatives de l'objet.
-
-\begin{figure}[H]
-  \subfloat[PFH ]{\includegraphics[width=4.5cm]{pfh_diagram.png}}
-  \subfloat[FPFH]{\includegraphics[width=4.5cm]{fpfh_diagram.png}}
-  \subfloat[subcaption]{\includegraphics[width=6cm]{second_component.jpg}}		
-\end{figure}
-
-\section {Classification} L'étape de classification correspond à la différentiation entre les
+L'étape de classification correspond à la différentiation entre les
 histogrammes caractéristiques de chaque vue de chaque objet. Cette
 mesure pourrait être apprise, par exemple, avec un réseau de neurone
 ou n'importe quel autre méthode classique de \textit{machine learning}.{\color{green}Le travail * three dimensional
@@ -249,7 +128,7 @@ ou n'importe quel autre méthode classique de \textit{machine learning}.{\color{
 d’apprentissage correspond à création d’un arbre de recherche,
 construit d'après la comparaison croisée entre les éléments de la base,
 que pour l'ordre de grandeur de la base de données envisagé, est
-presque instantané.
+presque instantané. Distance plus naturel...
 
 L'API de la librairie FLANN sur PCL permet l'utilisation directe du classificateur
 K - plus proches voisins. L'implémentation permets l'utilisation de plusieurs
@@ -258,7 +137,6 @@ dont la formule est décrit dans la suite, semble être capable de bien différe
 les histogrammes d'entrés, $H_1$ et $H_2$, et était choisi comme la définition pour le classificateur.
 
 $$\sum _I \frac{\left(H_1(I)-H_2(I)\right)^2}{H_1(I)} $$
-
 
 % Une étude des mesures de corrélation entre histogrammes peut être
 % intéressant. Ces mesures sont classifié en deux classes : croisés et
@@ -279,114 +157,6 @@ $$\sum _I \frac{\left(H_1(I)-H_2(I)\right)^2}{H_1(I)} $$
 % \item Bhattacharyya distance :
 % \end{itemize}
 
-\section{Représentation de l'objet}
-
-Ces choix débouchent sur un système fonctionnel de reconnaissance de
-vue qui permet de s’intéresser, ensuite, par le couplage de résultat de la
-reconnaissance avec les informations de déplacement du robot.
-
-{\color {green}
-  \subsection {Principes de la Reconnaissance Humaine}
-
-  Commençant par le modèle de l'objet, le but c'est de intégrer et
-  respecter certains principes appris après observation dans la
-  reconnaissance chez les humains :
-
-  \begin{enumerate}
-  \item Gazltat : Tendance à retrouver des formes et contours simples et
-    naturels par regroupement de caractéristiques et/ou comportements.
-
-  \item Continuité : l'apprentissage d'un nouvel objet se fait de forme
-    continue. Dans le cas discret, cela revient à un modèle qui simule les
-    transitions entre superficies.
-
-  \item Temporalité et séquentialité : Des études {\color{blue} ref} suggèrent que l'ordre
-    de visualisation de surfaces des objets influence sa reconnaissance à
-    posteriori. Par conséquent, la séquence spatiale entre vues joue un rôle sur le concept d'objet, où parcourir
-    séquence dans la même ordre que celle appris apporterais plus d'information.
-
-  \end{enumerate}
-
-  Malheureusement, avoir tous ces principes est une tâche assez complexe
-  pour l’état courant de la technologie, pourtant, en même temps, ils inspirent
-  possibles solutions et représentations. L'apport de cet étude se place dans les
-  domaines de la temporalité et séquentialité.
-
-  \subsection{Caractéristique des objets} 
-
-  En regardant dans la perspective des objets, certaines de ses caractéristiques sont utiles pour le différencier un des autres:
-
-  \begin {enumerate}
-  \item Taille
-  \item Position global
-  \item couleur et texture
-  \item Contraintes d’espace
-  \item Contexte dans l'environnement
-  \item Forme géométrique : 
-    \subitem Sous formes primaire 
-    \subitem Position et orientation relatif entre formes primaires
-  \item Affordance : se réfère au concept d’interactions possibles
-    avec un objet. De manière illustratif, dans le cadre du robot utilisé,
-    cela reviendrait à capacité de pousser un certain objet, d’où
-    l’intérêt de l’identification de l’orientation de l’objet.
-  \end{enumerate} 
-}
-
-Le modèle proposé doit être capable d'exprimer au
-mieux ses caractéristiques en restant, encore, simple.  En reprenant la
-discussion de l'état de l'art basé sur le sondage : 
-\textit{Active recognition through next view planning: a survey}
-, on présent quelques modèles usuellement
-utilisés pour représenter les objets en trois dimensions.
-
-\subsubsection{Modèle CAD}
-
-Consiste à représenter l'objet par son modèle 3D fait à l'aide d
-outils de design numériques. L'avantage vient du fait d'une fois le
-modèle construit, la visualisation de l'objet de n'importe quel vue
-devient évident. De l'autre côté, la fiabilité du modèle est
-intérieurement lié à la précision de la reconstruction 3D de l'objet,
-où un soin avec l'échelle et dimensions, ainsi que avec la
-reproduction de la couleur et texture, est important pour la bonne
-représentativité.
-
-\subsubsection{Évolution de contours}
-
-Une autre approche est basé sur les silluettes des objets et leur
-évolution d'après transformation affines. Cette problématique c'est
-démontre mathématiquement compliqué au niveau de la modélisation de
-fonctions de contour et de leur transformation. Cependant, une fois
-modélise, une prévision
-
-% \subsubsection{Squelettes}
-% ...
-
-\subsubsection{Aspect-Graphs}
-
-Cette forme de représenter les objets consiste à avoir un graphe où
-chaque nœud correspond à une image d'un point de vue et les liens
-entre nœuds les réelles transitions visuelles. Comme avoir un graphe
-complet, qui s'approche du continue, apporte une besoin mémoire
-important et une certaine redondance d'information, la préoccupation
-principale est de trouver des point de vues représentatives, nommés
-\textit{key-Frames}, qui peuvent être choisi avec politiques suivants:
-\begin{enumerate}
-\item Aléatoire : Ces key-frames peuvent être choisies de forme
-  complètement aléatoire. Absence de calcul intermédiaire ou
-  prétraitement.
-
-\item Intervalle constant : Une façon simple c'est de conditionner les
-  \textit{key-frames} à un écart angulaire fixe. Cela permet d'unifier
-  le nombre de frames pour chaque objet, ce qui peut être intéressant
-  pour certaines applications
-
-\item Événement visuels : Cela correspond à déterminer des grands
-  variations d'intensité des features pour estimer les key-frames plus
-  représentatifs de l'objet. L'inconvénient vient du besoin d'un
-  prétraitement, en plus, orienté différemment pour chaque feature,
-  lors de la création de la base de données.
-
-\end{enumerate}
 
 \section {Graphe d'aspect polaire}
 
@@ -576,15 +346,3 @@ l'originale était réinstallée. Une deuxième solution serait d'interdire
 certains mouvements du robot pour éviter cette déviation.
 
 
-
-\section{Architecture}
-
-Le design de l'architecture sert à décider comment définir les unités de traitement et la communication entre elles. La définition des unités de traitement suit le découpage du pipeline de reconnaissance avec des nœuds responsables pour la segmentation, calcul de features et la classification, aussi comme, le contrôle du robot.
-
-L'interfaçage matériaux-logiciel était fait sur l'environnement ROS -
-Robot Operating System. Aussi que les outils d'affichage, ROS, 
-rassemble les librairies d'acquisition d'images RGB-D, OpenNi 2 et Freenect, et de traitement de nuage de point, PCL.
-De même, sa structure de nœuds a permis une implémentation modulaire et direct du
-système décrit au-dessus, bien comme la communication entre machines, l'ordinateur portable et celui embarqué au robot.
-
-L'image *10* illustre l'architecture en soulignant le flux d'information à travers des nœuds.

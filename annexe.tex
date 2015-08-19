@@ -188,6 +188,102 @@ The iterative algorithm is composed of two different stages :
 %% \end{algorithmic}
 %% \end{algorithm}
 
+\section {Descripteurs}
+\subsection{Point Feature Histogram - PFH}
+
+Le PFH incorporé les notions de courbure des objets par le calcul de
+l'écart entre les normales de points. Ce descripteur peut être calculé
+localement ou globalement, en changeant l'importance du rayon de
+comparaison. Il est la base d'une grande famille de descripteurs, desquels
+quelques-uns seront expliqués dans la suite.
+
+En revenant à son calcul, l'histogramme est évalué à partir des pairs
+de points à l'intérieur d’un ensemble prédéfini. D'abord, un repère
+initial, illustré dans l'image *9* est établis sachant le vecteur distance normalisé et les deux
+normales. Ensuite, trois angles, qui correspondent à la transformation
+angulaire entre les deux normales, et la distance euclidienne entre le
+deux points sont estimés. Ces quatres valeurs seront considérés comme
+features pour réduire l’espace initial de douze dimensions - coordonnées
+et normales des dois point - à un espace de quatre dimension.
+
+
+\begin{equation*}
+  {\mathsf u} = \boldsymbol{n}_s \qquad
+  {\mathsf v} =  {\mathsf u} \times \frac{(\boldsymbol{p}_t-\boldsymbol{p}_s)}{{\|\boldsymbol{p}_t-\boldsymbol{p}_s\|}_{2}}  \qquad
+  {\mathsf w} = {\mathsf u} \times {\mathsf v}
+\end{equation*}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.6\textwidth]{pfh_frame.png}
+  % \caption{{\color{blue} Image d'explication du repère}.}
+\end{figure}
+
+
+Puis, les normales sont traduites en features angulaires décrit par les équations :
+\begin{equation*}
+  \alpha = {\mathsf v} \cdot \boldsymbol{n}_t  \qquad
+  \phi   = {\mathsf u} \cdot \frac{(\boldsymbol{p}_t - \boldsymbol{p}_s)}{d} \qquad
+  \theta = \arctan ({\mathsf w} \cdot \boldsymbol{n}_t, {\mathsf u} \cdot \boldsymbol{n}_t) \qquad
+  d={\|\boldsymbol{p}_t-\boldsymbol{p}_s\|}_2 
+\end{equation*}
+
+La prochaine étape c'est de calculer l'histogramme en-soi. Un
+subdivision du range de valeur de chaque feature angulaire, 
+normalisés pour rester dans le même intervalle trigonométrique,
+est faite et chaque cellule du histogramme est incrémenté dès
+qu'une feature tombe dans cet intervalle. 
+
+Le PFH se présente robuste à des différents échelles de densité de points et de bruit, au même temps que invariant à les transformations affines. Des inconvénients vient de la dépendance de la qualité de l'estimation de la normale\footnote{ Une discussion des méthodes présentés sur PCL est mis dans les annexes.}.
+
+\subsection{Fast Point Feature Histogram - FPFH}
+
+L'avènement du FPFH viens de la motivation de réduire la complexité de
+calcule du descripteur PFH, $ O(nk^2) $, pour un nuage avec $n$ points 
+où chaqu'un des points à $k$ voisins . Pour cela, l'algorithme au
+lieu de calculer la relation bidirectionnelle entre tous deux points 
+de l’ensemble définis, les features de chaque point sont pondérées 
+par les voisins à l'intérieur d'un rayon de recherche, selon la formule
+au-dessous :
+
+$$FPFH(\boldsymbol{p}_q) = SPFH(\boldsymbol{p}_q) + {1 \over k}
+\sum_{i=1}^k {{1 \over \omega_k} \cdot SPFH(\boldsymbol{p}_k)}$$
+
+Cette procédure résulte dans une complexité O(n*k). Le gain en vitesse est considérable,
+ce qui permet des applications en temps réelles. De plus, pour éviter une perte d'information considérable, le FPFH
+incorpore quelques point externes au rayon de voisinage, mais que sont compris dans un rayon de taille.
+
+\subsection{Viewpoint Feature Histogram- VFH}
+
+Le VFH, différemment du rapport entre PFH et FPFH, c'est une extension
+du deuxième descripteur où la variance de point de vue est prise en
+compte. De forme succincte, des angles entre la normale de chaque point
+et la direction principale d'observation est concaténée à l’histogramme
+provenant du SPFH (Simplified PFH). En gardant le repère utilisé dans
+les descripteurs d'avant, le vecteur direction principale est défini
+par la différence entre l'origine du capteur jusqu'au centroide du
+\textit{cluster}. Ce résultat permet, au même temps, de reconnaitre
+l'objet et son orientation spatiale, et, par conséquent, c'est le
+feature utilisé dans les premières expériences.
+
+\subsection{Clustered Viewpoint Feature Histogram - CVFH} CVFH -
+Clustered VFH - est une feature semi-global capable de gérer
+occlusions partiels, mauvaise segmentation et bruit par la
+décomposition du \textit{cluster}, segmenté comme objet, en sous-clusters de
+structure spatiale homogène. Le descripteur est obtenu d'après un premier
+filtrage de zones de haute gradient de courbure, considérés comme zones de
+transitions entre surfaces, et, puis, et l'estimation de l'histogramme VFH pour chaque surface 
+donnée par l'algorithme \textit{point growing}. Ainsi, pour un seul objet, le CVFH ne
+généré pas un seul histogramme VFH, mais un vecteur des histogrammes.
+En revanche, le découpement exige un soin un plus avec la résolution des surfaces pour
+quelles restent représentatives de l'objet.
+
+\begin{figure}[H]
+  \subfloat[PFH ]{\includegraphics[width=4.5cm]{pfh_diagram.png}}
+  \subfloat[FPFH]{\includegraphics[width=4.5cm]{fpfh_diagram.png}}
+  \subfloat[subcaption]{\includegraphics[width=6cm]{second_component.jpg}}		
+\end{figure}
+
 
 \textit{L'Universidad de León } a fait un compte rendu des
 \textit{features} implementés sur PCL dans le lien *[8]*. Plus
