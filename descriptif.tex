@@ -1,4 +1,3 @@
-
 \iftoggle{rapport} {
   \chapter{Introduction}
 }{}
@@ -8,27 +7,161 @@
 \end{center}
 
 \section{Contexte}
-La perception de l'environment par machines est indispensable pour son integration à la vie quotidienne. Compétences telle comme se localiser, prise de décisions et capacité d'apprentissage sont nécessaire pour la réalisation de les plus simples tâches. Dans cet étude, on s'intéresse à la compréhension d'éléments constituent d'une scène, sujet récurrent dans le domaine de la vision par ordinateur. Plusieurs approches proposés dans la littérature explorent une sous-partie du \textit{pipiline} de la reconnaissance pour faire face au difficile défi de représenter la forme visuelle des objets, pendent qu'autres s'intéressent à l'utilisation du système de reconnaissance pour tâches de recherche dans l'environnement et saisie {\color{blue}(empoignement)} , par exemple.
+La perception de l'environment par des machines est indispensable pour leur intégration à la vie quotidienne. Des compétences telle que se localiser, la prise de décisions et une capacité d'apprentissage sont nécessaires, même pour la réalisation des tâches les plus simples. Dans cet étude, on s'intéresse à la compréhension d'éléments constituant une scène, sujet récurrent dans le domaine de la vision par ordinateur \celine{et à l'apport de l'utilisation d'un robot mobile dans cette tâche}. 
+\celine{Ici, tu peux peut être parler de la représentation des objets dans le cerveau avec des vues et des transitions entre vues et dire qu'il peut être intéressant d'explorer cette approche plutôt que de faire de la reconnaissance statique, image par image}. Plusieurs approches proposés dans la littérature explorent une sous-partie du \textit{pipeline} de la reconnaissance pour faire face aux difficile défi de représenter les caractéristiques visuelle des objets \celine{citation ?}, pendant que d'autres s'intéressent à l'utilisation du système de reconnaissance pour des tâches de recherche dans l'environnement et la manipulation d'objets \celine{citation ?}.
 
 \section{Objectifs}
 
-Notre démarche correspond, initialement, à l'intégration de techniques de l'état de l'art pour arriver à un système fonctionnel de reconnaissance incorporé sur une plateforme mobile équipée d'un capteur RGB-D capable. Dans une première temps, la plateforme est capable d'acquérir une base de données d'images d'un objet et, ensuite, d'utiliser ces informations apprises pour vérifier si un objet candidat est ou non celui présenté auparavant, et, finalement, renforcer sa perception avec les information de son déplacement pour lever les possibles ambiguités.
+Notre démarche correspond, initialement, à l'intégration de techniques de l'état de l'art pour arriver à un système fonctionnel de reconnaissance intégré sur une plateforme mobile équipée d'un capteur RGB-D. Dans un premier temps, la plateforme doit être capable d'acquérir une base de données d'images d'objets de manière automatisée. Ensuite, le but est d'utiliser ces informations apprises pour vérifier si un objet candidat est ou non celui présenté auparavant. Finalement, nous souhaitons utiliser les information de son déplacement pour renforcer sa perception, lever les possibles ambiguités et rendre le système moins sensible à différents types de bruits. De plus, tous ces algorithmes doivent fonctionner en temps réel et être implémentés pour fonctionner sur le robot présent au sein du laboratoire.
 
 % Vision par ordinateur - Reconnaissance d'objets multi-vue - Robotique
 
 \section{État de l'art}
+\celine{Remarque générale pour les citations: Ne mets pas le titre de l'article dans le texte. Si la méthode porte un nom, tu peux le nommer, mais sinon le moyen classique de citer une référence est de nommer l'auteur puis mettre une référence bibtex. Par exemple, une approche proposée par Tedesco et al. \cite{borotschnig1998active} blablabla}
 
-La majorité de la littérature traite le problème de la reconnaissance d'après une seule image de l'objet. Typiquement, une ensemble de \textit{features} est extrait et, ensuite, comparé aux modèles d'objets présents dans une base de données initiale, en contraste aux méthodes directes, comme deep learning, où l'image d'entré est associée directement avec des classes des objets correspondants au compromis d'une étape d'entrainement importante d'apprentissage de \textit {features}, encore plus dans un espace à 3 dimensions provenant du capteur RGB-D. Innombrables exemples d'applications de la reconnaissance mono-vue dans le domaine de la robotique existent pour la navigation sémantique 
-\textbf{\textit{Neural Network Fusion of Color, Depth and Location for Object Instance Recognition on a Mobile Robot}} couplé avec l'estimation de pose pour la saisie de l'objet ref: \textbf{\textit{Three-Dimensional Object Recognition and 6 DoF Pose Estimation}} ou encore pour la recherche d'objets dans l'environnement ref: \textbf{\textit{Object Search and Localization for an Indoor Mobile Robot}} .
+\celine{Si tu as des papiers qui sont des revues de litteratures, tu peux les citer au début}
 
-Un grand effort était fait pour améliorer l'extraction, le \textit {matching}, ainsi que le \textit{features} elles-mêmes pour qu'elles soient invariantes à transformations affinés de l'image et représentatives de l'objet. Ce traitement classique a l’avantage d'être, à la fois modulaire, avec des étapes bien définies de segmentation, extraction de features, classification et post-traitement, et, au même temps, d'avoir des résultats satisfaisants d'après une implémentation plus immédiate. 
+La majorité de la littérature traite le problème de la reconnaissance d'objets basés sur une seule image. Typiquement, un ensemble de \textit{features} \celine{mettre des exemples de features en citations} est extrait et ensuite comparé aux modèles d'objets présents dans une base de données initiale. Il existe également des méthodes directes, comme deep learning \celine{mettre une citation}, où l'image d'entré est associée directement avec des classes des objets correspondants, au prix d'une étape d'entrainement importante d'apprentissage, encore plus dans un espace à 3 dimensions provenant du capteur RGB-D \celine{bizarre cette fin de phrase ...}. De très nombreux exemples d'applications de la reconnaissance mono-vue existent dans le domaine de la robotique, pour la navigation sémantique \cite{caron2014neural}, couplé avec l'estimation de pose pour la saisie de l'objet \cite{burel1995three} ou encore pour la recherche d'objets dans l'environnement \cite{kragic2009object,ali2014contextual}.
 
+Des effort conséquent ont été mis en oeuvre fait pour améliorer l'extraction, le \textit {matching}, ainsi que les \textit{features} elles-mêmes pour qu'elles soient invariantes à transformations affines de l'image et plus représentatives de l'objet \celine{cite des exemples de features 2d (A-SIFT, Harris affine) et 3d (pfh ...) qui font ça}. \celine{Tu peux peut être mettre une citation ou deux sur le tracking (2d et 3d) en disant que ca aide à être plus robuste au cours du temps}. Ce traitement classique a l’avantage d'être à la fois modulaire, avec des étapes bien définies de segmentation, d'extraction de features, de classification et de post-traitement, et en même temps, d'avoir des résultats satisfaisants sur des cas simples. 
 
-
-Malgré son intérêt dans certains cas, rapidement on s'aperçoit de limitations lors que vues ambiguës apparaissent. Un premier travail s'inspire de la continuité, temporalité et séquentialité des observations dans la reconnaissance chez les humains pour augmenter la représentativité des modèles d'objet et, ainsi, surmonter las limitation de la reconnaissance mono-vue. Au temps que d'autres, partent sur des modèles CAD à trois dimension, la description de contours et les graphes ref:\textit{3d object recognition through next view planning} pour avoir ce gain en représentativité. En spécial, les graphes d'aspect permettent une représentation basé sur une composition d'images de points de vue différents et les liens entre elles.  Les vues représentatives, nommés \textit{key-Frames}, peuvent être choisi avec des politiques aléatoire, constant ou à la recherche d'événements visuels.
+Malgré l'intérêt des features invariantes, on s'aperçoit rapidement de leurs limitations lorsque des vues ambiguës apparaissent. Un premier travail s'inspire de la continuité, temporalité et séquentialité des observations dans la reconnaissance chez les humains pour augmenter la représentativité des modèles d'objet, et ainsi surmonter las limitation de la reconnaissance mono-vue \celine{citation}. Certaines approches se basent sur des modèles CAD à trois dimension, la description de contours et les graphes \cite{roy2000isolated} pour augmenter leur représentativité. En particulier, les graphes d'aspect \celine{citation} permettent une représentation basée sur une composition d'images de points de vue différents et les liens entre elles.  Les vues représentatives, nommés \textit{key-Frames}, peuvent être choisie avec des politiques aléatoire, constant ou à la recherche d'événements visuels \celine{des citations !}. \celine{tu devrais aussi parler du travail de cedric \cite{le2014global}, de l'article que jeff t'avait donné sur les radars, et tu peux aussi citer un mec de l'ensta qui a fait de la reconaissance temporelle basée sur des graphes (vérifier si c'est bien celui la) \cite{duceux2014unsupervised}}
   
-Pendent que d'autres vont encore plus loin en suggérant une reconnaissance active où une estimation de quel serait le meilleur déplacement pour lever des ambiguïtés repositionne le capteur par la réduction de l'entropie en s'utilisant des probabilités de reconnaissance antérieures  ref:\textbf{\textit{Active Object Recognition in Parametric Eigenspace}} où encore par estimation des faces cachées de l'objet ref:\textbf{\textit{Next Best View}}. Finalement, ref:\textbf{\textit{Active Object Recognition on a Humanoid Robot}} traite ce même problème comme un problème de localisation et suivi par un filtre de particule.
+Enfin, certaines approches vont encore plus loin en suggérant une reconnaissance active. Ici, une estimation de quel serait le meilleur déplacement pour lever des ambiguïtés permet de repositionner le capteur. Cela peut se faire par des critères de réduction de l'entropie en utilisant des probabilités de reconnaissance antérieures \cite{borotschnig1998active}, en utilisant l'apprentissage par renforcement \cite{borji2009learning} où encore par estimation des faces cachées de l'objet \celine{je n'ai pas trouvé la citation} ref:\textbf{\textit{Next Best View}}. Finalement, \cite{browatzki2012active} traite ce même problème comme un problème de localisation et suivi par un filtre particulaire.
 
-
-
-
+%\section{État de l'art}
+%
+%La majorité de la littérature traite le problème de la reconnaissance d'après une seule image de l'objet. Typiquement, une ensemble de \textit{features} est extrait et, ensuite, comparé aux modèles d'objets présents dans une base de données initiale, en contraste aux méthodes directes, comme deep learning, où l'image d'entré est associée directement avec des classes des objets correspondants au compromis d'une étape d'entrainement importante, encore plus dans un espace à 3 dimensions provenant du capteur RGB-D, pour l'apprentissage de \textit {features}. 
+%
+%Un grand effort était fait pour améliorer l'extraction, le \textit {matching}, ainsi que le \textit{features} elles-mêmes pour qu'elles soient invariantes à transformations affines de l'image et représentatives de l'objet. Ce traitement classique a l’avantage d'être, à la fois modulaire, avec des étapes bien définies de segmentation, Extraction de features, classification et post-traitement, et, au même temps, d'avoir des résultats satisfaisants d’après une implémentation plus immédiate. Malgré son intérêt dans certains cas, rapidement on s’aperçoit de limitations lors que vues ambiguës apparaissent.
+%
+%\subsection{Navigation Sémantique}
+%Au terme de l'analyse, l'ouvrage \textbf{\textit{Three-Dimensional Object Recognition and 6 DoF Pose Estimation}} décrit une méthode simultanée d'estimation de pose et reconnaissance d'objet selon deux types perspectives de traitements : global et local, avec un compte rendu des leur respectives descripteurs. L'article suggère une segmentation, nécessaire dans le traitement global, simple qui considère les objets comme des points sur un plan support. L'étape de correspondance entre vues est faite par le classificateur K-plus proche voisin.
+%
+%L'oeuvre \textbf{\textit{Neural Network Fusion of Color, Depth and Location for Object Instance Recognition on a Mobile Robot}} part d'un algorithme de segmentation, à partir de l'extration de plans correspondant aux murs et au sol, pour ensuite classifier la concaténation de descripteurs - PFH, SIFT et RGB - de l'objet par un \textit{multi-layer perceptron} où la sortie correspond à une couche \textit{softmax}. Dans un premier temps, le classificateur est entrainé de façon supervisé ver l'algorithme \textit{backpropagation} dans une base d'objets initiale, pour, ensuite, à l'aide de la cartographie et localisation simultanée, étiqueter les objets présents dans l'environnement. 
+%
+%\subsection{Reconnaissance active}
+%La problématique de la recherche d'objets par un robot mobile est traitée dans l'article \textbf{\textit{Object Search and Localization for an Indoor Mobile Robot}} \cite{borotschnig1998active}, dont, l'intérêt central, est d'effectuer une exploration dans un environnement où le plan est généré par avance avec des capteur laser et du SLAM, ce qui permets la discrétisation en zones de recherche, pour retrouver un objet donné a priori. Le système est capable de retrouver des objets dans des environnements assez complexes, en s'utilisant des descripteurs SIFTs pour la reconnaissance et des heuristiques pour l'estimation de la distance. 
+%
+%Dans l'autre côté, le travail \textbf{\textit{Active Object Recognition in Parametric Eigenspace}} s'intéresse à la reconnaissance d'objet active avec traitement de vues ambigües par le repositionnement de la camera. Une étape initial d'entrainement, transforme les images d'objets dans la base du espace propre et la reconnaissance est fait par le projection d'une image de teste dans cet espace. Cela apporte aussi une estimation de l'orientation de l'objet, une fois que les images sont labellisées. Pour décider la prochaine action, l'algorithme propose la réduction de l'entropie en s'utilisant des probabilités de reconnaissance à partir des informations antérieures.
+%
+%Autrement, l'algorithme \textbf{\textit{Next Best View}} traite l'optimisation du nombre d'actions nécessaires par un bras mécanique de six dégrees de libertés pour réparer des surfaces chachées et des évenements visuels d'un objet à fin d'atteindre un modèle CAD à 3 dimensions. Pour un robot terrestre de deplacement contrainte en deux dimensions tout l'information concernant un objet peut être aquis en faisant un tour complèt autour du même, ce qui réduit la complexité du espace de recherche. La distance, aussi, joue un rôle important lorsque la résolution des capteurs est limité, mais la capacité de se rapprocher compense ce handicap.
+%
+%
+%{\color{green}	\textbf{\textit{Active Object Recognition on a Humanoid Robot}} traité la reconnaissance d'objets multi-vues pour un robot humanoïde comme un problème de localisation et suivi par un filtre particulaire... 
+%
+  %Dans, une autre perpective, la reconnaissance d'objet est une tâche évident pour des humans et partir dessous sers comme font d'inspiration. Selon les études réalisés en \textit{ View-based dynamic object recognition based on human perception }, les humans sembles construir un modèle géometrique rotationnel continu, en autre mots, une composition de vues sequentielles qui font le lien entre differentes faces du objet. a La méthode utilisé consisté à partir de l'image initial prise comme key-frame où ses features sont calculées. Ensuite, ses features sont trackées jusqu'à diminuition de features détectées tombe à un nombre inferieur à un seuil définis à priori. La reconnaissance est faite par le comparaison de 
+%
+  %... \textit{3d object recognition through next view planning} ...
+%} 
+%
+%\section{Représentation de l'objet}
+%
+%Ces choix débouchent sur un système fonctionnel de reconnaissance de
+%vue qui permet de s’intéresser, ensuite, par le couplage de résultat de la
+%reconnaissance avec les informations de déplacement du robot.
+%
+%{\color {green}
+  %\subsection {Principes de la Reconnaissance Humaine}
+%
+  %Commençant par le modèle de l'objet, le but c'est de intégrer et
+  %respecter certains principes appris après observation dans la
+  %reconnaissance chez les humains :
+%
+  %\begin{enumerate}
+  %\item Gazltat : Tendance à retrouver des formes et contours simples et
+    %naturels par regroupement de caractéristiques et/ou comportements.
+%
+  %\item Continuité : l'apprentissage d'un nouvel objet se fait de forme
+    %continue. Dans le cas discret, cela revient à un modèle qui simule les
+    %transitions entre superficies.
+%
+  %\item Temporalité et séquentialité : Des études {\color{blue} ref} suggèrent que l'ordre
+    %de visualisation de surfaces des objets influence sa reconnaissance à
+    %posteriori. Par conséquent, la séquence spatiale entre vues joue un rôle sur le concept d'objet, où parcourir
+    %séquence dans la même ordre que celle appris apporterais plus d'information.
+%
+  %\end{enumerate}
+%
+  %Malheureusement, avoir tous ces principes est une tâche assez complexe
+  %pour l’état courant de la technologie, pourtant, en même temps, ils inspirent
+  %possibles solutions et représentations. L'apport de cet étude se place dans les
+  %domaines de la temporalité et séquentialité.
+%
+  %\subsection{Caractéristique des objets} 
+%
+  %En regardant dans la perspective des objets, certaines de ses caractéristiques sont utiles pour le différencier un des autres:
+%
+  %\begin {enumerate}
+  %\item Taille
+  %\item Position global
+  %\item couleur et texture
+  %\item Contraintes d’espace
+  %\item Contexte dans l'environnement
+  %\item Forme géométrique : 
+    %\subitem Sous formes primaire 
+    %\subitem Position et orientation relatif entre formes primaires
+  %\item Affordance : se réfère au concept d’interactions possibles
+    %avec un objet. De manière illustratif, dans le cadre du robot utilisé,
+    %cela reviendrait à capacité de pousser un certain objet, d’où
+    %l’intérêt de l’identification de l’orientation de l’objet.
+  %\end{enumerate} 
+%}
+%
+%Le modèle proposé doit être capable d'exprimer au
+%mieux ses caractéristiques en restant, encore, simple.  En reprenant la
+%discussion de l'état de l'art basé sur le sondage : 
+%\textit{Active recognition through next view planning: a survey}
+%, on présent quelques modèles usuellement
+%utilisés pour représenter les objets en trois dimensions.
+%
+%\subsubsection{Modèle CAD}
+%
+%Consiste à représenter l'objet par son modèle 3D fait à l'aide d
+%outils de design numériques. L'avantage vient du fait d'une fois le
+%modèle construit, la visualisation de l'objet de n'importe quel vue
+%devient évident. De l'autre côté, la fiabilité du modèle est
+%intérieurement lié à la précision de la reconstruction 3D de l'objet,
+%où un soin avec l'échelle et dimensions, ainsi que avec la
+%reproduction de la couleur et texture, est important pour la bonne
+%représentativité.
+%
+%\subsubsection{Évolution de contours}
+%
+%Une autre approche est basé sur les silluettes des objets et leur
+%évolution d'après transformation affines. Cette problématique c'est
+%démontre mathématiquement compliqué au niveau de la modélisation de
+%fonctions de contour et de leur transformation. Cependant, une fois
+%modélise, une prévision
+%
+%% \subsubsection{Squelettes}
+%% ...
+%
+%\subsubsection{Aspect-Graphs}
+%
+%Cette forme de représenter les objets consiste à avoir un graphe où
+%chaque nœud correspond à une image d'un point de vue et les liens
+%entre nœuds les réelles transitions visuelles. Comme avoir un graphe
+%complet, qui s'approche du continue, apporte une besoin mémoire
+%important et une certaine redondance d'information, la préoccupation
+%principale est de trouver des point de vues représentatives, nommés
+%\textit{key-Frames}, qui peuvent être choisi avec politiques suivants:
+%\begin{enumerate}
+%\item Aléatoire : Ces key-frames peuvent être choisies de forme
+  %complètement aléatoire. Absence de calcul intermédiaire ou
+  %prétraitement.
+%
+%\item Intervalle constant : Une façon simple c'est de conditionner les
+  %\textit{key-frames} à un écart angulaire fixe. Cela permet d'unifier
+  %le nombre de frames pour chaque objet, ce qui peut être intéressant
+  %pour certaines applications
+%
+%\item Événement visuels : Cela correspond à déterminer des grands
+  %variations d'intensité des features pour estimer les key-frames plus
+  %représentatifs de l'objet. L'inconvénient vient du besoin d'un
+  %prétraitement, en plus, orienté différemment pour chaque feature,
+  %lors de la création de la base de données.
+%
+%\end{enumerate}
+%
+%

@@ -1,14 +1,28 @@
 \chapter{Conclusion}
 
 \section{Synthèse}  bien
-L'apport de ce projet vient du traitement finale de la reconnaissance. Au remarque qu'il pourrait être mis en place pour n'importe quel système de reconnaissance avec estimation de l'orientation du objet reconnu et un système mobile capable d'informer son déplacement. La reconnaissance d'objet multi-vue augment la capacité de résoudre situations d'ambiguité et gére les problèmes provenants de l'absence de vues base de données et erreurs de segmentation, en conséquence ...
+La principale contribution de ce projet est liée au traitement de la reconnaissance qui intègre un modèle temporel de transition entre vues. La méthode proposée ici pourrait être mise en place pour n'importe quel système de reconnaissance d'objets à condition qu'il soit mobile et capable de fournir une estimation de son déplacement, et que chaque élément de la base des objets à reconnaitre soit associé à une estimation de son orientation. La reconnaissance d'objets multi-vues augmente la capacité à résoudre des situations ambiguës et gère les problèmes de bruit provenant de la base de donnée (absence de vue, erreurs de segmentation). en conséquence ...
 
 \section{Discussion} mauvais
 
 limitations du système
 
 \section{Perspectives} améliorer
-Les possibles améliorations seraient d'un côté, intégrer un algorithme de SLAM pour robostifier les estimations de position et pour avoir une répresentation de l'environnement pour ajouter ensuite un méthode de planification de trajectoires à fin d'atteindre l'\textbf{autonomie de déplacement du robot}. Par ailleurs, un extension du filtre de Kalman avec des objets en déplassement et des mes modèles cinématiques suggéré par la reconnaissance.
+Les possibles améliorations seraient d'intégrer un algorithme de SLAM pour rendre plus robustes les estimations de position et avoir une meilleure répresentation de l'environnement. On pourrait ajouter ensuite un méthode de planification de trajectoires afin que le robot puisse se déplacer de manière autonome. Par ailleurs, on peut envisager une extension du filtre de Kalman pour des objets en déplacement grâce à des modèles cinématiques suggérés par la reconnaissance.
+
+\color[rgb]{1,0,0}
+{
+Quelques améliorations que tu n'as pas citées
+\begin{itemize}
+\item Dans les HMM, mettre une faible probabilité de changer d'objet (en cas d'occlusions, deux objets à côté ...). Associer à cela la possibilité d'ouvrir une nouvelle track si l'objet change
+\item Renforcer le filtre de Kalman avec une observation de similarité liée aux features, pas seulement à la position x,y de l'objet.
+\item Ajouter des features de couleur et de texture pour lever les ambiguités de vues
+\item Faire une base incrémentale (a moins que tu ne la fasse la semaine prochaine)
+\end{itemize}
+ }
+\color[rgb]{0,0,0}
+
+
 
 
 

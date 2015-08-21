@@ -1,9 +1,9 @@
 
 \chapter{Méthode proposée}
 
-L'utilisation d'un algorithme de reconnaissance basée sur une seule image apporte l'inconvénient de n'incorporer pas les notions de vue et de transition entre elles, au contraire, la majorité de ces systèmes souhaitent être invariant aux faces d'objets, en autres mots, avoir la capacité de l'identifier de n'importe quel point de vue. Un système mono-vue pourrait traiter le concept de vues plus représentatives et transitions, par contre, de façon moins intuitive. De cette manière, les articles présentés auparavant travaillent sur le domaine multi vue, incorporant des aspectes géométriques, pour augmenter la qualité de son estimation.
+L'utilisation d'un algorithme de reconnaissance basé sur une seule image possède l'inconvénient de ne pas prendre en compte les notions de vue et de transition entre elles. Pourtant, la majorité de ces systèmes souhaitent être invariants aux différents points de vue des objets, en d'autres termes, avoir la capacité de l'identifier de n'importe quel point de vue. Un système mono-vue pourrait traiter le concept de vues les plus représentatives et des transitions, mais cela de façon moins intuitive. Ainsi certains des articles présentés à la section \celine{\ref{}} travaillent sur le domaine multi-vues en y intégrant des aspects géométriques et ainsi augmenter la qualité de son estimation. \celine{Ce paragraphe aurait sa place dans l'état de l'art non ?}
 
-En dernière analyse, l'objectif ultime c'est d'avoir une reconnaissance multi vue, en instance, capable d'incorporer son déplacement pour résoudre des ambiguïtés et faux positifs. Pour incorporer les notions voulus, on présente, simultanément, un simple modèle d’objet suffisamment général et un système capable d'estimer l'orientation de l'objet reconnu, ou bien un système de reconnaissance de vue, pour, ensuite traiter l’information motrice du robot pour augmenter le taux de réussite.
+L'objectif de notre méthode est d'avoir une reconnaissance multi-vues d'un ou plusieurs objets à la fois, capable d'intégrer le déplacement du robot pour résoudre des ambiguïtés et faux positifs liés à cette reconnaissance. Pour incorporer ces notions, on utilise une représentation des objets simple et suffisamment général, capable d'estimer l'orientation de l'objet reconnu. On traite ensuite l’information motrice du robot que l'on intègre à l'estimation pour augmenter le taux de reconnaissance.
 
 \section{Architecture générale}
 Expliquer qu'est on a comme materiel....
@@ -13,7 +13,7 @@ expliquer schéma....
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{gen_arc.pdf}
-  \caption{Modèle polaire des objets.}
+  \caption{Architecture générale du système}
 \end{figure}
 
 \section{Segmentation}
@@ -145,7 +145,7 @@ définitions de distance entre histogrammes. La définition par défaut, Chi-squ
 dont la formule est décrit dans la suite, semble être capable de bien différentier
 les histogrammes d'entrés, $H_1$ et $H_2$, et était choisi comme la définition pour le classificateur.
 
-$$d(H_1, H_2) = \sum _I \frac{\left(H_1(I)-H_2(I)\right)^2}{H_1(I)} $$
+$$\sum _I \frac{\left(H_1(I)-H_2(I)\right)^2}{H_1(I)} $$
 
 % Une étude des mesures de corrélation entre histogrammes peut être
 % intéressant. Ces mesures sont classifié en deux classes : croisés et
@@ -166,9 +166,7 @@ $$d(H_1, H_2) = \sum _I \frac{\left(H_1(I)-H_2(I)\right)^2}{H_1(I)} $$
 % \item Bhattacharyya distance :
 % \end{itemize}
 
-Ces choix débouchent sur un système fonctionnel de reconnaissance de
-vue qui permet de s’intéresser, ensuite, par le couplage de résultat de la
-reconnaissance avec les informations de déplacement du robot.
+
 
 \section{Localisation et suivi d'objet}
 

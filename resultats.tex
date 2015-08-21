@@ -1,40 +1,40 @@
-\section {Protocole Expériment}
+\chapter {Protocole Expérimental}
 
 
-\subsection{Matériel utilisé}
+\section{Matériel utilisé}
 
-Le design de l'architecture sert à décider comment définir les unités de traitement et la communication entre elles. La définition des unités de traitement suit le découpage du pipeline de reconnaissance avec des nœuds responsables pour la segmentation, calcul de features et la classification, aussi comme, le contrôle du robot.
+Le design de l'architecture a permis de définir les unités de traitement et la communication entre elles. La définition des unités de traitement suit le découpage du pipeline de reconnaissance avec des nœuds dédiés pour la segmentation, l'extraction de features, la classification, mais également le contrôle du robot.
 
-L'interfaçage matériaux-logiciel était fait sur l'environnement ROS -
-Robot Operating System. Aussi que les outils d'affichage, ROS, 
-rassemble les librairies d'acquisition d'images RGB-D, OpenNi 2 et Freenect, et de traitement de nuage de point, PCL.
-De même, sa structure de nœuds a permis une implémentation modulaire et direct du
-système décrit au-dessus, bien comme la communication entre machines, l'ordinateur portable et celui embarqué au robot.
+L'interfaçage matériel-logiciel a été réalisé sur l'environnement ROS - Robot Operating System. En plus d'outils d'affichage, ROS rassemble des librairies d'acquisition d'images RGB-D, OpenNi 2 et Freenect, ainsi qu'une librairie de traitement de nuage de points, PCL.
+De plus, sa structure en nœuds a permis une implémentation modulaire et directe du système décrit \celine{au chapitre \ref{}}, ainsi que de gérer la communication entre l'ordinateur portable et le processeur embarqué sur le robot.
 
-L'image *10* illustre l'architecture en soulignant le flux d'information à travers des nœuds.
+L'image \celine{ \ref{}} présente l'architecture ainsi que le flux d'information à travers des nœuds.\celine{ Mets plutôt l'image en annexe, ca gagnera de la place}
 
-\subsection{Setup expérimental}
-D'abord, vingt objets de tailles et formes diverses ont été choisi pour évaluer les capacités *récognitif* du robot. Ils sont objets typiques qui peuvent être faciliment retrouvés dans un laboratoire. Une liste avec tous est incorporé aux annexes. Ensuite, le feature VFH était calculé pour huit positions différents écartées de 45 dégréés. La position correspondent au angle zero, était choisi de manière aléatoire en alignant un des axes de l'objet avec celui du capteur. 
+\section{Setup expérimental}
+Pour évaluer les capacités de reconnaissance du robot, vingt objets de tailles et formes diverses ont été choisis. Ils s'agit d'objets typiques qui peuvent être faciliment retrouvés dans un laboratoire ou un bureau. Une liste complète des objets figure en annexe \celine{\ref{}}. Ensuite, nous avons effectué un tour complet de l'objet avec le robot en sauvegardant les nuage de point et en extrayant les features VFH pour huit positions différentes écartées de 45 degrés. La position correspondent à l'angle zéro a été choisie de manière aléatoire en alignant un des axes de l'objet avec celui du capteur. \celine{Regarde ma remarque à la figure \ref{fig:setup_expe}}
 
 \begin{figure}[H]
 	\subfloat{\includegraphics[width=\textwidth]{chair_db.jpg}}		
+	\caption{\celine{Pense à toujours mettre une légende à tes figures, et à donner sa référence dans le texte}}
+	\label{fig:setup_expe}
 \end{figure}
 
-\subsection {Création de la base de données}
-Une première évaluation proposée consiste à faire un tour complèt autour de l'objet à être reconnu en quatre positions angulaires différentes : $0, 45, 90$ et une dernière choisi de manière aléatoire pour chaque objet. Le robot fait le tour à une vitesse de $0.35 \pm 0.1 m/s$ à une distance de $1.5m$, en enregistrant des images à $1hz$, ansi, une expérience typique consiste d'environ $25$  images d'angle différent et prendre $25 \pm 3$ seconds. Ensuite, trois différentes ratios sont calculés pour exprimer la reconnaissance d'objets, la reconnaissance de vue et la suivi des reconnaissances par la chaîne de Markov cachée.
+\section{Résultats expérimentaux}
+\subsection{Comparaison à la reconnaissance mono-vue}
+Une première évaluation consiste à faire un tour complet autour de l'objet à reconnaitre pour quatre positions angulaires différentes : $0, 45, 90$ et une dernière choisie de manière aléatoire pour chaque objet. Le robot fait le tour à une vitesse de $0.35 \pm 0.1 m/s$ à une distance de $1.5m$, en enregistrant des images à $1hz$, ansi, une expérience typique est constituée d'environ $25$  images d'angle différent et prendre $25 \pm 3$ seconds. 
 
-\subsection{Résultats expérimentaux}
-
-Un expérience typique est illustrée dans l'image {\color{green} ref} :
+Un expérience typique est illustrée dans l'image \ref{fig:resultats_expe} :
 
 \begin{figure}[H]
-	\subfloat{\includegraphics[width=\textwidth]{hmm_example.png}}		
+	\subfloat{\includegraphics[width=\textwidth]{hmm_example.png}}	
+			\caption{\celine{Tu devrais ajouter sur le côté de l'image que c'est l'image observée, l'image la plus proche par la reco mono-vue, et l'image la plus proche avec les HMM (même si tu le répète dans le texte, ca permet de comprendre la figure directement)}}
+	\label{fig:resultats_expe}
 \end{figure}
 
-La première ligne correspond à l'image vue par le robot à chaque instant de temps et, donc, l'objet à être reconnu. Pendent que la deuxième, donnée par l'algorithme de reconnaissance, équivaut à la vue plus probable de l'objet reconnu par le K-plus proches voisins. Il est intéressant remarquer que l'invariance à rotation trompe l'estimation de l'orientation en prenant son correspond énantiomorphe dans le premier carré rouge. Autrement, la définition de murs enlève une grande partie du dos du pingouin dans l'étape de segmentation, ainsi, la définition de ce point de vu n'est pas suffisamment précis pour être différentié des autres objets, ce qui résulte dans une mauvaise reconnaissance dans le carré bleu. Au total, on remarque que le traitement fait par la chaîne de Markov cachée, surpasse les problèmes d'une base de donnée relativement sparse avec des possibles erreus de segmentation, pour atteindre la correction simultanée de la reconnaissance et de l'orientation. 
+La première ligne correspond à la séquence d'images vues par le robot à chaque instant de temps, et donc, l'objet à être reconnu. La seconde ligne, donnée par l'algorithme de reconnaissance, équivaut à la vue la plus probable de l'objet reconnue par le K-plus proches voisins. Il est intéressant remarquer que l'invariance à rotation du descripteur trompe l'estimation de l'orientation en prenant son correspond énantiomorphe dans le premier carré rouge. Autrement, le dos du pinguin étant une grande surface presque plane, il est partiellement retiré par l'étape de segmentation. Ainsi, le nuage de points résultant de ce point de vue n'est pas suffisamment complet pour caractériser correctement l'objet, ce qui induit une mauvaise reconnaissance dans le carré bleu. Au final, on remarque que le traitement apporté par la chaîne de Markov cachée permet de corriger les problèmes d'une base de donnée relativement sparse avec des possibles erreus de segmentation, permettant la correction simultanée de la reconnaissance de l'objet et de son orientation. 
 
 cela correspond à avoir une base
-
+On utilise ensuite trois ratios différentes pour exprimer la reconnaissance d'objets, la reconnaissance de vue et la suivi des reconnaissances par la chaîne de Markov cachée.
 Finalement,  est affichée
 
 \begin{figure}[H]
@@ -45,3 +45,11 @@ Finalement,  est affichée
 {\color{green}
 Dans le premier tableaux on retrouve le résultats de la reconnaissance donné par la comparaison des histogrammes provenant du *plus proche voisin*. Ce résultat estime la capacité de distinguer deux objets quelconques, en autre mots, cette capacité viens de la représentativité des descripteurs utilisés et l'efficacité de la mesure de similarité entre histogrammes.
 }
+
+\subsection{Robustesse à l'occlusion}
+
+\subsection{Suivi et reconnaissance multi-cibles}
+
+\begin{figure}[H]
+	\subfloat{\includegraphics[width=\textwidth]{map.png}}		
+\end{figure}
