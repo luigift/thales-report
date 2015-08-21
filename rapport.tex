@@ -51,6 +51,7 @@
 \usepackage{hyperref}
 \usepackage{enumitem}
 \usepackage{etoolbox}
+\usepackage{natbib}
 
 \usetikzlibrary{positioning}
 
@@ -69,6 +70,7 @@
 %%%% BEGIN DOCUMENT
 \begin{document}
 \newcommand{\celine}{\textcolor[rgb]{1,0,0}}
+\newcommand{\review}{\textcolor[rgb]{0,1,0}}
 \pagenumbering{Roman}
 \include{cover}
 \include{empty}
@@ -96,14 +98,12 @@
 
 % \listoffigures
 % \listoftables
-%%%% Bibliografia 
-% \bibliographystyle{ieeetr.bst}
-% \bibliography{rapport}
 
-%%%% bibliografie
+%%%% Bibliografia 
+%\bibliographystyle{ieeetr.bst}
 \bibliographystyle{plain}
-\bibliography{Report}
-%\include{bibliographie}
+\bibliography{rapport}
+
 %%%% Apêndices
 \include{annexe}
 \include{presentationThales}

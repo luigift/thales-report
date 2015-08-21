@@ -1,8 +1,6 @@
 
 \chapter{Méthode proposée}
 
-L'utilisation d'un algorithme de reconnaissance basé sur une seule image possède l'inconvénient de ne pas prendre en compte les notions de vue et de transition entre elles. Pourtant, la majorité de ces systèmes souhaitent être invariants aux différents points de vue des objets, en d'autres termes, avoir la capacité de l'identifier de n'importe quel point de vue. Un système mono-vue pourrait traiter le concept de vues les plus représentatives et des transitions, mais cela de façon moins intuitive. Ainsi certains des articles présentés à la section \celine{\ref{}} travaillent sur le domaine multi-vues en y intégrant des aspects géométriques et ainsi augmenter la qualité de son estimation. \celine{Ce paragraphe aurait sa place dans l'état de l'art non ?}
-
 L'objectif de notre méthode est d'avoir une reconnaissance multi-vues d'un ou plusieurs objets à la fois, capable d'intégrer le déplacement du robot pour résoudre des ambiguïtés et faux positifs liés à cette reconnaissance. Pour incorporer ces notions, on utilise une représentation des objets simple et suffisamment général, capable d'estimer l'orientation de l'objet reconnu. On traite ensuite l’information motrice du robot que l'on intègre à l'estimation pour augmenter le taux de reconnaissance.
 
 \section{Architecture générale}
@@ -113,15 +111,15 @@ la capacité de segmentation.
 
 Le travail des descripteurs est, d'un côté, de comprendre les
 caractéristiques intéressants et, d'un autre, de réduire la
-dimensionnalité du espace traité, tandis que restant robuste à des
+dimensionalité du espace traité, tandis que restant robuste à des
 transformations affines et changement de luminosité. On classifie les
 descripteurs selon la caractéristique qu'il exprime. Une première
 group sont les descripteurs géométriques qui essaient de traduire les
 idées de courbure, forme et taille dans histogrammes, et sont intéressant
 pour etudier les ambiguïtés de reconnaissance, un fois que la plus parts 
-d'objet ont une certaine symétrie spatiel.
+d'objet ont une certaine symétrie spatial.
 
-\textbf{Prend le resultat de la segmentation et transforme en features....}
+En partant de l'hypothèse que la segmentation donné une bonne fragmentation des objets, on calcule des descripteurs globales à partir de les ensembles de points donnés par le première traitement. L'adoption du descripteur \textit{Viewpoint Feature Histogram} - VFH reflet l'intérêt d'avoir une distinction entre formes géométriques de même que points de vues. Une description détaillée du descripteur est rencontré dans les annexes.  
 
 \section {Reconnaissance mono-vue} 
 
@@ -145,7 +143,7 @@ définitions de distance entre histogrammes. La définition par défaut, Chi-squ
 dont la formule est décrit dans la suite, semble être capable de bien différentier
 les histogrammes d'entrés, $H_1$ et $H_2$, et était choisi comme la définition pour le classificateur.
 
-$$\sum _I \frac{\left(H_1(I)-H_2(I)\right)^2}{H_1(I)} $$
+$$d(H_1, H_2) = \sum _I \frac{\left(H_1(I)-H_2(I)\right)^2}{H_1(I)} $$
 
 % Une étude des mesures de corrélation entre histogrammes peut être
 % intéressant. Ces mesures sont classifié en deux classes : croisés et
@@ -155,47 +153,37 @@ $$\sum _I \frac{\left(H_1(I)-H_2(I)\right)^2}{H_1(I)} $$
 % corrélation. Les features géométriques ont des cellules bien définis
 % et statiques, ainsi, semble plus naturel d'utiliser une comparaison
 % \textit{bin-to-bin}.
-
-% *Formula do site*
-
 % \subsection{bin-to-bin} Comparaison entres cellules équivalents
-
 % \begin{itemize}
 % \item Correlation :
 % \item Intersection :
 % \item Bhattacharyya distance :
 % \end{itemize}
 
-
-
 \section{Localisation et suivi d'objet}
 
-\subsection{Déplacement du robot}
+\subsection{Definission de repères}
 
-Le robot est équipé de trois roues, desquelles les symétriques
-arrières sont motorisés et responsables pour le déplacement
-motrice. Au même temps que la dernière sert à donner un support pour
-la partie derrière du châssis. Les moteurs sont contrôlés à
-partir de commandes sériel, préétablis pour le fabricant, qui
-définissent la vitesse de roulement. La combinaison des rotations
-des deux roues motorises dans les deux sens possibles permets au
-robot d'avoir les comportements suivants:
+Se placer dans différents repères permettre d'avoir de référentiels plus naturels pour chaque type de composant du robot et pour les objets placés dans la scène. On défini quelques repères et conventions de base pour faciliter la localisation. D'abord le repère de la base du robot est orthonormale positive, où le déplacement ver l'avant correspond à l'axe $x$, vers la gauche à l'axe $y$ et ver le haut à l'axe $z$. Une deuxième référentielle de convention égale à celle d'avant positionne le capteur RGB-D par rapport au robot. Enfin, le dernière référentiel corresponde au repère optique du capteur orienté selon la convention usuelle pour les images avec l'axe $x$ orienté ver la droite et l'axe $y$ ver le bas et, enfin, l'axe $z$ vers l'avant. Ces trois repères permettent d'orienter tous les éléments aperçus par le robot dans l'environnement de façon pratique.
 
-\begin {itemize}
-\item Déplacement en ligne droite : deux roues roulant avec la même vitesse et dans le même sens.
+La \review{figure} illustre ces repères utilisés et les conventions décrits.
 
-\item Déplacement en arc de cercle : différence entre les vitesses des roues.
+\subsection{Transformation de repères}
 
-\item Rotation : deux roues à la même vitesse, mais avec de sens différents.
-\end{itemize}
+Ensuite, la transformation entre repères permet la passage de l'un à l'autre, pour avoir la position globale de l'objet d'après sa détection par la caméra. La transformation entre une base $a$ et une autre $b$ est faite par une matrice de rotation et translation classique, décrit en bas. 
 
+\begin{equation*}
+	\mathbf{R}^{a}_{b} = 
+	\begin{bmatrix} 
+	 	\cos \theta &  -\sin \theta & \Delta x \\ \sin \theta & \cos \theta & \Delta y \\ 0 & 0 & 1
+	 \end{bmatrix}
+\end{equation*}
 
-Finalement, la combinaison de ces mouvements permet au robot de
-accéder n'importe quelle position de l’espace.
+où $\theta$ équivaut à la rotation entre les deux repères et $\Delta x$ et $\Delta y$ les translations linéaires entre eux.
 
 \subsubsection{Estimation de l'odométrie}
 
-Certains robots sont dotés de capteurs aptes d'estimer de façon
+Certains robots sont dotés de capteurs à estimer de façon
 approximé sont déplacement. C'est aussi le cas du robot ciblé qui
 possède encodeurs capables d'estimer la rotation angulaire des
 roues. Une intégration, au sens mathématique, de la différence entre
@@ -209,17 +197,10 @@ position global du robot.
 		\theta_t &=& \theta_{t-1} + \delta\theta_{t-1}
 	\end{array}
 \end{equation*}
-\subsubsection{Problèmes de déplacement}
 
 
-La roulette de support originalement installée avait deux axes de
-rotation. Pourtant, quelques mouvements de rotation du robot alignent
-la roulette orthogonalement au sens du prochain mouvement ce qui crées
-une torche parasite que perturbe la trajectoire voulue. Une tentative
-frustrée d'installer une bille omnidirectionnelle à roulement, qui se
-bloquait sur la moquette avec le poids du robot, a fait que
-l'originale était réinstallée. Une deuxième solution serait d'interdire
-certains mouvements du robot pour éviter cette déviation.
+
+
 
 \subsection{Filtre de Kalman }
 
@@ -245,7 +226,9 @@ matrice. Lorsqu’une ambiguïté se produit dans l'étape
 d'identification, la classification peut aider à prendre une décision
 de mettre un filtre à jour ou, alors, créer un nouveau filtre.
 
+Classiquement le filtre de Kalman est mis à jour dans deux étapes : 
 
+\subsubsection{Prédiction} Une première de prédiction que s'utilise du modèle mathématique décrivent l'évolution du processus 
 
 \begin{equation*}
 	\begin{array}{ccl}
@@ -254,7 +237,8 @@ de mettre un filtre à jour ou, alors, créer un nouveau filtre.
 	\end{array}
 \end{equation*}
 
-innovation
+\subsubsection{Innovation}
+et une deuxième de mise à jour, où l'observation est incorporé pour le calcule de l'innovation e du gain de Kalman.
 
 \begin{equation*}
 	\begin{array}{ccl}
@@ -362,6 +346,3 @@ fois que la résolution de l’image joue un rôle assez critique pour la
 détection de features, comme les patches SIFTs. Ainsi, avoir la distance
 que l’image étais prise peut être intéressant pour limiter la
 classification à une échelle valable.
-
-
-
