@@ -1,124 +1,76 @@
 
 \chapter{Méthode proposée}
 
-L'objectif de notre méthode est d'avoir une reconnaissance multi-vues d'un ou plusieurs objets à la fois, capable d'intégrer le déplacement du robot pour résoudre des ambiguïtés et faux positifs. Pour incorporer les notions de vue et de transition entre elles, on s'utilise d'une représentation simple et suffisamment général basé sur les graphes d'aspect, couplé avec un dispositif de reconnaissance mono-vue classique capable d'estimer l'orientation de l'objet reconnu. Une suivi des objets et un traitement probabiliste intègre l'information motrice pour augmenter le taux de reconnaissance.
+L'objectif de notre méthode est d'avoir une reconnaissance multi-vues d'un ou plusieurs objets à la fois, capable d'intégrer le déplacement du robot pour résoudre des ambiguïtés et faux positifs. Pour incorporer les notions de vues et de transition entre elles, on utilise une représentation simple et suffisamment générale basée sur les graphes d'aspect. Le déplacement d'un état à un autre dans ce graphe est ensuite estimé par rapport au déplacement du robot. Ce système est ensuite couplé avec un dispositif de reconnaissance mono-vue classique capable de retrouver la vue la plus probable d'un objet à partir de descripteurs 3D. Une méthode de suivi des objets et un traitement probabiliste de changement de vue étant donné l'information motrice permet enfin d'augmenter le taux de reconnaissance.
 
 \section{Architecture générale}
-L'approche cible une base mobile différentiel muni de capteurs proprioceptives odométiques et d'une caméra RGB-D. Les informations provenant des ces unités sont envoyés à une unité de traitement qui interprète les images reçus et compare cette interprétation avec une base de données contenue dans la mémoire. Dans le cas d'absence de correspondent, ce nouveau exemplaire peut être ajouté à la base de données et agrandir les connaissances d'objets existants dans l'environnement. 
+L'approche a été développée pour une base mobile différentielle munie de capteurs proprioceptifs odométiques et d'une caméra RGB-D. Les informations provenant des ces unités sont envoyés à une unité de traitement qui interprète les images reçues, isole les objets qu'elles contiennent et compare cette interprétation avec une base de données stockée dans la mémoire. En cas d'absence de correspondant dans la base, ce nouvel exemplaire pourra éventuellement être ajouté à la base de données et agrandir les connaissances d'objets existants dans l'environnement.
 
-L'architecture est illustrée dans \ref{fig:architecture} et permet à, la fois, de comprendre les dépendances entre les étapes de traitement, de même que, la nature du flux d'information entre modules.
+L'architecture du système est illustrée à la figure \ref{fig:architecture} et permet à la fois, de comprendre les dépendances entre les étapes de traitement, de même que, la nature du flux d'information entre modules.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{gen_arc.pdf}
+  \includegraphics[width=\textwidth]{gen_arc.png}
   \caption{Architecture générale du système}
   \label{fig:architecture}
 \end{figure}
 
-Précisément, l'unité de traitement reçois une nuage brute provenant de la caméra et la mesure de rotation de roues du robot. La première partie du traitement vise nettoyer le nuage en segmentant des points des objets candidats de la scène, ce qui permet, déjà, d'enlever une partie non pertinent et envoyer à l'unité de extraction de features seulement des morceaux de l'image original qui respectent certains caractéristiques. Simultanément, un conversion de référentiel localise des objets dans le repère absolu de déplacement du robot. Puis, les positions des objets sont donnés au module de localisation et tracking qui suit les observations et les associes entre elles pour avoir une cohérence globale des positions. En dernière instance, les histogrammes de features , aussi comme, la position, dans la carte globale, de chaque objet sont utilisés pour pour reconnaitre les éléments de la scène et pour donner leur vue la plus probable à chaque instant de temps. 
+Plus précisément, l'unité de traitement reçoit un nuage de points brut provenant de la caméra, ainsi que la mesure de rotation de roues du robot. La première partie du traitement vise à nettoyer le nuage en segmentant des points des objets candidats de la scène, ce qui permet d'enlever une partie non pertinente et de créer un nuage de point dédié pour chaque objet de l'image. Ces nuages de points sont envoyés à l'unité d'extraction de features pour générer des histogrammes représentatif de chaque objets dans l'image. Simultanément, une conversion de référentiel localise des objets dans le repère absolu de déplacement du robot. Puis, les positions des objets sont données au module de localisation et tracking qui suit les observations et les associes entre elles pour avoir une cohérence globale des positions. En dernier lieu, pour chaque objet, les histogrammes de features ainsi que leurs positions converties dans un repère global sont envoyées au module de reconnaissance, et sont utilisés pour reconnaitre les éléments de la scène et donner leur vue la plus probable à chaque instant de temps. 
 
-Les prochaines sections dissèquent l'architecture de l'image \ref{fig:architecture}, en présentant le fond théorique derrière le fonctionnement de chaque sous module.
+Les prochaines sections détaillent l'architecture présentée à l'image \ref{fig:architecture}, en présentant le fond théorique derrière le fonctionnement de chaque sous-module.
 
 \section{Segmentation}
 
-La segmentation consiste de la soustraction des objets d'une image brute, en autres mots, différencier les éléments non constituent du objet de lui-même. La compréhension de la continuité des objets est considérée comme un défi majeur dans le traitement d'image étant donné qu'une fois l'objet séparé du fond, la reconnaisse devient beaucoup plus évident. Une énorme partie de sa difficulté vient du fait de la projection de la scène dans le plan supprimer l'information
-correspondant à distance. Les capteurs stéréoscopiques et infra-rouges ont recomposé cette absence d'information et simplifié énormément le traitement nécessaire pour obtenir des objets potentiels. Les cartes de profondeur pourraient être utilisées pour représenter cette nouvelle information, pourtant, encore plus naturelle, le concept de nuage de points propose une représentation spatial en trois dimensions de l'environnement capturé.
+La segmentation consiste à isoler des objets dans une image brute, ou en d'autres termes, différencier les éléments qui ne constituent pas un objet et les objets eux-mêmes. La segmentation d'objets est considérée comme un élément essentiel en traitement d'image étant donné qu'une fois l'objet séparé du fond, la reconnaissance devient beaucoup plus simple. La difficulté majeure d'un tel algorithme sur des images RGB vient du fait que la projection de la scène sur le plan image supprime l'information de profondeur. Les capteurs stéréoscopiques et infra-rouges permettent de compenser cette absence d'information et simplifient énormément le traitement nécessaire. \celine{La dernière phrase n'est pas forcément utile je trouve}. Les cartes de profondeur pourraient être utilisées pour représenter l'information de profondeur, pourtant, encore plus naturel, le concept de nuage de points propose une représentation en trois dimensions de l'environnement capturé.
 
-La démarche proposée par la littérature considère les objets comme des
-ensembles de points définis par un seuil initial de proximité. Cette
-définition est bien extensive et permet de représenter une énormité,
-sinon tous, les objets. Néanmoins, définir ces ensembles dans une
-image brute n'est pas tout à fait simple. En conséquence, un nouveau à
-priori qui spécifie que les objets se placent sur des plans de
-support, malgré plus restrictif que la définition d'avant, permet un
-segmentation crédible.
+\celine{Je t'ai ajouté une phrase pour la segmentation dans le cas où le fond est statique.}Dans le cas où le capteur est immobile, on utilise classiquement des méthodes de soustraction de fond pour l'étape de segmentation \cite{dai2006prospects}. Ceci n'est pas possible dans notre cas car le robot évolue dans son environnement. La démarche proposée par la littérature dans ce cas considère les objets comme des ensembles de points délimités par un seuil de proximité. Cette définition est suffisamment générale pour permettre de représenter une grande quantité d'objets. Néanmoins, définir ces ensembles dans une image brute n'est pas forcément simple. Par conséquent, on utilise un nouvel \textit{a priori} qui spécifie que les objets se situent sur des plans de support. Bien que plus restrictif que la définition d'avant, cela permet un segmentation crédible. Parmis les méthodes de segmentation se basant sur cette définition, on peut citer Tabletop object detector \cite{tabletop} qui détermine le plan principal de l'image (généralement une table ou le sol) grâce à l'algorithme RANSAC \cite{fischler1981random}, puis recherche des objets dans l'enveloppe convexe de ce plan. Par ailleurs, Caron et al. \cite{caron2014neural} ont proposé une approche légèrement différente. En partant du même principe, le sol est estimé, puis un traitement pour le fond de la scène est appliqué, où les plans orthogonaux à la normale du sol et de taille suffisamment grands sont considérés comme des murs, et les éléments trop près des bords ne sont pas considérés. 
 
 \subsection{Algorithme}
 
-La méthode de segmentation de l’algorithme Tabletop
-se base exactement sur ces aprioris. Pour retrouver les objets posés
-sur une table, l'algorithme recherche récursivement les plans de
-support, où le plus important est pris comme la table. Autrement,
-l'article \cite{caron2014neural} en partant du même principe, propose un
-traitement pour le fond de la scène, où les plans orthogonaux à
-normale du sol et de taille suffisamment grand sont considérés comme
-des murs, orientés à segmentation d'objets dans les environnements
-intérieurs. Ainsi, la dernière segmentation répond aux exigences du domaine de déplacement du robot: le
-laboratoire de Thales, Theresis.\\
+La méthode de segmentation utilisée dans notre cas est celle proposée par Caron et al. Cette méthode s'applique surtout pour de la segmentation d'objets posés sur le sol dans des environnements intérieurs et répond aux exigences du domaine de déplacement du robot : le laboratoire de Thales Theresis.\\
 
-Plus spécifiquement, elle peut être découpée dans les étapes suivantes :
-\begin{enumerate}
-\item Soustraction du sol
-
-\item Filtrage de points distants, considérés comme plus incertains.
-
-\item Calcul de la normale des superficies comprises dans la scène
-
-\item Élimination de murs, considérés comme de plans orthogonaux au
-  sol de taille suffisamment grande, d'après un seuil.
-
-\item Projection des points appartenant aux objets dans le plan du
-  sol.
-
-\item Détermination de l’enveloppe convexe correspondant au sol détecté.
-
-\item Réduction de la densité de discrétisation pour accélérer l'étape
-  de \textit{clustering}.
-
-\item \textit{Clustering} des objets par l'algorithme \textit{point growing}
-
-\item Calcul du centroïde et \textit{bouding boxes} 2D et 3D \\
-
+Plus spécifiquement, elle peut être découpée selon les étapes suivantes :
+\begin{enumerate}[start=0]
+\item Calibration permettant d'obtenir l'équation du sol avant le début de la séquence. Puis, pour chaque frame de la séquence
+\item Soustraction du sol à partir de l'équation trouvée
+\item Filtrage des points trop éloignés, considérés comme plus incertains
+\item Calcul de la normale des surfaces de la scène
+\item Élimination de murs, considérés comme des plans orthogonaux au sol et de taille suffisamment grande
+\item Voxelisation des points non filtrés pour accélérer le traitement
+\item Projection des points voxelisés dans le plan du so
+\item Regroupement des points en objets grâce à l'algorithme de \textit{clustering} point growing de PCL
+\item Calcul du centroïde et des bounding boxes 2D et 3D de chaque objet
 \end{enumerate}
 
-Une calibration initiale est nécessaire pour définir l'équation du
-sol. Pour cela, on place le robot dans un endroit de façon que l'image
-aperçue correspond majoritairement au sol. L’équation du plan plus
-important, plus grand nombre de points dans le nuage, est extrait par
-le RANSAC et sauvegardé dans un fichier texte. Une explication plus
-détaillée sur les sous-méthodes utilisées pour chaque étape, telle
-comme le RANSAC est présentée dans les annexes, ainsi comme une
-discussion des paramètres utilisés.
+Ainsi, l'algorithme fournit la position de chaque objet dans le repère de la caméra ainsi que le nuage de point et les normales qui leur sont associés.
 
-\subsection{Restrictions} Les physiques de capteurs restreins les
-types d'objet qui peuvent être aperçus et, ensuite, segmentés, soit à
-cause de l'interaction avec les rayons infra-rouges, soit à cause de
-résolution limitée des images mesurées. Dans l'autre côté, la
-segmentation a ses propres contraints concernant le positionnement des
-objets dans l'image et, principalement, la définition de sol et murs,
-résultant dans les restrictions suivantes :\\
+Une calibration initiale est nécessaire pour définir l'équation du sol. Pour cela, on place le robot dans un endroit où l'image obtenue correspond majoritairement au sol. L’équation du plan dominant est extrait par RANSAC et sauvegardée dans un fichier texte. \celine{Ce n'est peut être pas la peine de détailler trop en annexes. Tous les algos sont classiques, il suffit de mettre une référence ou un lien vers l'implémentaiton utilisée}. Une explication plus détaillée sur les sous-méthodes utilisées pour chaque étape est présentée dans les annexes, ainsi qu'une discussion sur les paramètres utilisés.
+
+
+\subsection{Restrictions} 
+\celine{Ce paragraphe aurait peut être plus sa place dans les annexes. Vois en fonction de la place qu'il te reste ...}
+La physique des capteurs restreint le type d'objets qui peuvent être aperçus et segmentés, soit à cause des réflexions des rayons infra-rouges, soit à cause de la
+résolution limitée des images mesurées. D'un autre côté, la segmentation a ses propres contraintes en ce qui concerne le positionnement des objets dans l'image et, principalement, la définition du sol et des murs. Par conséquent, les restrictions de l'algorithme sont les suivantes :
 
 \begin{itemize}
 \item L'objet se trouve par terre.
 \item L'objet se trouve au centre de l'image.
-\item Ambiant isolés de lumière infra-rouge.
-\item L'objet n'est ni transparents et ni trop réflective.
+\item La lumière ambiante ne doit pas contenir trop de lumière infra-rouge.
+\item L'objet n'est ni transparent ni trop réflectif.
 \item Le sol où le robot se déplace n'est pas accidenté.
 \item L'objet se trouve à une distance inférieure à 3 mètres.
-\item L'objet est assez grand et dépasse le seuil d'appartenance au sol.\\
+\item L'objet est assez grand et dépasse le seuil d'appartenance au sol.
 
 \end{itemize} 
 
-Un grand nombre d'objets, entre chaises tables, écrans, boîtes en
-carton, poubelles, de tailles et formes variés étaient testés et
-peuvent être segmentés malgré les restrictions listées. Quelques
-exemples de segmentation sont présentés dans les annexes pour illustrer
-la capacité de segmentation.
+Un grand nombre d'objets, entre autres chaises, tables, écrans, boîtes en carton, poubelles, de tailles et formes variés ont été testés et peuvent être segmentés malgré les restrictions. Quelques exemples de segmentation sont présentés en annexes \celine{il est mieux de citer l'annexe à laquelle tu fais référence. Dans ton cas l'annexe \ref{annexe:segmentation}} pour illustrer la capacité de segmentation. \celine{Si tu as de la place, tu peux carrément montrer des exemples dans cette section et non dans les annexes.}
 
 \section{Descripteurs}
 
-Le travail des descripteurs est, d'un côté, de comprendre les
-caractéristiques intéressants et, d'un autre, de réduire la
-dimensionnalité du espace traité, tandis que restant robuste à des
-transformations affines et changement de luminosité. On classifie les
-descripteurs selon la caractéristique qu'ils expriment. Une première
-groupe sont les descripteurs géométriques qui essaient de traduire les
-idées de courbure, forme et taille dans histogrammes, et sont intéressant
-pour étudier les ambiguïtés de reconnaissance, un fois que la plus parts 
-d'objet ont une certaine symétrie spatial.
+Le travail des descripteurs est, d'une part, d'extraire des caractéristiques intéressants de l'élément observé et, d'autre part, de réduire la
+dimensionnalité de l'espace traité, tout en restant robuste à des transformations affines et aux changements de luminosité. On s'intéresse surtout ici aux descripteurs basés sur le nuage de point des objets, bien qu'il soit possible aussi d'utiliser des descripteurs associés à la texture ou à la couleur. Les descripteurs qui nous intéressent sont des descripteurs géométriques qui essaient de traduire les idées de courbure, de forme et taille dans les histogrammes, et sont intéressants pour étudier les ambiguïtés de reconnaissance. Parmis les descripteurs 3D proposés dans la littérature, on peut citer PFH \cite{} qui est invariant par changement de point de vue. \celine{décris les autres méthodes en une phrase avec la citation associée}  Une description détaillée de ces descripteurs et leurs principales différences sont expliquées dans les annexes \ref{annexe:descripteur}. Nous choisissons d'utiliser le descripteur \textit{Viewpoint Feature Histogram} - VFH, car il permet de discriminer non seulement les formes géométriques (pour la reconnaissance d'objet), mais aussi les points de vues (reconnaissance de vue).
 
-
-En partant de l'hypothèse que la segmentation donné une bonne fragmentation des objets, on extrait des descripteurs globales à partir de les ensembles de points donnés par le première traitement. L'adoption du descripteur \textit{Viewpoint Feature Histogram} - VFH, entre tous proposés par la littérature, reflet l'intérêt d'avoir une distinction entre formes géométriques et entre points de vues. Une description détaillée du descripteur est rencontré dans les annexes.  
+En partant de l'hypothèse que la segmentation propose un découpage correct des objets, on extrait des descripteurs globaux à partir des ensembles de points proposés. Ainsi, pour chaque objet, on obtient un histogramme VFH représentatif de l'objet et de la vue segmentée.
 
 \section {Reconnaissance mono-vue} 
 
