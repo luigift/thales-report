@@ -10,7 +10,7 @@ L'architecture du système est illustrée à la figure \ref{fig:architecture} et
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=\textwidth]{gen_arc.png}
+  \includegraphics[width=0.95\textwidth]{gen_arc.png}
   \caption{Architecture générale du système}
   \label{fig:architecture}
 \end{figure}
@@ -21,9 +21,9 @@ Les prochaines sections détaillent l'architecture présentée à l'image \ref{f
 
 \section{Segmentation}
 
-La segmentation consiste à isoler des objets dans une image brute, ou en d'autres termes, différencier les éléments qui ne constituent pas un objet et les objets eux-mêmes. La segmentation d'objets est considérée comme un élément essentiel en traitement d'image étant donné qu'une fois l'objet séparé du fond, la reconnaissance devient beaucoup plus simple. La difficulté majeure d'un tel algorithme sur des images RGB vient du fait que la projection de la scène sur le plan image supprime l'information de profondeur. Les capteurs stéréoscopiques et infra-rouges permettent de compenser cette absence d'information et simplifient énormément le traitement nécessaire. \celine{La dernière phrase n'est pas forcément utile je trouve}. Les cartes de profondeur pourraient être utilisées pour représenter l'information de profondeur, pourtant, encore plus naturel, le concept de nuage de points propose une représentation en trois dimensions de l'environnement capturé.
+La segmentation consiste à isoler des objets dans une image brute, ou en d'autres termes, différencier les éléments qui ne constituent pas un objet et les objets eux-mêmes. La segmentation d'objets est considérée comme un élément essentiel en traitement d'image étant donné qu'une fois l'objet séparé du fond, la reconnaissance devient beaucoup plus simple. La difficulté majeure d'un tel algorithme sur des images RGB vient du fait que la projection de la scène sur le plan image supprime l'information de profondeur. Les capteurs stéréoscopiques et infra-rouges permettent de compenser cette absence d'information et simplifient énormément le traitement nécessaire.
 
-\celine{Je t'ai ajouté une phrase pour la segmentation dans le cas où le fond est statique.}Dans le cas où le capteur est immobile, on utilise classiquement des méthodes de soustraction de fond pour l'étape de segmentation \cite{dai2006prospects}. Ceci n'est pas possible dans notre cas car le robot évolue dans son environnement. La démarche proposée par la littérature dans ce cas considère les objets comme des ensembles de points délimités par un seuil de proximité. Cette définition est suffisamment générale pour permettre de représenter une grande quantité d'objets. Néanmoins, définir ces ensembles dans une image brute n'est pas forcément simple. Par conséquent, on utilise un nouvel \textit{a priori} qui spécifie que les objets se situent sur des plans de support. Bien que plus restrictif que la définition d'avant, cela permet un segmentation crédible. Parmis les méthodes de segmentation se basant sur cette définition, on peut citer Tabletop object detector \cite{tabletop} qui détermine le plan principal de l'image (généralement une table ou le sol) grâce à l'algorithme RANSAC \cite{fischler1981random}, puis recherche des objets dans l'enveloppe convexe de ce plan. Par ailleurs, Caron et al. \cite{caron2014neural} ont proposé une approche légèrement différente. En partant du même principe, le sol est estimé, puis un traitement pour le fond de la scène est appliqué, où les plans orthogonaux à la normale du sol et de taille suffisamment grands sont considérés comme des murs, et les éléments trop près des bords ne sont pas considérés. 
+Dans le cas où le capteur est immobile, on utilise classiquement des méthodes de soustraction de fond pour l'étape de segmentation \cite{dai2006prospects}. Ceci n'est pas possible dans notre cas car le robot évolue dans son environnement. La démarche proposée par la littérature dans ce cas considère les objets comme des ensembles de points délimités par un seuil de proximité. Cette définition est suffisamment générale pour permettre de représenter une grande quantité d'objets. Néanmoins, définir ces ensembles dans une image brute n'est pas forcément simple. Par conséquent, on utilise un nouvel \textit{a priori} qui spécifie que les objets se situent sur des plans de support. Bien que plus restrictif que la définition d'avant, cela permet un segmentation crédible. Parmis les méthodes de segmentation se basant sur cette définition, on peut citer Tabletop object detector \cite{tabletop} qui détermine le plan principal de l'image (généralement une table ou le sol) grâce à l'algorithme RANSAC \cite{fischler1981random}, puis recherche des objets dans l'enveloppe convexe de ce plan. Par ailleurs, Caron et al. \cite{caron2014neural} ont proposé une approche légèrement différente. En partant du même principe, le sol est estimé, puis un traitement pour le fond de la scène est appliqué, où les plans orthogonaux à la normale du sol et de taille suffisamment grands sont considérés comme des murs, et les éléments trop près des bords ne sont pas considérés. 
 
 \subsection{Algorithme}
 
@@ -44,7 +44,7 @@ Plus spécifiquement, elle peut être découpée selon les étapes suivantes :
 
 Ainsi, l'algorithme fournit la position de chaque objet dans le repère de la caméra ainsi que le nuage de point et les normales qui leur sont associés.
 
-Une calibration initiale est nécessaire pour définir l'équation du sol. Pour cela, on place le robot dans un endroit où l'image obtenue correspond majoritairement au sol. L’équation du plan dominant est extrait par RANSAC et sauvegardée dans un fichier texte. \celine{Ce n'est peut être pas la peine de détailler trop en annexes. Tous les algos sont classiques, il suffit de mettre une référence ou un lien vers l'implémentaiton utilisée}. Une explication plus détaillée sur les sous-méthodes utilisées pour chaque étape est présentée dans les annexes, ainsi qu'une discussion sur les paramètres utilisés.
+Une calibration initiale est nécessaire pour définir l'équation du sol. Pour cela, on place le robot dans un endroit où l'image obtenue correspond majoritairement au sol. L’équation du plan dominant est extrait par RANSAC et sauvegardée dans un fichier texte. Une explication plus détaillée sur les sous-méthodes utilisées pour chaque étape est présentée dans les annexes, ainsi qu'une discussion sur les paramètres utilisés.
 
 
 \subsection{Restrictions} 
@@ -63,12 +63,12 @@ résolution limitée des images mesurées. D'un autre côté, la segmentation a 
 
 \end{itemize} 
 
-Un grand nombre d'objets, entre autres chaises, tables, écrans, boîtes en carton, poubelles, de tailles et formes variés ont été testés et peuvent être segmentés malgré les restrictions. Quelques exemples de segmentation sont présentés en annexes \celine{il est mieux de citer l'annexe à laquelle tu fais référence. Dans ton cas l'annexe \ref{annexe:segmentation}} pour illustrer la capacité de segmentation. \celine{Si tu as de la place, tu peux carrément montrer des exemples dans cette section et non dans les annexes.}
+Un grand nombre d'objets, entre autres chaises, tables, écrans, boîtes en carton, poubelles, de tailles et formes variés ont été testés et peuvent être segmentés malgré les restrictions. Quelques exemples de segmentation sont présentés en annexes \ref{annexe:segmentation} pour illustrer la capacité de segmentation. \celine{Si tu as de la place, tu peux carrément montrer des exemples dans cette section et non dans les annexes.}
 
 \section{Descripteurs}
 
 Le travail des descripteurs est, d'une part, d'extraire des caractéristiques intéressants de l'élément observé et, d'autre part, de réduire la
-dimensionnalité de l'espace traité, tout en restant robuste à des transformations affines et aux changements de luminosité. On s'intéresse surtout ici aux descripteurs basés sur le nuage de point des objets, bien qu'il soit possible aussi d'utiliser des descripteurs associés à la texture ou à la couleur. Les descripteurs qui nous intéressent sont des descripteurs géométriques qui essaient de traduire les idées de courbure, de forme et taille dans les histogrammes, et sont intéressants pour étudier les ambiguïtés de reconnaissance. Parmis les descripteurs 3D proposés dans la littérature, on peut citer PFH \cite{} qui est invariant par changement de point de vue. \celine{décris les autres méthodes en une phrase avec la citation associée}  Une description détaillée de ces descripteurs et leurs principales différences sont expliquées dans les annexes \ref{annexe:descripteur}. Nous choisissons d'utiliser le descripteur \textit{Viewpoint Feature Histogram} - VFH, car il permet de discriminer non seulement les formes géométriques (pour la reconnaissance d'objet), mais aussi les points de vues (reconnaissance de vue).
+dimensionnalité de l'espace traité, tout en restant robuste à des transformations affines et aux changements de luminosité. On s'intéresse surtout ici aux descripteurs basés sur le nuage de point des objets, bien qu'il soit possible aussi d'utiliser des descripteurs associés à la texture ou à la couleur. Les descripteurs qui nous intéressent sont des descripteurs géométriques qui essaient de traduire les idées de courbure, de forme et taille dans les histogrammes, et sont intéressants pour étudier les ambiguïtés de reconnaissance. Parmis les descripteurs 3D proposés dans la littérature, on peut citer FPFH \cite{rusu2009fast} qui est invariant par changement de point de vue, SHOT \cite{tombari2010unique} étant un descripteur local de courbure et des descripteurs semi-globales orientés au traitement des occlusions CVFH \cite{aldoma2011cad} et Our-CVFH \cite{aldoma2012our}. Une description détaillée de ces descripteurs et leurs principales différences sont expliquées dans les annexes \ref{annexe:descripteur}. Nous choisissons d'utiliser le descripteur \textit{Viewpoint Feature Histogram} - VFH, car il permet de discriminer non seulement les formes géométriques (pour la reconnaissance d'objet), mais aussi les points de vues (reconnaissance de vue).
 
 En partant de l'hypothèse que la segmentation propose un découpage correct des objets, on extrait des descripteurs globaux à partir des ensembles de points proposés. Ainsi, pour chaque objet, on obtient un histogramme VFH représentatif de l'objet et de la vue segmentée.
 
@@ -115,13 +115,13 @@ $$d(H_1, H_2) = \sum _I \frac{\left(H_1(I)-H_2(I)\right)^2}{H_1(I)} $$
 
 \subsection{Définition de repères}
 
-Se placer dans différents repères permettre d'avoir de référentiels plus naturels pour chaque type de composant du robot et pour les objets placés dans la scène. On défini quelques repères et conventions de base pour faciliter la localisation. D'abord le repère de la base du robot est orthonormale positive, où le déplacement ver l'avant correspond à l'axe $x$, vers la gauche à l'axe $y$ et ver le haut à l'axe $z$. Une deuxième référentielle de convention égale à celle d'avant positionne le capteur RGB-D par rapport au robot. Enfin, le dernière référentiel corresponde au repère optique du capteur orienté selon la convention usuelle pour les images avec l'axe $x$ orienté ver la droite et l'axe $y$ ver le bas et, enfin, l'axe $z$ vers l'avant. Ces trois repères permettent d'orienter tous les éléments aperçus par le robot dans l'environnement de façon pratique.
+Se placer dans différents repères permettre d'avoir de référentiels plus naturels pour chaque type de composant du robot et pour les objets placés dans la scène. On défini quelques repères et conventions de base pour faciliter la localisation. D'abord le repère de la base du robot est orthonormale positive, où le déplacement vers l'avant correspond à l'axe $x$, vers la gauche à l'axe $y$ et ver le haut à l'axe $z$. Une deuxième référentielle de convention égale à celle d'avant positionne le capteur RGB-D par rapport au robot. Enfin, le dernière référentiel corresponde au repère optique du capteur orienté selon la convention usuelle pour les images avec l'axe $x$ orienté ver la droite et l'axe $y$ ver le bas et, enfin, l'axe $z$ vers l'avant. Ces trois repères permettent d'orienter tous les éléments aperçus par le robot dans l'environnement de façon pratique.
 
 La \review{figure} illustre ces repères utilisés et les conventions décrits.
 
 \subsection{Transformation de repères}
 
-Ensuite, la transformation entre repères permet la passage de l'un à l'autre, pour avoir la position globale de l'objet d'après sa détection par la caméra. La transformation entre une base $a$ et une autre $b$ est faite par une matrice de rotation et translation classique, décrit en bas. 
+Ensuite, la transformation entre repères permet la passage de l'un à l'autre, pour avoir la position globale de l'objet d'après sa détection par la caméra, par exemple. La transformation entre une base $a$ et une autre $b$ est faite par une matrice de rotation et translation classique, décrit en bas. 
 
 \begin{equation*}
 	\mathbf{R}^{a}_{b} = 
@@ -132,31 +132,34 @@ Ensuite, la transformation entre repères permet la passage de l'un à l'autre, 
 
 où $\theta$ équivaut à la rotation entre les deux repères et $\Delta x$ et $\Delta y$ sont les translations linéaires entre eux.
 
-\subsection{les bases mobiles}
+\subsection{Base mobile}
 
 \subsubsection{Estimation de l'odométrie}
 
 Certains robots sont dotés de capteurs à estimer de façon
 approximé sont déplacement. C'est aussi le cas du robot ciblé qui
 possède encodeurs capables d'estimer la rotation angulaire des
-roues. Une intégration, au sens mathématique, de la différence entre
+roues. Pour le cas d'un robot différentiel, où chaque roue peut être
+commandée indépendamment, son déplacement et orientation suit les équations suivantes:
+\begin{equation*}
+	\begin{array}{rcl}
+		\delta x_t &=& \frac{\delta \omega_{gauche} + \delta \omega_{droite}}{2} \\
+		\delta y_t &=& ...\\
+		\delta \theta_t &=& ...								
+	\end{array}
+\end{equation*}
+
+Une intégration, au sens mathématique, de la différence entre
 l'odométrie entre deux intervalles de temps permet de retrouver la
 position global du robot.
 
 \begin{equation*}
 	\begin{array}{rcl}
-		x_t &=& x_{t-1} + \delta x_{t-1} * cos(\theta_{t-1}) - \delta y_{t-1} * sin(\theta_{t-1}) \\
-		y_t &=& y_{t-1} + \delta x_{t-1} * sin(\theta_{t-1}) + \delta y_{t-1} * cos(\theta_{t-1}) \\
-		\theta_t &=& \theta_{t-1} + \delta\theta_{t-1}
+		x_t &=& x_{t-1} + \delta x_{t} * cos(\theta_{t-1}) - \delta y_{t} * sin(\theta_{t-1}) \\
+		y_t &=& y_{t-1} + \delta x_{t} * sin(\theta_{t-1}) + \delta y_{t} * cos(\theta_{t-1}) \\
+		\theta_t &=& \theta_{t-1} + \delta\theta_{t}
 	\end{array}
 \end{equation*}
-
-
-Les plates-formes différentielles Une des configurations les plus utilisées pour les robots mobiles d’intérieur est la configuration différentielle qui comporte deux roues commandées indépendamment. Une ou plusieurs roues folles sont ajoutées à l’avant ou à l’arrière du robot pour assurer sa stabilité (Figure 4.1). Cette plate-forme est très simple à commander, puisqu’il suffit de spécifier les vitesses des deux roues, et permet de plus au robot de tourner sur place. Cette possibilité permet de traiter dans certains cas le robot comme un robot holonome, ce qui va simplifier la planification de déplacement et la commande du robot.
-
-L’estimation du déplacement par odométrie est également très simple à partir de la mesure des vitesses de rotation des deux roues et . Les vitesses de translation v et de rotation sont en effet données par :
-
-Ce type de plate-forme peut également être utilisé avec des chenilles ce qui fournit une capacité de franchissement de petits obstacles intéressante (Figure 4.1). Ces plates-formes peuvent ainsi être utilisées en extérieur ou dans des décombres. L’utilisation de chenilles conduit cependant à une odométrie très bruitée à cause du contact mal défini entre les chenilles et le sol qui glissent beaucoup, notamment lors des rotations. L’estimation de la direction par l’odométrie sur ce type de plates-formes est donc en général rapidement inutilisable.
 
 \subsection{Filtre de Kalman }
 
@@ -184,7 +187,7 @@ de mettre un filtre à jour ou, alors, créer un nouveau filtre.
 
 Classiquement le filtre de Kalman est mis à jour dans deux étapes : 
 
-\subsubsection{Prédiction} Une première de prédiction que s'utilise du modèle mathématique décrivent l'évolution du processus 
+\subsubsection{Prédiction} Une première de prédiction que s'utilise du modèle linéaire $\textbf{F}_{k}$ pour décrire l'évolution des états au long du temps avec son bruit de process, $\textbf{Q}_{k}$, associé et que estime a priori la covariance de l'erreur en $\textbf{P}_{k|k-1}$. Formalisé dans les équations suivantes:
 
 \begin{equation*}
 	\begin{array}{ccl}
@@ -193,18 +196,30 @@ Classiquement le filtre de Kalman est mis à jour dans deux étapes :
 	\end{array}
 \end{equation*}
 
+\noindent Où les variables sont : \\ 
+$\textbf{F}_{k}$: dynamique du système \\
+$\textbf{u}_{k}$ : entrée de commande \\
+$\textbf{B}_{k}$ : matrice qui relie l'entrée de commande u à l'état x \\ 
+$\textbf{P}_{k|k-1}$ : matrice d'estimation a priori de la covariance de l'erreur \\
+$\textbf{Q}_{k}$ : matrice de covariance du bruit de process
+
 \subsubsection{Innovation}
-et une deuxième de mise à jour, où l'observation est incorporé pour le calcule de l'innovation e du gain de Kalman.
+Une deuxième de mise à jour, où l'observation est incorporé pour le calcule de l'innovation, $\tilde{\textbf{y}}_{k}$, e du gain de Kalman, $\textbf{K}_{k}$.
 
 \begin{equation*}
 	\begin{array}{ccl}
-\tilde{\textbf{y}}_{k} &=& \textbf{z}_{k} - \textbf{H}_{k}\hat{\textbf{x}}_{k|k-1} \\
-\textbf{S}_{k} &=& \textbf{H}_{k}\textbf{P}_{k|k-1} \textbf{H}_{k}^{T}+\textbf{R}_{k} \\
-\textbf{K}_{k} &=& \textbf{P}_{k|k-1}\textbf{H}_{k}^{T}\textbf{S}_{k}^{-1} \\
-\hat{\textbf{x}}_{k|k} &=& \hat{\textbf{x}}_{k|k-1} + \textbf{K}_{k}\tilde{\textbf{y}}_{k} \\
-\textbf{P}_{k|k} &=& (I - \textbf{K}_{k} \textbf{H}_{k}) \textbf{P}_{k|k-1}
+		\tilde{\textbf{y}}_{k} &=& \textbf{z}_{k} - \textbf{H}_{k}\hat{\textbf{x}}_{k|k-1} \\
+		\textbf{S}_{k} &=& \textbf{H}_{k}\textbf{P}_{k|k-1} \textbf{H}_{k}^{T}+\textbf{R}_{k} \\
+		\textbf{K}_{k} &=& \textbf{P}_{k|k-1}\textbf{H}_{k}^{T}\textbf{S}_{k}^{-1} \\
+		\hat{\textbf{x}}_{k|k} &=& \hat{\textbf{x}}_{k|k-1} + \textbf{K}_{k}\tilde{\textbf{y}}_{k} \\
+		\textbf{P}_{k|k} &=& (I - \textbf{K}_{k} \textbf{H}_{k}) \textbf{P}_{k|k-1}
 	\end{array}
 \end{equation*}
+\noindent Avec: \\
+$\textbf{z}_{k}$ : observation ou mesure du process à l'instant k \\
+$\textbf{H}_{k}$ : matrice qui relie l'état $\textbf{x}_{k}$ à la mesure$ \textbf{z}_{k}$\\
+$\textbf{P}_{k|k}$ : matrice d'estimation a posteriori de la covariance de l'erreur\\
+$\textbf{R}_{k}$ : matrice de covariance du bruit de mesure
 
 \section {Reconnaissance Multi-vue}
 

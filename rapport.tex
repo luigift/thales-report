@@ -52,7 +52,9 @@
 \usepackage{enumitem}
 \usepackage{etoolbox}
 \usepackage{natbib}
-
+\usepackage{titlesec}
+\titleformat{\chapter}[display]{\normalfont\bfseries}{}{0pt}{\Huge}
+%\titleformat{\chapter}{\huge}{\thechapter.}{20pt}{\huge\it}
 \usetikzlibrary{positioning}
 
 \newtoggle{rapport}
@@ -101,6 +103,12 @@
 
 %%%% Bibliografia 
 %\bibliographystyle{ieeetr.bst}
+\addcontentsline{toc}{chapter}{Bibliographie}
+% % % % % % % % %
+%\cleardoublepage
+%\phantomsection
+%\addcontentsline{toc}{chapter}{Bibliography}
+% % % % % % % % %
 \bibliographystyle{plain}
 \bibliography{rapport}
 
