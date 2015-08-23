@@ -1,37 +1,10 @@
 \chapter {Protocole Expérimental}
 
 \section{Matériel utilisé}
-
-\subsection{Déplacement du robot}
-
-Le robot est équipé de trois roues, desquelles les symétriques
-arrières sont motorisés et responsables pour le déplacement
-motrice. Au même temps que la dernière sert à donner un support pour
-la partie derrière du châssis. Les moteurs sont contrôlés à
-partir de commandes sériel, préétablis pour le fabricant, qui
-définissent la vitesse de roulement. La combinaison des rotations
-des deux roues motorises dans les deux sens possibles permets au
-robot d'avoir les comportements suivants:
-
-\begin {itemize}
-\item Déplacement en ligne droite : deux roues roulant avec la même vitesse et dans le même sens.
-
-\item Déplacement en arc de cercle : différence entre les vitesses des roues.
-
-\item Rotation : deux roues à la même vitesse, mais avec de sens différents.
-\end{itemize}
-
-Finalement, la combinaison de ces mouvements permet au robot de
-accéder n'importe quelle position de l’espace.
-
-
-Le design de l'architecture a permis de définir les unités de traitement et la communication entre elles. La définition des unités de traitement suit le découpage du pipeline de reconnaissance avec des nœuds dédiés pour la segmentation, l'extraction de features, la classification, mais également le contrôle du robot.
-
-L'interfaçage matériel-logiciel a été réalisé sur l'environnement ROS - Robot Operating System. En plus d'outils d'affichage, ROS rassemble des librairies d'acquisition d'images RGB-D, OpenNi 2 et Freenect, ainsi qu'une librairie de traitement de nuage de points, PCL.
-De plus, sa structure en nœuds a permis une implémentation modulaire et directe du système, ainsi que de gérer la communication entre l'ordinateur portable et le processeur embarqué sur le robot. La structure complète de l'architecture peut être retrouvé dans les annexes \ref{}.
+En ce que concerne les aspects matériels, le robot bimoteur Wifibot v2, équipé d'un ordinateur à bord, sera utilisé comme plateforme mobile. L'acquisition des données est faite par une camera RGB-D Asus Xtion Pro Live. Par rapport au choix logiciel, l'environnement robotique ROS\footnote{Robot Operating System} a été adopté pour avoir les bibliothèques qui permettent de gérer les nuages de points, Freenect, OpenNi2 et PCL\footnote{Point Cloud Library}, et d'autres nombreux outils de contrôle du robot et sauvegarde d'informations.
 
 \section{Setup expérimental}
-Pour évaluer les capacités de reconnaissance du robot, vingt objets de tailles et formes diverses ont été choisis. Ils s'agit d'objets typiques qui peuvent être facilement retrouvés dans un laboratoire ou un bureau. Ensuite, nous avons effectué un tour complet de l'objet avec le robot en sauvegardant les nuage de point et en extrayant les features VFH pour huit positions différentes écartées de 45 degrés à $1.5 m$ de distance. La position correspondent à l'angle zéro a été choisie de manière aléatoire en alignant un des axes de l'objet avec celui du capteur. L'image \ref{fig:setup_expe} des vues d'un objet exemplifie la composition de la base de données. Une liste complète des objets figure en annexe \ref{fig:dataset}.
+Pour évaluer les capacités de reconnaissance du robot, vingt objets de tailles et formes diverses ont été choisis pour être incorporé à la base de connaissance. Ils s'agit d'objets typiques qui peuvent être facilement retrouvés dans un laboratoire ou un bureau. Ensuite, nous avons effectué un tour complet de l'objet avec le robot en sauvegardant les nuage de point et en extrayant les features VFH pour huit positions différentes écartées de 45 degrés à 1.5 mètres de distance. La position correspondent à l'angle zéro a été choisie de manière aléatoire en alignant un des axes de l'objet avec celui du capteur. L'image \ref{fig:setup_expe} des vues d'un objet exemplifie la composition de la base de données. Une liste complète des objets figure en annexe \ref{fig:dataset}.
 
 \begin{figure}[H]
 	\subfloat{\includegraphics[width=\textwidth]{chair_db.jpg}}		
@@ -43,19 +16,17 @@ Pour évaluer les capacités de reconnaissance du robot, vingt objets de tailles
 \subsection{Comparaison à la reconnaissance mono-vue}
 Une première évaluation consiste à faire un tour complet autour de l'objet à reconnaitre pour quatre positions angulaires différentes : $0, 45, 90$ et une dernière choisie de manière aléatoire pour chaque objet. Le robot fait le tour à une vitesse de $0.35 \pm 0.1 m/s$ à une distance de $1.5m$, en enregistrant des images à $1hz$, ansi, une expérience typique est constituée d'environ $25$  images d'angle différent et prendre $25 \pm 3$ seconds. 
 
+La difficulté de l'évaluation vient, premièrement, du fait du robot avoir une base assez discrète ce qui donne marge à des mauvaise reconnaissance mono-vue une fois le point de vue étant inexistant dans la base de connaissance. Puis, la vitesse du déplacement résulte dans images plus floues lors des acquisitions et la modification de l'angle de la caméra\footnote{L'angle entre la base et la tête de la caméra Asus Xtion est facilement modifié.} apportent un obstacle en plus pour le \textit{matching} de descripteurs dans le classificateur K-plus proches voisins.
+
 Un expérience typique est illustrée dans l'image \ref{fig:resultats_expe} :
 
 \begin{figure}[H]
 	\subfloat{\includegraphics[width=\textwidth]{hmm_example.png}}	
-			\caption{\celine{Tu devrais ajouter sur le côté de l'image que c'est l'image observée, l'image la plus proche par la reco mono-vue, et l'image la plus proche avec les HMM (même si tu le répète dans le texte, ca permet de comprendre la figure directement)}}
+			\caption{\textbf{Résultat de l'évaluation} - Reconnaissance multi-vue corrige des ambiguïtés et surmonte la mauvaise segmentation lors de la création de la base.}
 	\label{fig:resultats_expe}
 \end{figure}
 
-La première ligne correspond à la séquence d'images vues par le robot à chaque instant de temps, et donc, l'objet à être reconnu. La seconde ligne, donnée par l'algorithme de reconnaissance, équivaut à la vue la plus probable de l'objet reconnue par le K-plus proches voisins. Il est intéressant remarquer que l'invariance à rotation du descripteur trompe l'estimation de l'orientation en prenant son correspond énantiomorphe dans le premier carré rouge. Autrement, le dos du pinguin étant une grande surface presque plane, il est partiellement retiré par l'étape de segmentation. Ainsi, le nuage de points résultant de ce point de vue n'est pas suffisamment complet pour caractériser correctement l'objet, ce qui induit une mauvaise reconnaissance dans le carré bleu. Au final, on remarque que le traitement apporté par la chaîne de Markov cachée permet de corriger les problèmes d'une base de donnée relativement sparse avec des possibles erreus de segmentation, permettant la correction simultanée de la reconnaissance de l'objet et de son orientation. 
-
-cela correspond à avoir une base
-On utilise ensuite trois ratios différentes pour exprimer la reconnaissance d'objets, la reconnaissance de vue et la suivi des reconnaissances par la chaîne de Markov cachée.
-Finalement,  est affichée
+La première ligne correspond à la séquence d'images vues par le robot à chaque instant de temps, et donc, l'objet à être reconnu. La seconde ligne, donnée par l'algorithme de reconnaissance, équivaut à la vue la plus probable de l'objet reconnue par le K-plus proches voisins. Il est intéressant remarquer que l'invariance à rotation du descripteur trompe l'estimation de l'orientation en prenant son correspond énantiomorphe dans le premier carré rouge. Autrement, le dos du pinguin étant une grande surface presque plane, il est partiellement retiré par l'étape de segmentation. Ainsi, le nuage de points résultant de ce point de vue n'est pas suffisamment complet pour caractériser correctement l'objet, ce qui induit une mauvaise reconnaissance dans le carré bleu. Au final, on remarque que le traitement apporté par la chaîne de Markov cachée permet de corriger les problèmes d'une base de donnée relativement sparse avec des possibles erreus de segmentation, permettant la correction simultanée de la reconnaissance de l'objet et de son orientation en ligne. 
 
 %\begin{figure}[H]
 %	\subfloat{\includegraphics[width=\textwidth]{hmm_mov.png}}		
@@ -66,11 +37,13 @@ Finalement,  est affichée
 Dans le premier tableaux on retrouve le résultats de la reconnaissance donné par la comparaison des histogrammes provenant du *plus proche voisin*. Ce résultat estime la capacité de distinguer deux objets quelconques, en autre mots, cette capacité viens de la représentativité des descripteurs utilisés et l'efficacité de la mesure de similarité entre histogrammes.
 }
 
-\subsection{Robustesse à l'occlusion}
+%\subsection{Robustesse à l'occlusion}
 
 \subsection{Suivi et reconnaissance multi-cibles}
 
-Le deuxième experiement correspond à placer des objets existant appris auparavant dans une pièce et conduire le robot faisant en sort qu'il les regardait de plusieurs points de vues différents. La carte finale donnée par l'algorithme, \ref{fig:multi_map}, 
+Le deuxième expérimentent correspond à placer des objets appris auparavant dans une pièce et conduire le robot faisant en sort qu'il les regardait de plusieurs points de vues différents. 
+Ce scénario est beaucoup plus complexe que celui d'avant. D'abord les objets occultent uns aux autres résultant en mauvaises segmentations. Ensuite, la suivi d'objets est plus complexe
+La carte finale donnée par l'algorithme, \ref{fig:multi_map}, 
 
 \begin{figure}[H]
 	\includegraphics[width=\textwidth]{map.png}
