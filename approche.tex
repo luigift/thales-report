@@ -1,18 +1,23 @@
 
 \chapter{Méthode proposée}
 
-L'objectif de notre méthode est d'avoir une reconnaissance multi-vues d'un ou plusieurs objets à la fois, capable d'intégrer le déplacement du robot pour résoudre des ambiguïtés et faux positifs liés à cette reconnaissance. Pour incorporer ces notions, on utilise une représentation des objets simple et suffisamment général, capable d'estimer l'orientation de l'objet reconnu. On traite ensuite l’information motrice du robot que l'on intègre à l'estimation pour augmenter le taux de reconnaissance.
+L'objectif de notre méthode est d'avoir une reconnaissance multi-vues d'un ou plusieurs objets à la fois, capable d'intégrer le déplacement du robot pour résoudre des ambiguïtés et faux positifs. Pour incorporer les notions de vue et de transition entre elles, on s'utilise d'une représentation simple et suffisamment général basé sur les graphes d'aspect, couplé avec un dispositif de reconnaissance mono-vue classique capable d'estimer l'orientation de l'objet reconnu. Une suivi des objets et un traitement probabiliste intègre l'information motrice pour augmenter le taux de reconnaissance.
 
 \section{Architecture générale}
-Expliquer qu'est on a comme materiel....
+L'approche cible une base mobile différentiel muni de capteurs proprioceptives odométiques et d'une caméra RGB-D. Les informations provenant des ces unités sont envoyés à une unité de traitement qui interprète les images reçus et compare cette interprétation avec une base de données contenue dans la mémoire. Dans le cas d'absence de correspondent, ce nouveau exemplaire peut être ajouté à la base de données et agrandir les connaissances d'objets existants dans l'environnement. 
 
-expliquer schéma....
+L'architecture est illustrée dans \ref{fig:architecture} et permet à, la fois, de comprendre les dépendances entre les étapes de traitement, de même que, la nature du flux d'information entre modules.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{gen_arc.pdf}
   \caption{Architecture générale du système}
+  \label{fig:architecture}
 \end{figure}
+
+Précisément, l'unité de traitement reçois une nuage brute provenant de la caméra et la mesure de rotation de roues du robot. La première partie du traitement vise nettoyer le nuage en segmentant des points des objets candidats de la scène, ce qui permet, déjà, d'enlever une partie non pertinent et envoyer à l'unité de extraction de features seulement des morceaux de l'image original qui respectent certains caractéristiques. Simultanément, un conversion de référentiel localise des objets dans le repère absolu de déplacement du robot. Puis, les positions des objets sont donnés au module de localisation et tracking qui suit les observations et les associes entre elles pour avoir une cohérence globale des positions. En dernière instance, les histogrammes de features , aussi comme, la position, dans la carte globale, de chaque objet sont utilisés pour pour reconnaitre les éléments de la scène et pour donner leur vue la plus probable à chaque instant de temps. 
+
+Les prochaines sections dissèquent l'architecture de l'image \ref{fig:architecture}, en présentant le fond théorique derrière le fonctionnement de chaque sous module.
 
 \section{Segmentation}
 
@@ -34,19 +39,16 @@ La méthode de segmentation de l’algorithme Tabletop
 se base exactement sur ces aprioris. Pour retrouver les objets posés
 sur une table, l'algorithme recherche récursivement les plans de
 support, où le plus important est pris comme la table. Autrement,
-l'article {\color{blue}ENSTA}, en partant du même principe, propose un
+l'article \cite{caron2014neural} en partant du même principe, propose un
 traitement pour le fond de la scène, où les plans orthogonaux à
 normale du sol et de taille suffisamment grand sont considérés comme
 des murs, orientés à segmentation d'objets dans les environnements
-intérieurs. Ainsi, la dernière segmentation, proposé par *Luis
-Charles*, répond aux exigences du domaine de déplacement du robot: le
-laboratoire de Thales, Theresis.
+intérieurs. Ainsi, la dernière segmentation répond aux exigences du domaine de déplacement du robot: le
+laboratoire de Thales, Theresis.\\
 
-Plus spécifiquement, elle peut être découpée dans les étapes suivantes
-:
-
+Plus spécifiquement, elle peut être découpée dans les étapes suivantes :
 \begin{enumerate}
-\item Soustraction du sol... {\color{blue} DETAILLER}
+\item Soustraction du sol
 
 \item Filtrage de points distants, considérés comme plus incertains.
 
@@ -63,14 +65,10 @@ Plus spécifiquement, elle peut être découpée dans les étapes suivantes
 \item Réduction de la densité de discrétisation pour accélérer l'étape
   de \textit{clustering}.
 
-\item Clustering des objets par l'algorithme *point growing*
+\item \textit{Clustering} des objets par l'algorithme \textit{point growing}
 
-\item Retour à discrétisation initiale.
+\item Calcul du centroïde et \textit{bouding boxes} 2D et 3D \\
 
-\item Calcul du centroïde et \textit{bouding boxes} 2D et 3D
-
-\item extraction d’imagettes, et autre informations pertinents aux
-  objets détectés.
 \end{enumerate}
 
 Une calibration initiale est nécessaire pour définir l'équation du
@@ -88,18 +86,18 @@ cause de l'interaction avec les rayons infra-rouges, soit à cause de
 résolution limitée des images mesurées. Dans l'autre côté, la
 segmentation a ses propres contraints concernant le positionnement des
 objets dans l'image et, principalement, la définition de sol et murs,
-résultant dans les restrictions suivantes :
+résultant dans les restrictions suivantes :\\
 
 \begin{itemize}
 \item L'objet se trouve par terre.
-\item L'objet se trouve au centre de l'image
-\item Ambiant isolés de lumière infra-rouge 
-\item Le sol où le robot se déplace n'est pas accidenté.
-\item L'objet se trouve à une distance inférieure à 3 mètres 
-\item L'objet est assez grand et dépasse le seuil d'appartenance au
-  sol.
+\item L'objet se trouve au centre de l'image.
+\item Ambiant isolés de lumière infra-rouge.
 \item L'objet n'est ni transparents et ni trop réflective.
-\end{itemize}
+\item Le sol où le robot se déplace n'est pas accidenté.
+\item L'objet se trouve à une distance inférieure à 3 mètres.
+\item L'objet est assez grand et dépasse le seuil d'appartenance au sol.\\
+
+\end{itemize} 
 
 Un grand nombre d'objets, entre chaises tables, écrans, boîtes en
 carton, poubelles, de tailles et formes variés étaient testés et
@@ -111,15 +109,16 @@ la capacité de segmentation.
 
 Le travail des descripteurs est, d'un côté, de comprendre les
 caractéristiques intéressants et, d'un autre, de réduire la
-dimensionalité du espace traité, tandis que restant robuste à des
+dimensionnalité du espace traité, tandis que restant robuste à des
 transformations affines et changement de luminosité. On classifie les
-descripteurs selon la caractéristique qu'il exprime. Une première
-group sont les descripteurs géométriques qui essaient de traduire les
+descripteurs selon la caractéristique qu'ils expriment. Une première
+groupe sont les descripteurs géométriques qui essaient de traduire les
 idées de courbure, forme et taille dans histogrammes, et sont intéressant
-pour etudier les ambiguïtés de reconnaissance, un fois que la plus parts 
+pour étudier les ambiguïtés de reconnaissance, un fois que la plus parts 
 d'objet ont une certaine symétrie spatial.
 
-En partant de l'hypothèse que la segmentation donné une bonne fragmentation des objets, on calcule des descripteurs globales à partir de les ensembles de points donnés par le première traitement. L'adoption du descripteur \textit{Viewpoint Feature Histogram} - VFH reflet l'intérêt d'avoir une distinction entre formes géométriques de même que points de vues. Une description détaillée du descripteur est rencontré dans les annexes.  
+
+En partant de l'hypothèse que la segmentation donné une bonne fragmentation des objets, on extrait des descripteurs globales à partir de les ensembles de points donnés par le première traitement. L'adoption du descripteur \textit{Viewpoint Feature Histogram} - VFH, entre tous proposés par la littérature, reflet l'intérêt d'avoir une distinction entre formes géométriques et entre points de vues. Une description détaillée du descripteur est rencontré dans les annexes.  
 
 \section {Reconnaissance mono-vue} 
 
@@ -162,7 +161,7 @@ $$d(H_1, H_2) = \sum _I \frac{\left(H_1(I)-H_2(I)\right)^2}{H_1(I)} $$
 
 \section{Localisation et suivi d'objet}
 
-\subsection{Definission de repères}
+\subsection{Définition de repères}
 
 Se placer dans différents repères permettre d'avoir de référentiels plus naturels pour chaque type de composant du robot et pour les objets placés dans la scène. On défini quelques repères et conventions de base pour faciliter la localisation. D'abord le repère de la base du robot est orthonormale positive, où le déplacement ver l'avant correspond à l'axe $x$, vers la gauche à l'axe $y$ et ver le haut à l'axe $z$. Une deuxième référentielle de convention égale à celle d'avant positionne le capteur RGB-D par rapport au robot. Enfin, le dernière référentiel corresponde au repère optique du capteur orienté selon la convention usuelle pour les images avec l'axe $x$ orienté ver la droite et l'axe $y$ ver le bas et, enfin, l'axe $z$ vers l'avant. Ces trois repères permettent d'orienter tous les éléments aperçus par le robot dans l'environnement de façon pratique.
 
@@ -179,7 +178,9 @@ Ensuite, la transformation entre repères permet la passage de l'un à l'autre, 
 	 \end{bmatrix}
 \end{equation*}
 
-où $\theta$ équivaut à la rotation entre les deux repères et $\Delta x$ et $\Delta y$ les translations linéaires entre eux.
+où $\theta$ équivaut à la rotation entre les deux repères et $\Delta x$ et $\Delta y$ sont les translations linéaires entre eux.
+
+\subsection{les bases mobiles}
 
 \subsubsection{Estimation de l'odométrie}
 
@@ -199,8 +200,11 @@ position global du robot.
 \end{equation*}
 
 
+Les plates-formes différentielles Une des configurations les plus utilisées pour les robots mobiles d’intérieur est la configuration différentielle qui comporte deux roues commandées indépendamment. Une ou plusieurs roues folles sont ajoutées à l’avant ou à l’arrière du robot pour assurer sa stabilité (Figure 4.1). Cette plate-forme est très simple à commander, puisqu’il suffit de spécifier les vitesses des deux roues, et permet de plus au robot de tourner sur place. Cette possibilité permet de traiter dans certains cas le robot comme un robot holonome, ce qui va simplifier la planification de déplacement et la commande du robot.
 
+L’estimation du déplacement par odométrie est également très simple à partir de la mesure des vitesses de rotation des deux roues et . Les vitesses de translation v et de rotation sont en effet données par :
 
+Ce type de plate-forme peut également être utilisé avec des chenilles ce qui fournit une capacité de franchissement de petits obstacles intéressante (Figure 4.1). Ces plates-formes peuvent ainsi être utilisées en extérieur ou dans des décombres. L’utilisation de chenilles conduit cependant à une odométrie très bruitée à cause du contact mal défini entre les chenilles et le sol qui glissent beaucoup, notamment lors des rotations. L’estimation de la direction par l’odométrie sur ce type de plates-formes est donc en général rapidement inutilisable.
 
 \subsection{Filtre de Kalman }
 

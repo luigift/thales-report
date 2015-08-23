@@ -1,6 +1,5 @@
 \chapter {Protocole Expérimental}
 
-
 \section{Matériel utilisé}
 
 \subsection{Déplacement du robot}
@@ -29,16 +28,14 @@ accéder n'importe quelle position de l’espace.
 Le design de l'architecture a permis de définir les unités de traitement et la communication entre elles. La définition des unités de traitement suit le découpage du pipeline de reconnaissance avec des nœuds dédiés pour la segmentation, l'extraction de features, la classification, mais également le contrôle du robot.
 
 L'interfaçage matériel-logiciel a été réalisé sur l'environnement ROS - Robot Operating System. En plus d'outils d'affichage, ROS rassemble des librairies d'acquisition d'images RGB-D, OpenNi 2 et Freenect, ainsi qu'une librairie de traitement de nuage de points, PCL.
-De plus, sa structure en nœuds a permis une implémentation modulaire et directe du système décrit \celine{au chapitre \ref{}}, ainsi que de gérer la communication entre l'ordinateur portable et le processeur embarqué sur le robot.
-
-L'image \celine{ \ref{}} présente l'architecture ainsi que le flux d'information à travers des nœuds.\celine{ Mets plutôt l'image en annexe, ca gagnera de la place}
+De plus, sa structure en nœuds a permis une implémentation modulaire et directe du système, ainsi que de gérer la communication entre l'ordinateur portable et le processeur embarqué sur le robot. La structure complète de l'architecture peut être retrouvé dans les annexes \ref{}.
 
 \section{Setup expérimental}
-Pour évaluer les capacités de reconnaissance du robot, vingt objets de tailles et formes diverses ont été choisis. Ils s'agit d'objets typiques qui peuvent être faciliment retrouvés dans un laboratoire ou un bureau. Une liste complète des objets figure en annexe \celine{\ref{}}. Ensuite, nous avons effectué un tour complet de l'objet avec le robot en sauvegardant les nuage de point et en extrayant les features VFH pour huit positions différentes écartées de 45 degrés. La position correspondent à l'angle zéro a été choisie de manière aléatoire en alignant un des axes de l'objet avec celui du capteur. \celine{Regarde ma remarque à la figure \ref{fig:setup_expe}}
+Pour évaluer les capacités de reconnaissance du robot, vingt objets de tailles et formes diverses ont été choisis. Ils s'agit d'objets typiques qui peuvent être facilement retrouvés dans un laboratoire ou un bureau. Ensuite, nous avons effectué un tour complet de l'objet avec le robot en sauvegardant les nuage de point et en extrayant les features VFH pour huit positions différentes écartées de 45 degrés à $1.5 m$ de distance. La position correspondent à l'angle zéro a été choisie de manière aléatoire en alignant un des axes de l'objet avec celui du capteur. L'image \ref{fig:setup_expe} des vues d'un objet exemplifie la composition de la base de données. Une liste complète des objets figure en annexe \ref{fig:dataset}.
 
 \begin{figure}[H]
 	\subfloat{\includegraphics[width=\textwidth]{chair_db.jpg}}		
-	\caption{\celine{Pense à toujours mettre une légende à tes figures, et à donner sa référence dans le texte}}
+	\caption{Les huit point de vues de l'objet commençant par la position zéro et en tournant le robot en sens horaire}
 	\label{fig:setup_expe}
 \end{figure}
 
@@ -60,9 +57,9 @@ cela correspond à avoir une base
 On utilise ensuite trois ratios différentes pour exprimer la reconnaissance d'objets, la reconnaissance de vue et la suivi des reconnaissances par la chaîne de Markov cachée.
 Finalement,  est affichée
 
-\begin{figure}[H]
-	\subfloat{\includegraphics[width=\textwidth]{hmm_mov.png}}		
-\end{figure}
+%\begin{figure}[H]
+%	\subfloat{\includegraphics[width=\textwidth]{hmm_mov.png}}		
+%\end{figure}
 
 
 {\color{green}
@@ -73,11 +70,17 @@ Dans le premier tableaux on retrouve le résultats de la reconnaissance donné p
 
 \subsection{Suivi et reconnaissance multi-cibles}
 
-%\begin{figure}[H]
-%	\subfloat{\includegraphics[width=\textwidth]{map.png}}		
-%\end{figure}
+Le deuxième experiement correspond à placer des objets existant appris auparavant dans une pièce et conduire le robot faisant en sort qu'il les regardait de plusieurs points de vues différents. La carte finale donnée par l'algorithme, \ref{fig:multi_map}, 
+
+\begin{figure}[H]
+	\includegraphics[width=\textwidth]{map.png}
+	\caption{...}	
+	\label{fig:multi_map}
+\end{figure}
 
 \section{Problèmes rencontrés}
+
+\subsubsection{Synchronisation}
 
 \subsubsection{Problèmes de déplacement}
 

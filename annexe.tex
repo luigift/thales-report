@@ -1,8 +1,8 @@
-\chapter{Annexe I}
+\chapter{Matériels}
 
-\section{Matériels}
+\section{}
 
-En ce que concerne les aspects matériels, le robot bimoteur Wifibot v2, qui transporte un ordinateur embarqué, sera utilisé comme plateforme mobile. L'acquisition des données est faite par une camera RGB-D portée par une tourelle qui permet son orientation indépendamment du positionnement du robot. Par rapport au choix logiciel, l'environnement robotique ROS a été adopté pout avoir les bibliothèques pour gérer les nuages de points, Freenect, OpenNi2 et PCL - Point Cloud Library, et d'autres nombreux outils de contrôle du robot et sauvegarde d'informations.
+En ce que concerne les aspects matériels, le robot bimoteur Wifibot v2, qui transporte un ordinateur embarqué, sera utilisé comme plateforme mobile. L'acquisition des données est faite par une camera RGB-D Asus Xtion Pro Live portée par une tourelle qui permet son orientation indépendamment du positionnement du robot. Par rapport au choix logiciel, l'environnement robotique ROS a été adopté pout avoir les bibliothèques pour gérer les nuages de points, Freenect, OpenNi2 et PCL - Point Cloud Library, et d'autres nombreux outils de contrôle du robot et sauvegarde d'informations.
 
 \subsection{ Plateforme mobile } 
 \noindent
@@ -78,14 +78,13 @@ Version ROS : ROS Indigo \\
 
 
 
-\section{Base de données }
+\chapter{Base de données }
 
 \begin{figure}[H]
-  \subfloat{\includegraphics[width=\textwidth]{box_seq.png}}
-\end{figure}
-
-\begin{figure}[H]
-  \subfloat{\includegraphics[width=\textwidth]{chair_db.jpg}}
+	\includegraphics[width=\textwidth]{box_seq.png}
+	\includegraphics[width=\textwidth]{chair_db.jpg}
+	\label{fig:dataset}
+	\caption{Composition complète de la base de données.}
 \end{figure}
 
 \begin{figure}[H]
@@ -291,21 +290,6 @@ d'information sur les descripteur et ses implementations sur la
 librarie PCL peuvent être retrouvés sur le site
 internet \url{http://pointclouds.org}.
 
-Les images sont sauvegardées à l'aide de la librarie OpenCv dans le format 8\_U et .png (Portable Network Graphics).
-
-Les nauges de points sont sauvegardées dans le format .pcd (Point Cloud Data).
-
-Pour sauvegarder les information *provenientes* de la segmentation, les [it]topics de sorti sont souscrit avec rosbag pendent le deplacement du robot. Les messages sauvegardes sont le suivants :
-
-\begin{itemize}
-\item v\_objects\_clouds : Vector de nuages de points obtenues pour chaque objet 
-
-\item v\_objects\_image\_and\_mask : Sousimages et mask de chaque objet
-
-\item v\_object\_
-
-\end{itemize}
-
 \subsection{Fusion de données}
 
 L'estimation de l’odométrie diverge au long du temps dû à
@@ -319,13 +303,13 @@ que l'odométrie doive être
 
 \section{Planning de Travail}
 \begin{itemize}
-\item[\checkmark] Mise en place de l'architecture et des protocoles de communication entre composants physiques.
-\item[\checkmark] Étude bibliographique initiale pour situer le travail par rapport à l'existant.
-\item[\checkmark] Implémentation de l'asservissement d'une caméra PTZ par rapport au retour d'un algorithme de tracking.
-\item[\checkmark] Aperçu de certaines limitations de la caméra PTZ qui a été remplacée par une caméra RGB-D.
-\item[\checkmark] Utilisation d'un algorithme de segmentation d'objets possibles dans la scène.
-\item[\checkmark] Asservissement en boucle ouvert du robot pour la création de la base de données.
-\item[\checkmark] Premiers tests pour l'acquisition de la base des données.
+\item Mise en place de l'architecture et des protocoles de communication entre composants physiques.
+\item Étude bibliographique initiale pour situer le travail par rapport à l'existant.
+\item Implémentation de l'asservissement d'une caméra PTZ par rapport au retour d'un algorithme de tracking.
+\item Aperçu de certaines limitations de la caméra PTZ qui a été remplacée par une caméra RGB-D.
+\item Utilisation d'un algorithme de segmentation d'objets possibles dans la scène.
+\item Asservissement en boucle ouvert du robot pour la création de la base de données.
+\item Premiers tests pour l'acquisition de la base des données.
 \item Résolution des problèmes trouvés lors des premiers tests pour la création de la base de données.
 \item Validation de la base de données. Représentativité et reproduction.
 \item Étude approfondie de l’état de l'art des modèles et méthodes qui puissent être utiles pour notre problème.
