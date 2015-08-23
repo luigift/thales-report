@@ -88,6 +88,11 @@ construit d'après la comparaison croisée entre les éléments de la base,
 que pour l'ordre de grandeur de la base de données envisagé, est
 presque instantané. Distance plus naturel...
 
+\begin{figure}[H]
+	\includegraphics[width=\textwidth]{mono_recon.png}
+	\caption{\textbf{reconnaissance mono-vue} - Le résultat de la classification sur les objets segmentés où une écran et un ventilateur étaient reconnus. En rouge le plan du sol et en blanc les points à plus de 3 mètre considérés comme plus bruités. Un remarque pour les ombres infra-rouges qui occultent les objets}   
+\end{figure}
+
 L'API de la librairie FLANN sur PCL permet l'utilisation directe du classificateur
 K - plus proches voisins. L'implémentation permets l'utilisation de plusieurs
 définitions de distance entre histogrammes. La définition par défaut, Chi-squared,
@@ -256,6 +261,24 @@ et une personne assise sur une chaise ou encore un personne
 commence à marcher \footnote{Le fait de se mettre en mouvement
   altère les formes d'une personne, ce qui possibilite sa détection
   comme un nouveau objet.}.
+  
+transition
+
+La variation angulaire entre deux positions du robot est donnée par la relation suivante :
+\begin{equation*}
+\begin{array}{rcl}
+  \vec{d}_0 &=& p_0 - p_{obj}\\
+  \vec{d}_1 &=& p_1 - p_{obj} \\
+   \delta_{angle} &=& atan(\vec{d}_1) - atan(\vec{d}_0)
+\end{array}
+\end{equation*}
+Ce $\delta_{angle}$ est utilisé pour calculer la transition entre états possibles.
+
+%	mod\(mod\(a,2pi\) + 2pi, 2pi\)
+%	angle_wrap\(angle_s1 - angle_s2\) < delta_angle * densité de vue de l'objet = 1
+%	0.1 else
+%emission
+%	\sum_i\(scores\) - scores / \sum_j \sum_k(scores) - scores\)
 
 \subsection{Algorithme de Viterbi}
 

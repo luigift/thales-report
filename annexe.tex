@@ -77,14 +77,10 @@ Version ROS : ROS Indigo \\
 
 \chapter{Logiciels}
 
-Le design de l'architecture a permis de définir les unités de traitement et la communication entre elles. La définition des unités de traitement suit le découpage du pipeline de reconnaissance avec des nœuds dédiés pour la segmentation, l'extraction de features, la classification, mais également le contrôle du robot.
-
-L'interfaçage matériel-logiciel a été réalisé sur l'environnement ROS - Robot Operating System. En plus d'outils d'affichage, ROS rassemble des librairies d'acquisition d'images RGB-D, OpenNi 2 et Freenect, ainsi qu'une librairie de traitement de nuage de points, PCL.
-
-De plus, sa structure en nœuds a permis une implémentation modulaire et directe du système, ainsi que de gérer la communication entre l'ordinateur portable et le processeur embarqué sur le robot. La structure complète de l'architecture peut être retrouvé dans les annexes \ref{}.
+Le design de l'architecture a permis de définir les unités de traitement et la communication entre elles. La définition des unités de traitement suit le découpage du pipeline de reconnaissance avec des nœuds dédiés pour la segmentation, l'extraction de features, la classification, mais également le contrôle du robot. L'interfaçage matériel-logiciel a été réalisé sur l'environnement ROS - Robot Operating System. En plus d'outils d'affichage, ROS rassemble des librairies d'acquisition d'images RGB-D, OpenNi 2 et Freenect, ainsi qu'une librairie de traitement de nuage de points, PCL. De plus, sa structure en nœuds a permis une implémentation modulaire et directe du système, ainsi que de gérer la communication entre l'ordinateur portable et le processeur embarqué sur le robot. La structure complète de l'architecture peut être retrouvé dans les annexes.
 
 \subsection{Restrictions logiciels}
-L' ordinateur embarqué a un puissance de calcul reduit ce que ne permet pas que le node d'acquisition \(openni2\_launch\) tourne correctment. La solution pour l'instant c'était de connecter le capteur Asus sur l'ordinateur portable HP.
+L' ordinateur embarqué a un puissance de calcul réduit ce que ne permet pas que le nodelet d'acquisition OpenNi2 tourne correctement. La solution pour l'instant c'était de connecter le capteur Asus sur l'ordinateur portable HP.
 
 \chapter{Base de données }
 \label{annexe:dataset}

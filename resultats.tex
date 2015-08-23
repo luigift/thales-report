@@ -32,22 +32,22 @@ La première ligne correspond à la séquence d'images vues par le robot à chaq
 %	\subfloat{\includegraphics[width=\textwidth]{hmm_mov.png}}		
 %\end{figure}
 
-
-{\color{green}
 Dans le premier tableaux on retrouve le résultats de la reconnaissance donné par la comparaison des histogrammes provenant du *plus proche voisin*. Ce résultat estime la capacité de distinguer deux objets quelconques, en autre mots, cette capacité viens de la représentativité des descripteurs utilisés et l'efficacité de la mesure de similarité entre histogrammes.
-}
-
-%\subsection{Robustesse à l'occlusion}
 
 \subsection{Suivi et reconnaissance multi-cibles}
 
-Le deuxième expérimentent correspond à placer des objets appris auparavant dans une pièce et conduire le robot faisant en sort qu'il les regardait de plusieurs points de vues différents. 
-Ce scénario est beaucoup plus complexe que celui d'avant. D'abord les objets occultent uns aux autres résultant en mauvaises segmentations. Ensuite, la suivi d'objets est plus complexe
-La carte finale donnée par l'algorithme, \ref{fig:multi_map}, 
+Le deuxième expérimentent correspond à placer des objets appris auparavant de manière aléatoire dans une pièce de 5 mètres carrés et conduire le robot faisant en sort qu'il les regardait de plusieurs points de vues différents. Les objets sont espacés d'environ 1.5 mètres pour que le robot puisse se promener entre eux. Ce scénario est beaucoup plus complexe que celui d'avant. D'abord les objets occultent uns aux autres résultant en mauvaises segmentations et, ensuite, la suivi d'objets est plus complexe car des objets proches peuvent être confondus.
+Le résultat finale est une carte, telle comme celle de la figure \ref{fig:multi_map}, avec les objets détectés et leur reconnaissance.
+
+\begin{figure}[H]
+	\includegraphics[width=\textwidth]{multi_recon.png}
+	\caption{}	
+	\label{fig:multi_map}
+\end{figure}
 
 \begin{figure}[H]
 	\includegraphics[width=\textwidth]{map.png}
-	\caption{...}	
+	\caption{Les boules rouges correspodent à les observations des postions des objets dans la cène donné au alfotithme multi-kalman qui suivi chaque object avec un trackes dédié represetné par des croix d couleurs diffe=érents. En noire la trajectoire du robot bien comme sa dernière position.}	
 	\label{fig:multi_map}
 \end{figure}
 
