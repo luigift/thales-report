@@ -77,140 +77,79 @@ Version ROS : ROS Indigo \\
 
 \chapter{Logiciels}
 
-Le design de l'architecture a permis de définir les unités de traitement et la communication entre elles. La définition des unités de traitement suit le découpage du pipeline de reconnaissance avec des nœuds dédiés pour la segmentation, l'extraction de features, la classification, mais également le contrôle du robot. L'interfaçage matériel-logiciel a été réalisé sur l'environnement ROS - Robot Operating System. En plus d'outils d'affichage, ROS rassemble des librairies d'acquisition d'images RGB-D, OpenNi 2 et Freenect, ainsi qu'une librairie de traitement de nuage de points, PCL. De plus, sa structure en nœuds a permis une implémentation modulaire et directe du système, ainsi que de gérer la communication entre l'ordinateur portable et le processeur embarqué sur le robot. La structure complète de l'architecture peut être retrouvé dans les annexes.
+Le design de l'architecture a permis de définir les unités de traitement et la communication entre elles. La définition des unités de traitement suit le découpage du pipeline de reconnaissance avec des nœuds dédiés pour la segmentation, l'extraction de features, la classification, mais également le contrôle du robot.
 
-\subsection{Restrictions logiciels}
-L' ordinateur embarqué a un puissance de calcul réduit ce que ne permet pas que le nodelet d'acquisition OpenNi2 tourne correctement. La solution pour l'instant c'était de connecter le capteur Asus sur l'ordinateur portable HP.
+L'interfaçage matériel-logiciel a été réalisé sur l'environnement ROS - Robot Operating System. En plus d'outils d'affichage, ROS rassemble des librairies d'acquisition d'images RGB-D, OpenNi 2 et Freenect, ainsi qu'une librairie de traitement de nuage de points, PCL.
 
-\chapter{Base de données }
-\label{annexe:dataset}
-\begin{figure}[H]
-	\includegraphics[width=\textwidth]{box_seq.png}
-	\includegraphics[width=\textwidth]{chair_db.jpg}
-	\label{fig:dataset}
-	\caption{Composition complète de la base de données.}
-\end{figure}
+De plus, sa structure en nœuds a permis une implémentation modulaire et directe du système, ainsi que de gérer la communication entre l'ordinateur portable et le processeur embarqué sur le robot. \\
 
-\begin{figure}[H]
-  \subfloat{\includegraphics[width=\textwidth]{chair_seq.png}}
-\end{figure}
+\url{https://github.com/PointCloudLibrary/pcl/wiki/} \\
 
-\begin{figure}[H]
-  \subfloat{\includegraphics[width=\textwidth]{chair4w.png}}			
-\end{figure}
+\url{http://pointclouds.org/documentation/tutorials/} \\
 
+\chapter{Problèmes rencontrés}
 
+\section{Synchronisation}
 
+La synchronisation entre tous les modules du robot s'est montrée d'extrême importance pour le bon fonctionnement de du système. Retards trop importants résultent en mauvaises transformations de repère, par conséquent, le système de suivi multi-cible n'arrive pas à bien distinguer des objets trop proches. 
 
-\section{ Segmentation }
-\label{annexe:segmentation}
+\section{Problèmes de déplacement}
 
- \celine{Ce n'est peut être pas la peine de détailler trop en annexes. Tous les algos sont classiques, il suffit de mettre une référence ou un lien vers l'implémentaiton utilisée}
+La roulette du support originalement installée avait deux axes de
+rotation. Pourtant, quelques mouvements de rotation du robot alignent
+la roulette orthogonalement au sens du prochain mouvement ce qui crée
+un mouvement parasite qui perturbe la trajectoire voulue. Nous avons tenté sans succès d'installer une bille omnidirectionnelle à roulement, qui se
+bloquait sur la moquette avec le poids du robot. Une deuxième solution serait d'interdirecertains mouvements du robot pour éviter cette déviation.
+
+\section{Restrictions logicielles}
+L' ordinateur embarqué a un puissance de calcul réduite, ce qui ne permet pas que le noeud d'acquisition \(openni2\_launch\) tourne correctment. La solution pour l'instant était de connecter le capteur Asus sur l'ordinateur portable HP.
+
+%\chapter{Evaluation}
+%\section{Suivi et reconnaissance multi-cibles}
+%\section{Base de données}
+%\label{annexe:dataset}
+%\begin{figure}[H]
+%	\includegraphics[width=\textwidth]{box_seq.png}
+%	\includegraphics[width=\textwidth]{chair_db.jpg}
+%	\label{fig:dataset}
+%	\caption{Composition complète de la base de données.}
+%\end{figure}
+%
+%\begin{figure}[H]
+ % \subfloat{\includegraphics[width=\textwidth]{chair_seq.png}}
+%\end{figure}
+
+%\begin{figure}[H]
+%  \subfloat{\includegraphics[width=\textwidth]{chair4w.png}}			
+%\end{figure}
  
-\subsection{ Paramètres }
-
+\chapter{Reconnaissance Mono-vue} 
+\section{Paramètres Segmentation}
+\label{annexe:segmentation}
+Le méthode de segmentation exige une définition a priori des paramètres pour le bon fonctionnement du système.
 \begin{itemize}
-\item Distance maximale au capteur : 3 m
-\item Distance pour qu'un point soit considéré comme appartenant au plan : 5 cm
 \item Taille du \textit{grid} de voxalization : 2 cm
+\item Distance maximale au capteur : 3 m
 \item Rayon d'estimation de la normale : 2 cm
 \item Aire de \textit{smoothing} de la normale : 10 $cm^2$
-\item Distance minimal du plan du sol pour qu'il soit considére comme partie de l'objet : 3 cm
+\item Distance pour qu'un point soit considéré comme appartenant au plan : 5 cm
+\item Distance minimale du plan du sol pour qu'il soit considére comme partie de l'objet : 3 cm
 \end{itemize}
 
-La plus parts de valeurs étaient choisis telle comme ils était proposé dans la librarie PCL. Quelque autre ont été modifiés pour atteint charactéristique attendue.
-
-\subsection { Floor Detection } 
-
-The major concern goal of the algorithm is to well estimate the floor plan coordinates. From that, other plans like walls could be inferred, supposing they have a fixed geometrical relation. The RANSAC algorithm provide a reasonable solution to the problem and it is already implemented in the PCL library.
-
-Some parameters need to be set, such as deviation from the plan mathematical model.
-
-The parameters used for the robot are described at the annex section.
-
-
-\subsection{Estimation de la normale}
-
-Pour constituer les informations géométriques l'estimation de la normale du point est d'extrême importance. 
-
-Sont calcul est fait de la manière suivant :
-1. Un nombre de voisins est choisi 
-2. Ces point *servem* à trouver des paramètres de l'équation du plan tangent et, par consequent, la normale correspondent.
-
-Le méthode adopté pour la bibliothéque PCL correspond à prendre un certain nombre de plus proches voisins définis par un seiul. Un petit seil rendre le calcul faux et un grand prend en compte points distants que peuvent ne pas faire partie du plan estimé.
-
-\url{http://www.pointclouds.org/documentation/tutorials/vfh_recognition.php#vfh-recognition} \\
-
-\url{http://pointclouds.org/documentation/tutorials/fpfh_estimation.php} \\
-
-\url{https://github.com/PointCloudLibrary/pcl/wiki/Overview-and-Comparison-of-Features} \\
-
-\subsection { RANSAC } 
-
-The RANSAC algorithm is a learning method to estimate a given model parameters. Contrary to other estimation algorithms, which considers the whole data represenetative to model estimation, RANSAC suppose the existance of \textbf{inliers or consensus} and \textbf{outliers}  and uses a voting scheme to select between reliable data, that must follow two assumptions: 
-
-\begin{itemize}
-\item Noisy data will not vote consistenly for a single model - (few outliners) 
-\item Enough good features voting for the same model - (few missing data)
-\end{itemize}
-
-\subsubsection{The RANSAC algorithm}
-
-The iterative algorithm is composed of two different stages : 
-\begin {itemize}
-\item Sample minimal data from dataset requerid to first estimate model parameters.
-\item Given a threshold error, it selects data points that are consistent to the model created in the first step.
-\end {itemize}
-
-\begin{itemize}
-\item Random hypoythetical inliers subset
-\item Find model parameters
-\item All data tested according to a loss function that determine the \textit{consensus}
-\item Finishes when a sufficient number of point belongs to the \textit{consensus}
-\end{itemize}
-
-{ \large{\color{blue} If the variables are linear and normally distributed the Bayes filter becomes equal to the Kalman filter.}}
-
-%% \caption{My algorithm}\label{euclid}
-%% \begin{algorithmic}[1]
-%%   \Procedure{RANSAC}{}
-%%   \State $\textit{stringlen} \gets \text{length of }\textit{string}$
-%%   \State $i \gets \textit{patlen}$
-%%   \BState \emph{top}:
-%%   \If {$i > \textit{stringlen}$} \Return false
-%%   \EndIf
-%%   \State $j \gets \textit{patlen}$
-%%   \BState \emph{loop}:
-%%   \If {$\textit{string}(i) = \textit{path}(j)$}
-%%   \State $j \gets j-1$.
-%%   \State $i \gets i-1$.
-%%   \State \textbf{goto} \emph{loop}.
-%%   \State \textbf{close};
-%%   \EndIf
-%%   \State $i \gets i+\max(\textit{delta}_1(\textit{string}(i)),\textit{delta}_2(j))$.
-%%   \State \textbf{goto} \emph{top}.
-%%   \EndProcedure
-%% \end{algorithmic}
-%% \end{algorithm}
+La pluparts des valeurs ont été choisies telle qu'elles étaient proposées dans la librarie PCL. Certaines ont été modifiées pour atteindre les caractéristiques attendues.
 
 \section {Descripteurs}
 \label{annexe:descripteur}
 \subsection{Point Feature Histogram - PFH}
 
-Le PFH incorporé les notions de courbure des objets par le calcul de
+Le PFH utilise les notions de courbure des objets par le calcul de
 l'écart entre les normales de points. Ce descripteur peut être calculé
 localement ou globalement, en changeant l'importance du rayon de
-comparaison. Il est la base d'une grande famille de descripteurs, desquels
-quelques-uns seront expliqués dans la suite.
+comparaison. Il est la base d'une grande famille de descripteurs, dont certains seront expliqués par la suite.
 
-En revenant à son calcul, l'histogramme est évalué à partir des pairs
+En revenant à son calcul, l'histogramme est évalué à partir des paires
 de points à l'intérieur d’un ensemble prédéfini. D'abord, un repère
-initial, illustré dans l'image *9* est établis sachant le vecteur distance normalisé et les deux
-normales. Ensuite, trois angles, qui correspondent à la transformation
-angulaire entre les deux normales, et la distance euclidienne entre le
-deux points sont estimés. Ces quatres valeurs seront considérés comme
-features pour réduire l’espace initial de douze dimensions - coordonnées
-et normales des dois point - à un espace de quatre dimension.
+initial, illustré dans l'image \ref{fig:pfh} est établi sachant le vecteur distance normalisé et les normales aux deux points. Ensuite, trois angles, qui correspondent à la transformation angulaire entre les deux normales, et la distance euclidienne entre le deux points sont estimés. Ces quatres valeurs seront considérées comme features pour réduire l’espace initial à douze dimensions - coordonnées et normales des deux point - à un espace à quatre dimensions.
 
 
 \begin{equation*}
@@ -223,66 +162,68 @@ et normales des dois point - à un espace de quatre dimension.
   \centering
   \includegraphics[width=0.6\textwidth]{pfh_frame.png}
   % \caption{{\color{blue} Image d'explication du repère}.}
+	\label{fig:pfh}
 \end{figure}
 
 
-Puis, les normales sont traduites en features angulaires décrit par les équations :
-\begin{equation*}
+Puis, les normales sont transformées en features angulaires décrit par les équations \ref{eq:pfh}
+\begin{equation}
   \alpha = {\mathsf v} \cdot \boldsymbol{n}_t  \qquad
   \phi   = {\mathsf u} \cdot \frac{(\boldsymbol{p}_t - \boldsymbol{p}_s)}{d} \qquad
   \theta = \arctan ({\mathsf w} \cdot \boldsymbol{n}_t, {\mathsf u} \cdot \boldsymbol{n}_t) \qquad
   d={\|\boldsymbol{p}_t-\boldsymbol{p}_s\|}_2 
-\end{equation*}
+	\label{eq:pfh}
+\end{equation}
 
-La prochaine étape c'est de calculer l'histogramme en-soi. Un
+La prochaine étape est de calculer l'histogramme lui-même. Une
 subdivision du range de valeur de chaque feature angulaire, 
 normalisés pour rester dans le même intervalle trigonométrique,
-est faite et chaque cellule du histogramme est incrémenté dès
+est faite et chaque cellule de l'histogramme est incrémenté dès
 qu'une feature tombe dans cet intervalle. 
 
-Le PFH se présente robuste à des différents échelles de densité de points et de bruit, au même temps que invariant à les transformations affines. Des inconvénients vient de la dépendance de la qualité de l'estimation de la normale\footnote{ Une discussion des méthodes présentés sur PCL est mis dans les annexes.}.
+Le PFH est robuste à des différents échelles de densité de points et de bruit, mais aussi invariant à des transformations affines. Ses inconvénients sont liés à la dépendance de la qualité de l'estimation de la normale.
 
 \subsection{Fast Point Feature Histogram - FPFH}
 
-L'avènement du FPFH viens de la motivation de réduire la complexité de
-calcule du descripteur PFH, $ O(nk^2) $, pour un nuage avec $n$ points 
-où chaqu'un des points à $k$ voisins . Pour cela, l'algorithme au
+L'utilisation du FPFH vient de la volonté de réduire la complexité du
+calcul du descripteur PFH, $ O(nk^2) $, pour un nuage avec $n$ points 
+où chacun des points a $k$ voisins . Pour cela, l'algorithme, au
 lieu de calculer la relation bidirectionnelle entre tous deux points 
-de l’ensemble définis, les features de chaque point sont pondérées 
+de l’ensemble définis, pondère les features de chaque point  
 par les voisins à l'intérieur d'un rayon de recherche, selon la formule
-au-dessous :
+\ref{eq:fpfh}
 
-$$FPFH(\boldsymbol{p}_q) = SPFH(\boldsymbol{p}_q) + {1 \over k}
-\sum_{i=1}^k {{1 \over \omega_k} \cdot SPFH(\boldsymbol{p}_k)}$$
+\begin{equation}FPFH(\boldsymbol{p}_q) = SPFH(\boldsymbol{p}_q) + {1 \over k}
+\sum_{i=1}^k {{1 \over \omega_k} \cdot SPFH(\boldsymbol{p}_k)}
+\label{eq:fpfh}
+\end{equation}
 
-Cette procédure résulte dans une complexité O(n*k). Le gain en vitesse est considérable,
-ce qui permet des applications en temps réelles. De plus, pour éviter une perte d'information considérable, le FPFH
-incorpore quelques point externes au rayon de voisinage, mais que sont compris dans un rayon de taille.
+Cette procédure a maintenant une complexité O(n*k). Le gain en vitesse est donc considérable,
+ce qui lui permet d'être appliquée pour des utilisations en temps réel. De plus, pour éviter une perte d'information considérable, le FPFH
+incorpore quelques point externes au rayon de voisinage, mais qui sont compris dans un rayon de taille donné.
 
 \subsection{Viewpoint Feature Histogram- VFH}
 
-Le VFH, différemment du rapport entre PFH et FPFH, c'est une extension
+Le VFH, contrairement à PFH et FPFH, est une extension
 du deuxième descripteur où la variance de point de vue est prise en
-compte. De forme succincte, des angles entre la normale de chaque point
-et la direction principale d'observation est concaténée à l’histogramme
+compte. Succintement, des angles entre la normale de chaque point
+et la direction principale d'observation sont concaténés à l’histogramme
 provenant du SPFH (Simplified PFH). En gardant le repère utilisé dans
-les descripteurs d'avant, le vecteur direction principale est défini
+les descripteurs précédents, le vecteur de direction principale est défini
 par la différence entre l'origine du capteur jusqu'au centroide du
-\textit{cluster}. Ce résultat permet, au même temps, de reconnaitre
-l'objet et son orientation spatiale, et, par conséquent, c'est le
-feature utilisé dans les premières expériences.
+nuage de point considéré. Ce type de feature permet de reconnaitre à la fois
+l'objet et son orientation spatiale. Par conséquent, c'est la
+feature utilisée dans notre système.
 
 \subsection{Clustered Viewpoint Feature Histogram - CVFH} CVFH -
-Clustered VFH - est une feature semi-global capable de gérer
-occlusions partiels, mauvaise segmentation et bruit par la
+Clustered VFH - est une feature semi-globale capable de gérer
+des occlusions partielles, des erreurs de segmentation et du bruit. Ceci est possible grâce à la
 décomposition du \textit{cluster}, segmenté comme objet, en sous-clusters de
 structure spatiale homogène. Le descripteur est obtenu d'après un premier
-filtrage de zones de haute gradient de courbure, considérés comme zones de
-transitions entre surfaces, et, puis, et l'estimation de l'histogramme VFH pour chaque surface 
-donnée par l'algorithme \textit{point growing}. Ainsi, pour un seul objet, le CVFH ne
-généré pas un seul histogramme VFH, mais un vecteur des histogrammes.
-En revanche, le découpement exige un soin un plus avec la résolution des surfaces pour
-quelles restent représentatives de l'objet.
+filtrage de zones de fort gradient de courbure, considérés comme zones de
+transitions entre surfaces. Puis, l'estimation de l'histogramme VFH pour chaque surface 
+donnée par l'algorithme \textit{point growing}. Ainsi, pour un seul objet, le CVFH ne génère pas un seul histogramme VFH, mais un vecteur d'histogrammes.
+En revanche, le découpage exige un soin plus important avec la résolution des surfaces afin quelles restent représentatives de l'objet.
 
 \begin{figure}[H]
   \subfloat[PFH ]{\includegraphics[width=4.5cm]{pfh_diagram.png}}
@@ -292,20 +233,28 @@ quelles restent représentatives de l'objet.
 
 
 \textit{L'Universidad de León } a fait un compte rendu des
-\textit{features} implementés sur PCL dans le lien *[8]*. Plus
+\textit{features} implémentés sur PCL dans le lien *[8]*. Plus
 d'information sur les descripteur et ses implementations sur la
 librarie PCL peuvent être retrouvés sur le site
-internet \url{http://pointclouds.org}.
+internet \url{http://pointclouds.org}. \celine{n'oublie pas de mettre un lien}
+
+\subsection{Estimation de la normale}
+
+Pour constituer les informations géométriques l'estimation de la normale du point est d'extrême importance. Sont calcul est fait de la manière suivant :\\
+1. Un nombre de voisins est choisi \\
+2. Ces point servent à trouver des paramètres de l'équation du plan tangent et, par consequent, la normale correspondent.
+
+Le méthode adopté pour la bibliothéque PCL correspond à prendre un certain nombre de plus proches voisins définis par un seiul. Un petit seil rendre le calcul faux et un grand prend en compte points distants que peuvent ne pas faire partie du plan estimé.\\
 
 \subsection{Déplacement du robot}
 
-Le robot est équipé de trois roues, desquelles les symétriques
-arrières sont motorisés et responsables pour le déplacement
-motrice. Au même temps que la dernière sert à donner un support pour
-la partie derrière du châssis. Les moteurs sont contrôlés à
-partir de commandes sériel, préétablis pour le fabricant, qui
+Le robot est équipé de trois roues, dont les deux roues symétriques
+arrières sont motorisés et responsables du déplacement
+moteur. D'autre part, la dernière sert à donner un support pour
+la partie arrière du châssis. Les moteurs sont contrôlés à
+partir de commandes sériel, préétablis par le fabricant, qui
 définissent la vitesse de roulement. La combinaison des rotations
-des deux roues motorises dans les deux sens possibles permets au
+des deux roues motorisées dans les deux sens possibles permets au
 robot d'avoir les comportements suivants:
 
 \begin{figure}[H]
@@ -319,34 +268,4 @@ robot d'avoir les comportements suivants:
 \item Rotation : deux roues à la même vitesse, mais avec de sens différents.
 \end{itemize}
 
-Finalement, la combinaison de ces mouvements permet au robot de
-accéder n'importe quelle position de l’espace.
-
-\subsection{Fusion de données}
-
-L'estimation de l’odométrie diverge au long du temps dû à
-l'accumulation d'erreurs mesure. Cette divergence est encore plus
-considérable . Dans l'autre côté, l'utilisation du senseur RGB-D
-estime la distance au centroïde de chaque objet. Une correspondance
-entre les objets de deux observations consécutives nous donné une
-autre repère de positionnement. Un couplage des deux mesure, une
-provenant de l’encodeur moteur et l'autre du capteur infrarouge, fait
-que l'odométrie doive être
-
-\section{Planning de Travail}
-\begin{itemize}
-\item Mise en place de l'architecture et des protocoles de communication entre composants physiques.
-\item Étude bibliographique initiale pour situer le travail par rapport à l'existant.
-\item Implémentation de l'asservissement d'une caméra PTZ par rapport au retour d'un algorithme de tracking.
-\item Aperçu de certaines limitations de la caméra PTZ qui a été remplacée par une caméra RGB-D.
-\item Utilisation d'un algorithme de segmentation d'objets possibles dans la scène.
-\item Asservissement en boucle ouvert du robot pour la création de la base de données.
-\item Premiers tests pour l'acquisition de la base des données.
-\item Résolution des problèmes trouvés lors des premiers tests pour la création de la base de données.
-\item Validation de la base de données. Représentativité et reproduction.
-\item Étude approfondie de l’état de l'art des modèles et méthodes qui puissent être utiles pour notre problème.
-\item Mise en place de la solution et du modèle proposé.
-\item Premiers tests et ajustements nécessaires.
-\item Mise en œuvre de la solution complète.
-\item Validation finale.    
-\end{itemize}
+Finalement, la combinaison de ces mouvements permet au robot d'accéder à n'importe quelle position de l’espace.
